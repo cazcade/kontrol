@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.myjeeva.digitalocean:digitalocean-api-client:1.2-CAZCADE">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/myjeeva/digitalocean/digitalocean-api-client/1.2-CAZCADE/digitalocean-api-client-1.2-CAZCADE.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/myjeeva/digitalocean/digitalocean-api-client/1.2-CAZCADE/digitalocean-api-client-1.2-CAZCADE-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/myjeeva/digitalocean/digitalocean-api-client/1.2-CAZCADE/digitalocean-api-client-1.2-CAZCADE-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
