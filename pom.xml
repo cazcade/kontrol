@@ -6,7 +6,17 @@
 
     <groupId>com.cazcade</groupId>
     <artifactId>kontrol</artifactId>
+    <packaging>pom</packaging>
     <version>0.1-SNAPSHOT</version>
+    <modules>
+        <module>api</module>
+        <module>common</module>
+        <module>mock</module>
+        <module>doclient</module>
+        <module>digitalocean</module>
+        <module>sensors</module>
+        <module>examples</module>
+    </modules>
     <properties>
         <kotlin.version>0.6.1910</kotlin.version>
     </properties>
@@ -83,27 +93,17 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.5</version>
         </dependency>
-        <dependency>
-            <groupId>com.myjeeva.digitalocean</groupId>
-            <artifactId>digitalocean-api-client</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-jdk14</artifactId>
-                </exclusion>
-            </exclusions>
-            <version>1.2-CAZCADE</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.slf4j</groupId>-->
+            <!--<artifactId>slf4j-simple</artifactId>-->
+            <!--<version>1.7.5</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-        </dependency>
+
     </dependencies>
 
     <repositories>

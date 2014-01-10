@@ -22,7 +22,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="kontrol" />
+        <module name="api" />
+        <module name="common" />
+        <module name="digitalocean" />
+        <module name="doclient" />
+        <module name="examples" />
+        <module name="mock" />
+        <module name="sensors" />
       </profile>
     </annotationProcessing>
   </component>

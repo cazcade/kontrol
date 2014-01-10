@@ -25,7 +25,125 @@
     <option name="FILTER_BY_CURRENT_PROJECT" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c806a7ad-9094-4afb-b072-e526c70b2a8b" name="Default" comment="" />
+    <list default="true" id="c806a7ad-9094-4afb-b072-e526c70b2a8b" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/exception/AccessDeniedException.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/common/Action.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/Constants.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/DigitalOcean.kt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/impl/DigitalOceanClient.kt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/src/main/java/kontrol_examples/DigitalOceanKontrolr.kt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/Domain.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/DomainRecord.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/Droplet.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/DropletImage.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/DropletSize.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/org/apache/http/conn/ssl/HackedSSLSocketFactory.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/Region.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/exception/RequestUnsuccessfulException.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/exception/ResourceNotFoundException.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/Response.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/SshKey.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common/src/main/java/kontrol/impl/String_SSH.kt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/Utils.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/api/api.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common/common.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/digitalocean/digitalocean.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/doclient.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/examples.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mock/mock.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/api/pom.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common/pom.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/digitalocean/pom.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/pom.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/pom.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mock/pom.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sensors/pom.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sensors/sensors.iml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.name" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/deployment.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/kannotator.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_google_code_gson_gson_2_2_4.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_myjeeva_digitalocean_digitalocean_api_client_1_2_CAZCADE.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_codec_commons_codec_1_6.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_io_commons_io_2_4.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_1_1_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_servlet_javax_servlet_api_3_0_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_11.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_schmizz_sshj_0_9_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_httpcomponents_httpclient_4_2_5.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_httpcomponents_httpcore_4_2_4.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_bouncycastle_bcpkix_jdk15on_1_49.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_bouncycastle_bcprov_jdk15on_1_49.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_runtime_0_6_1910.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_0_6_1910.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_api_1_7_5.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/HttpUtil.java" afterPath="$PROJECT_DIR$/common/src/main/java/kontrol/HttpUtil.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Action.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Action.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Alerter.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Alerter.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Controller.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Controller.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/GroupAction.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/GroupAction.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/HasStateMachine.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/HasStateMachine.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Infrastructure.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Infrastructure.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Machine.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Machine.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/MachineAction.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/MachineAction.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/MachineGroup.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/MachineGroup.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/MachineGroupAction.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/MachineGroupAction.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/MachineGroupState.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/MachineGroupState.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/MachineState.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/MachineState.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Monitor.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Monitor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/MonitorRule.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/MonitorRule.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Policy.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Policy.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/StateMachine.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/StateMachine.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/StateMachineRules.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/StateMachineRules.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Strategy.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Strategy.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Topology.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Topology.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/Type.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/Type.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/sensor/LoadSensor.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/sensor/LoadSensor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/sensor/Sensor.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/sensor/Sensor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/sensor/SensorArray.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/sensor/SensorArray.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/api/sensor/SensorValue.kt" afterPath="$PROJECT_DIR$/api/src/main/java/kontrol/api/sensor/SensorValue.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/DefaultController.kt" afterPath="$PROJECT_DIR$/common/src/main/java/kontrol/impl/DefaultController.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/DefaultStateMachine.kt" afterPath="$PROJECT_DIR$/common/src/main/java/kontrol/impl/DefaultStateMachine.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/DefaultStateMachineRules.kt" afterPath="$PROJECT_DIR$/common/src/main/java/kontrol/impl/DefaultStateMachineRules.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/mock/MockDoubleSensor.kt" afterPath="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockDoubleSensor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/mock/MockGroupMonitor.kt" afterPath="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockGroupMonitor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/mock/MockInfrastructure.kt" afterPath="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockInfrastructure.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/mock/MockMachine.kt" afterPath="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockMachine.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/mock/MockMachineGroup.kt" afterPath="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockMachineGroup.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/mock/MockMachineMonitor.kt" afterPath="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockMachineMonitor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/mock/MockSequencedGroupMonitor.kt" afterPath="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockSequencedGroupMonitor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/mock/MockSequencedMonitor.kt" afterPath="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockSequencedMonitor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/mock/MockTopology.kt" afterPath="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockTopology.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanClientFactory.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanClientFactory.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanCloud.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanCloud.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanConfig.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanConfig.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanMachine.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachine.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanMachineGroup.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineGroup.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanMachineGroupMonitor.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineGroupMonitor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanMachineMonitor.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineMonitor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanTopology.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanTopology.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/DefaultSensorArray.kt" afterPath="$PROJECT_DIR$/common/src/main/java/kontrol/impl/DefaultSensorArray.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpLoadSensor.kt" afterPath="$PROJECT_DIR$/sensors/src/main/java/kontrol/impl/sensor/HttpLoadSensor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpStatusSensor.kt" afterPath="$PROJECT_DIR$/sensors/src/main/java/kontrol/impl/sensor/HttpStatusSensor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/SSHLoadSensor.kt" afterPath="$PROJECT_DIR$/sensors/src/main/java/kontrol/impl/sensor/SSHLoadSensor.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/test/java/TestConfig.kt" afterPath="$PROJECT_DIR$/mock/src/test/java/TestConfig.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/test/java/TestMockController.kt" afterPath="$PROJECT_DIR$/mock/src/test/java/TestMockController.kt" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/test/java/TestSensors.kt" afterPath="$PROJECT_DIR$/sensors/src/test/java/TestSensors.kt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/kontrol.iml" afterPath="$PROJECT_DIR$/kontrol.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
+    </list>
     <ignored path="kontrol.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -79,6 +197,23 @@
       </breakpoint>
     </breakpoint_any>
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <line_breakpoints>
+      <breakpoint url="file://$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/impl/DigitalOceanClient.kt" line="88" class="Class at DigitalOceanClient.kt:88" package="">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </line_breakpoints>
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -88,95 +223,133 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="pom.xml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="24" selection-start="451" selection-end="451" vertical-scroll-proportion="22.5" vertical-offset="690" max-vertical-offset="1965">
+            <state line="99" column="25" selection-start="3466" selection-end="3661" vertical-scroll-proportion="0.4605042" vertical-offset="1211" max-vertical-offset="1950">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestMockController.kt" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/java/TestMockController.kt">
+      <file leaf-file-name="SSHLoadSensor.kt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sensors/src/main/java/kontrol/impl/sensor/SSHLoadSensor.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="116" column="22" selection-start="5474" selection-end="5474" vertical-scroll-proportion="0.33230293" vertical-offset="1585" max-vertical-offset="2295">
+            <state line="45" column="27" selection-start="721" selection-end="1445" vertical-scroll-proportion="0.0" vertical-offset="131" max-vertical-offset="750">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="String_SSH.kt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common/src/main/java/kontrol/impl/String_SSH.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="14" column="19" selection-start="441" selection-end="441" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="660">
               <folding>
-                <element signature="e#99#783#0" expanded="true" />
+                <element signature="e#22#216#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestConfig.kt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/TestConfig.kt">
+      <file leaf-file-name="Channel.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/net/schmizz/sshj/0.9.0/sshj-0.9.0-sources.jar!/net/schmizz/sshj/connection/channel/Channel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="8" selection-start="8" selection-end="8" vertical-scroll-proportion="0.0" vertical-offset="2505" max-vertical-offset="3300">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HttpUtil.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/HttpUtil.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="0" selection-start="860" selection-end="860" vertical-scroll-proportion="0.0" vertical-offset="1530" max-vertical-offset="3135">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DigitalOceanMachineGroup.kt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanMachineGroup.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="1" column="0" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0" vertical-offset="1123" max-vertical-offset="1770">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HttpLoadSensor.kt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpLoadSensor.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="41" selection-start="690" selection-end="690" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="675">
+            <state line="142" column="9" selection-start="4718" selection-end="4718" vertical-scroll-proportion="0.0" vertical-offset="1311" max-vertical-offset="1950">
               <folding>
-                <element signature="e#29#167#0" expanded="true" />
+                <element signature="e#0#4794#0" expanded="false" />
+                <element signature="imports" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HttpStatusSensor.kt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpStatusSensor.kt">
+      <file leaf-file-name="Channel.class" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/net/schmizz/sshj/0.9.0/sshj-0.9.0.jar!/net/schmizz/sshj/connection/channel/Channel.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="12" selection-start="1114" selection-end="1114" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+            <state line="37" column="9" selection-start="959" selection-end="959" vertical-scroll-proportion="0.0" vertical-offset="216" max-vertical-offset="855">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DigitalOceanClientFactory.kt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanClientFactory.kt">
+      <file leaf-file-name="AbstractChannel.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/net/schmizz/sshj/0.9.0/sshj-0.9.0-sources.jar!/net/schmizz/sshj/connection/channel/AbstractChannel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1" column="0" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
+            <state line="279" column="16" selection-start="8242" selection-end="8242" vertical-scroll-proportion="0.0" vertical-offset="2944" max-vertical-offset="5715">
+              <folding>
+                <element signature="e#0#13971#0" expanded="false" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#3079#3107#0" expanded="false" />
+                <element signature="e#4876#4877#0" expanded="false" />
+                <element signature="e#4909#4910#0" expanded="false" />
+                <element signature="e#4949#4950#0" expanded="false" />
+                <element signature="e#4974#4975#0" expanded="false" />
+                <element signature="e#5031#5032#0" expanded="false" />
+                <element signature="e#5056#5057#0" expanded="false" />
+                <element signature="e#5305#5306#0" expanded="false" />
+                <element signature="e#5331#5332#0" expanded="false" />
+                <element signature="e#5378#5379#0" expanded="false" />
+                <element signature="e#5410#5411#0" expanded="false" />
+                <element signature="e#5647#5648#0" expanded="false" />
+                <element signature="e#5674#5675#0" expanded="false" />
+                <element signature="e#7542#7543#0" expanded="false" />
+                <element signature="e#7586#7587#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Machine.kt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/api/src/main/java/kontrol/api/Machine.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="14" column="8" selection-start="338" selection-end="338" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1095">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Controller.kt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/api/Controller.kt">
+      <file leaf-file-name="SSHClient.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/net/schmizz/sshj/0.9.0/sshj-0.9.0-sources.jar!/net/schmizz/sshj/SSHClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="98" selection-start="1632" selection-end="1632" vertical-scroll-proportion="0.0" vertical-offset="653" max-vertical-offset="1320">
-              <folding />
+            <state line="648" column="19" selection-start="27267" selection-end="27267" vertical-scroll-proportion="0.0" vertical-offset="8179" max-vertical-offset="9585">
+              <folding>
+                <element signature="e#0#29581#0" expanded="false" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#7031#7242#0" expanded="false" />
+                <element signature="e#7231#7232#0" expanded="false" />
+                <element signature="e#7847#7859#0" expanded="false" />
+                <element signature="e#8443#8462#0" expanded="false" />
+                <element signature="class#10141:10476" expanded="false" />
+                <element signature="e#12942#12954#0" expanded="false" />
+                <element signature="e#13955#13968#0" expanded="false" />
+                <element signature="e#15062#15075#0" expanded="false" />
+                <element signature="e#16150#16151#0" expanded="false" />
+                <element signature="e#16177#16178#0" expanded="false" />
+                <element signature="e#16712#16713#0" expanded="false" />
+                <element signature="e#16740#16741#0" expanded="false" />
+                <element signature="e#17070#17071#0" expanded="false" />
+                <element signature="e#17097#17098#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Action.kt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/api/Action.kt">
+      <file leaf-file-name="DigitalOceanClient.kt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/impl/DigitalOceanClient.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="8" selection-start="8" selection-end="8" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
+            <state line="299" column="31" selection-start="13869" selection-end="13869" vertical-scroll-proportion="0.0" vertical-offset="4392" max-vertical-offset="5430">
+              <folding>
+                <element signature="e#39#1008#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DigitalOceanMachine.kt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachine.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="41" column="0" selection-start="1564" selection-end="1564" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="945">
               <folding />
             </state>
           </provider>
@@ -189,19 +362,42 @@
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/src/main/java/kontrol/api/Action.kt" />
         <option value="$PROJECT_DIR$/src/main/java/kontrol/api/Controller.kt" />
         <option value="$PROJECT_DIR$/src/main/java/SnapitoHttpUtil.java" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanMachineGroup.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/kontrol/SnapitoHttpUtil.java" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpLoadSensor.kt" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpStatusSensor.kt" />
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/test/java/TestConfig.kt" />
         <option value="$PROJECT_DIR$/src/test/java/TestMockController.kt" />
+        <option value="$PROJECT_DIR$/.idea/workspace.xml" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpLoadSensor.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpStatusSensor.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/SSHLoadSensor.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanMachineGroup.kt" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/kontrol_examples/DigitalOceanKontrolr.kt" />
+        <option value="$PROJECT_DIR$/common/pom.xml" />
+        <option value="$PROJECT_DIR$/mock/pom.xml" />
+        <option value="$PROJECT_DIR$/digitalocean/pom.xml" />
+        <option value="$PROJECT_DIR$/examples/pom.xml" />
+        <option value="$PROJECT_DIR$/sensors/pom.xml" />
+        <option value="$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockMachineGroup.kt" />
+        <option value="$PROJECT_DIR$/common/src/main/java/kontrol/impl/DefaultSensorArray.kt" />
+        <option value="$PROJECT_DIR$/sensors/src/test/java/TestSensors.kt" />
+        <option value="$PROJECT_DIR$/examples/src/main/java/kontrol_examples/DigitalOceanKontrolr.kt" />
+        <option value="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/impl/DigitalOceanClient.java" />
+        <option value="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/DigitalOcean.kt" />
+        <option value="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachine.kt" />
+        <option value="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/Utils.java" />
+        <option value="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/impl/DigitalOceanClient.kt" />
+        <option value="$PROJECT_DIR$/common/src/main/java/kontrol/HttpUtil.java" />
+        <option value="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineGroup.kt" />
+        <option value="$PROJECT_DIR$/common/src/main/java/kontrol/impl/String_SSH.kt" />
+        <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
   </component>
@@ -219,6 +415,12 @@
   </component>
   <component name="MavenProjectNavigator">
     <treeState>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+      </PATH>
       <PATH>
         <PATH_ELEMENT>
           <option name="myItemId" value="" />
@@ -289,12 +491,12 @@
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds">
-    <option name="x" value="-18" />
-    <option name="y" value="25" />
+    <option name="x" value="1440" />
+    <option name="y" value="22" />
     <option name="width" value="1920" />
-    <option name="height" value="1127" />
+    <option name="height" value="1178" />
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
     <OptionsSetting value="true" id="Checkout" />
@@ -320,6 +522,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -353,6 +556,42 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sensors" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sensors" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -371,6 +610,10 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="sensors" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -389,29 +632,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kotlin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kontrol" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kontrol" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kontrol" />
+              <option name="myItemId" value="sensors" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -423,45 +644,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="kotlin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kontrol" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="api" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kontrol" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kontrol" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kotlin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kontrol" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="api" />
+              <option name="myItemId" value="java" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -469,9 +652,712 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mock" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mock" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mock" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mock" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="examples" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="examples" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="examples" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="examples" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol_examples" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="doclient" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="doclient" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="doclient" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="doclient" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="doclient" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="digitalocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="doclient" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="digitalocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pojo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="doclient" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="digitalocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="impl" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="doclient" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="digitalocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="exception" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="doclient" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="digitalocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="digitalocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="digitalocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="digitalocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="digitalocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ocean" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="impl" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="api" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="api" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="api" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kontrol" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="api" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -490,17 +1376,31 @@
     <property name="dynamic.classpath" value="false" />
     <property name="LayoutCode.rearrangeEntriesJava" value="false" />
     <property name="recentsLimit" value="5" />
+    <property name="LayoutCode.rearrangeEntriesKotlin" value="false" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/sensors/src/main/java" />
+    <property name="SearchEverywhereHistory" value="" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/doclient/src/main/java" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/kontrol_examples" />
       <recent name="$PROJECT_DIR$/src/test/java" />
       <recent name="$PROJECT_DIR$/src/main/java" />
     </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="kontrol" />
+      <recent name="" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/common/src/main/java/kontrol/impl" />
+      <recent name="$PROJECT_DIR$/sensors/src/test/java" />
+      <recent name="$PROJECT_DIR$/mock/src/test/java" />
+      <recent name="$PROJECT_DIR$/src/main/kotlin/kontrol_examples" />
       <recent name="$PROJECT_DIR$/src/main/kotlin/kontrol" />
     </key>
   </component>
-  <component name="RunManager" selected="Maven.kontrol [deploy]">
+  <component name="RunManager" selected="Kotlin.kontrol_examples.Kontrol_examplesPackage">
     <configuration default="false" name="kontrol [deploy]" type="MavenRunConfiguration" factoryName="Maven" temporary="true">
       <MavenSettings>
         <option name="myGeneralSettings" />
@@ -533,10 +1433,6 @@
       <option name="PROGRAM_PARAMETERS" />
       <method />
     </configuration>
-    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
-      <TestRunner />
-      <method />
-    </configuration>
     <configuration default="true" type="MavenRunConfiguration" factoryName="Maven">
       <MavenSettings>
         <option name="myGeneralSettings" />
@@ -559,6 +1455,10 @@
       </MavenSettings>
       <method />
     </configuration>
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner />
+      <method />
+    </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
@@ -573,8 +1473,16 @@
     <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
       <method />
     </configuration>
-    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" working-dir="">
-      <browser start="false" url="" with-js-debugger="false" />
+    <configuration default="true" type="JetRunConfigurationType" factoryName="Kotlin">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="kontrol" />
+      <envs />
       <method />
     </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -590,6 +1498,10 @@
       <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" working-dir="">
+      <browser start="false" url="" with-js-debugger="false" />
+      <method />
+    </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" />
       <option name="VM_PARAMETERS" />
@@ -602,9 +1514,6 @@
       <option name="PASS_PARENT_ENVS" value="true" />
       <module name="" />
       <envs />
-      <method />
-    </configuration>
-    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
       <method />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
@@ -627,8 +1536,38 @@
       <patterns />
       <method />
     </configuration>
-    <list size="1">
-      <item index="0" class="java.lang.String" itemvalue="Maven.kontrol [deploy]" />
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
+      <method />
+    </configuration>
+    <configuration default="false" name="kontrol_examples.Kontrol_examplesPackage" type="JetRunConfigurationType" factoryName="Kotlin">
+      <option name="MAIN_CLASS_NAME" value="kontrol_examples.Kontrol_examplesPackage" />
+      <option name="VM_PARAMETERS" value="-Xmx1g -Ddo.cid=&quot;bzP7De7eNLZwfNwNYWwjO&quot; -Ddo.apikey=&quot;zSD8rraNeI4a-q6np6m2Kf_0bfUYcD6qeWYVYZOG&quot;" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="examples" />
+      <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="JProfiler">
+        <option name="WINDOW" value="false" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Profile ">
+        <option name="myExternalizedOptions" value="&#10;additional-options2=onexit\=snapshot&#10;" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <list size="2">
+      <item index="0" class="java.lang.String" itemvalue="Kotlin.kontrol_examples.Kontrol_examplesPackage" />
+      <item index="1" class="java.lang.String" itemvalue="Maven.kontrol [deploy]" />
     </list>
     <recent_temporary>
       <list size="1">
@@ -652,50 +1591,51 @@
       <changelist id="c806a7ad-9094-4afb-b072-e526c70b2a8b" name="Default" comment="" />
       <created>1389305764298</created>
       <updated>1389305764298</updated>
-      <workItem from="1389305766740" duration="2074000" />
+      <workItem from="1389305766740" duration="3520000" />
+      <workItem from="1389309463903" duration="22441000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2074000" />
+    <option name="totallyTimeSpent" value="25961000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-18" y="25" width="1920" height="1127" extended-state="6" />
-    <editor active="false" />
+    <frame x="1440" y="22" width="1920" height="1178" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Jelastic" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Jelastic" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32945737" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32945737" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Mongo Runner" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Kotlin" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="TeamCity" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32945737" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.38688827" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871652" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39981532" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Mongo Runner" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Kotlin" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TeamCity" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32779318" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32978722" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.08031915" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -715,84 +1655,432 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/api/sensor/Sensor.kt">
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="25" selection-start="931" selection-end="931" vertical-scroll-proportion="0.0" vertical-offset="360" max-vertical-offset="1950">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mock/src/test/java/TestMockController.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="116" column="22" selection-start="5474" selection-end="5474" vertical-scroll-proportion="0.0" vertical-offset="1740" max-vertical-offset="2205">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mock/src/test/java/TestConfig.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="8" selection-start="8" selection-end="8" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2970">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/main/java/kontrol/HttpUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="0" selection-start="860" selection-end="860" vertical-scroll-proportion="0.0" vertical-offset="1530" max-vertical-offset="3135">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineGroup.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1" column="0" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="1830">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sensors/src/main/java/kontrol/impl/sensor/HttpLoadSensor.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="41" selection-start="690" selection-end="690" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="675">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sensors/src/main/java/kontrol/impl/sensor/HttpStatusSensor.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="9" selection-start="1114" selection-end="1114" vertical-scroll-proportion="0.0" vertical-offset="555" max-vertical-offset="690">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanClientFactory.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1" column="0" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="345">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/src/main/java/kontrol/api/sensor/Sensor.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1007">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/api/Action.kt">
+    <entry file="file://$PROJECT_DIR$/api/src/main/java/kontrol/api/Action.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="8" selection-start="8" selection-end="8" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1007">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/api/Controller.kt">
+    <entry file="file://$PROJECT_DIR$/api/src/main/java/kontrol/api/Controller.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state line="40" column="98" selection-start="1632" selection-end="1632" vertical-scroll-proportion="0.0" vertical-offset="653" max-vertical-offset="1320">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanClientFactory.kt">
+    <entry file="file://$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanClientFactory.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state line="1" column="0" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/impl/ocean/DigitalOceanMachineGroup.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="0" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0" vertical-offset="1123" max-vertical-offset="1770">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/HttpUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="0" selection-start="860" selection-end="860" vertical-scroll-proportion="0.0" vertical-offset="1530" max-vertical-offset="3255">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpLoadSensor.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="41" selection-start="690" selection-end="690" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="675">
-          <folding>
-            <element signature="e#29#167#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/kontrol/impl/sensor/HttpStatusSensor.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="12" selection-start="1114" selection-end="1114" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="24" selection-start="451" selection-end="451" vertical-scroll-proportion="22.5" vertical-offset="690" max-vertical-offset="1965">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/TestConfig.kt">
+    <entry file="file://$PROJECT_DIR$/mock/src/test/java/TestConfig.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="8" selection-start="8" selection-end="8" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3300">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/TestMockController.kt">
+    <entry file="file://$PROJECT_DIR$/mock/src/test/java/TestMockController.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="116" column="22" selection-start="5474" selection-end="5474" vertical-scroll-proportion="0.33230293" vertical-offset="1585" max-vertical-offset="2295">
+        <state line="116" column="22" selection-start="5474" selection-end="5474" vertical-scroll-proportion="0.0" vertical-offset="1585" max-vertical-offset="2295">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sensors/src/main/java/kontrol/impl/sensor/HttpLoadSensor.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="50" selection-start="1026" selection-end="1026" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sensors/src/main/java/kontrol/impl/sensor/HttpStatusSensor.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="52" selection-start="1052" selection-end="1052" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/main/java/kontrol/impl/DefaultStateMachine.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="18" selection-start="244" selection-end="244" vertical-scroll-proportion="0.0" vertical-offset="75" max-vertical-offset="1320">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/src/main/java/kontrol/api/StateMachine.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="8" selection-start="360" selection-end="360" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineMonitor.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="14" selection-start="342" selection-end="342" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="705">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="619">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1038">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/main/java/kontrol/impl/DefaultController.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="13" selection-start="440" selection-end="440" vertical-scroll-proportion="0.0" vertical-offset="2" max-vertical-offset="1635">
           <folding>
-            <element signature="e#99#783#0" expanded="true" />
+            <element signature="e#22#326#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="35" selection-start="646" selection-end="646" vertical-scroll-proportion="-10.0" vertical-offset="0" max-vertical-offset="420">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mock/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="39" selection-start="651" selection-end="651" vertical-scroll-proportion="-10.0" vertical-offset="0" max-vertical-offset="405">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/digitalocean/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="40" selection-start="1018" selection-end="1018" vertical-scroll-proportion="-16.25" vertical-offset="0" max-vertical-offset="555">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="39" selection-start="840" selection-end="840" vertical-scroll-proportion="-13.125" vertical-offset="0" max-vertical-offset="480">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sensors/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="24" selection-start="1106" selection-end="1106" vertical-scroll-proportion="-17.5" vertical-offset="0" max-vertical-offset="570">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mock/src/main/java/kontrol/impl/mock/MockMachineGroup.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="38" selection-start="383" selection-end="383" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1050">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/main/java/kontrol/impl/DefaultSensorArray.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="20" selection-start="20" selection-end="20" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1170">
+          <folding>
+            <element signature="e#22#176#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sensors/src/test/java/TestSensors.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="19" selection-start="292" selection-end="292" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="705">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/src/main/java/kontrol_examples/DigitalOceanKontrolr.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="19" selection-start="396" selection-end="396" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3720">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/Constants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="11" selection-start="1753" selection-end="1753" vertical-scroll-proportion="0.0" vertical-offset="214" max-vertical-offset="1035">
+          <folding>
+            <element signature="e#0#2681#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar!/com/google/gson/JsonElement.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="38" selection-start="559" selection-end="559" vertical-scroll-proportion="-9.08" vertical-offset="43" max-vertical-offset="885">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient/4.2.5/httpclient-4.2.5-sources.jar!/org/apache/http/client/utils/URIBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="101" column="15" selection-start="3101" selection-end="3101" vertical-scroll-proportion="0.0" vertical-offset="763" max-vertical-offset="4770">
+          <folding>
+            <element signature="e#0#11123#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="method#setScheme#0;class#URIBuilder#0" expanded="false" />
+            <element signature="e#10065#10066#0" expanded="false" />
+            <element signature="e#10099#10100#0" expanded="false" />
+            <element signature="e#10134#10135#0" expanded="false" />
+            <element signature="e#10170#10171#0" expanded="false" />
+            <element signature="e#10201#10202#0" expanded="false" />
+            <element signature="e#10233#10234#0" expanded="false" />
+            <element signature="e#10261#10262#0" expanded="false" />
+            <element signature="e#10293#10294#0" expanded="false" />
+            <element signature="e#10324#10325#0" expanded="false" />
+            <element signature="e#10356#10357#0" expanded="false" />
+            <element signature="e#10633#10634#0" expanded="false" />
+            <element signature="e#10669#10670#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/DigitalOcean.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="382" column="8" selection-start="15574" selection-end="15574" vertical-scroll-proportion="-3.962264" vertical-offset="5520" max-vertical-offset="10140">
+          <folding>
+            <element signature="e#34#275#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/Droplet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="62" column="19" selection-start="1857" selection-end="1857" vertical-scroll-proportion="0.0" vertical-offset="373" max-vertical-offset="2025">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib/0.6.1910/kotlin-stdlib-0.6.1910-sources.jar!/kotlin/JUtilJVM.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="53" column="17" selection-start="2343" selection-end="2343" vertical-scroll-proportion="0.0" vertical-offset="589" max-vertical-offset="1800">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/Utils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="73" column="38" selection-start="2428" selection-end="2428" vertical-scroll-proportion="0.0" vertical-offset="388" max-vertical-offset="1170">
+          <folding>
+            <element signature="e#2525#2541#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/impl/DigitalOceanClient.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="299" column="31" selection-start="13869" selection-end="13869" vertical-scroll-proportion="0.0" vertical-offset="4392" max-vertical-offset="5430">
+          <folding>
+            <element signature="e#39#1008#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/main/java/kontrol/HttpUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="76" column="16" selection-start="2798" selection-end="2798" vertical-scroll-proportion="0.4184168" vertical-offset="896" max-vertical-offset="2220">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sensors/src/main/java/kontrol/impl/sensor/SSHLoadSensor.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="27" selection-start="721" selection-end="1445" vertical-scroll-proportion="0.0" vertical-offset="131" max-vertical-offset="750">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/net/schmizz/sshj/0.9.0/sshj-0.9.0.jar!/net/schmizz/sshj/SSHClient.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="79" column="62" selection-start="5602" selection-end="5602" vertical-scroll-proportion="-4.36" vertical-offset="1061" max-vertical-offset="1680">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/net/schmizz/sshj/0.9.0/sshj-0.9.0-sources.jar!/net/schmizz/sshj/SSHClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="648" column="19" selection-start="27267" selection-end="27267" vertical-scroll-proportion="0.0" vertical-offset="8179" max-vertical-offset="9585">
+          <folding>
+            <element signature="e#0#29581#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#7031#7242#0" expanded="false" />
+            <element signature="e#7231#7232#0" expanded="false" />
+            <element signature="e#7847#7859#0" expanded="false" />
+            <element signature="e#8443#8462#0" expanded="false" />
+            <element signature="class#10141:10476" expanded="false" />
+            <element signature="e#12942#12954#0" expanded="false" />
+            <element signature="e#13955#13968#0" expanded="false" />
+            <element signature="e#15062#15075#0" expanded="false" />
+            <element signature="e#16150#16151#0" expanded="false" />
+            <element signature="e#16177#16178#0" expanded="false" />
+            <element signature="e#16712#16713#0" expanded="false" />
+            <element signature="e#16740#16741#0" expanded="false" />
+            <element signature="e#17070#17071#0" expanded="false" />
+            <element signature="e#17097#17098#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/net/schmizz/sshj/0.9.0/sshj-0.9.0-sources.jar!/net/schmizz/sshj/connection/channel/Channel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="142" column="9" selection-start="4718" selection-end="4718" vertical-scroll-proportion="0.0" vertical-offset="1311" max-vertical-offset="1950">
+          <folding>
+            <element signature="e#0#4794#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/net/schmizz/sshj/0.9.0/sshj-0.9.0-sources.jar!/net/schmizz/sshj/connection/channel/AbstractChannel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="279" column="16" selection-start="8242" selection-end="8242" vertical-scroll-proportion="0.0" vertical-offset="2944" max-vertical-offset="5715">
+          <folding>
+            <element signature="e#0#13971#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#3079#3107#0" expanded="false" />
+            <element signature="e#4876#4877#0" expanded="false" />
+            <element signature="e#4909#4910#0" expanded="false" />
+            <element signature="e#4949#4950#0" expanded="false" />
+            <element signature="e#4974#4975#0" expanded="false" />
+            <element signature="e#5031#5032#0" expanded="false" />
+            <element signature="e#5056#5057#0" expanded="false" />
+            <element signature="e#5305#5306#0" expanded="false" />
+            <element signature="e#5331#5332#0" expanded="false" />
+            <element signature="e#5378#5379#0" expanded="false" />
+            <element signature="e#5410#5411#0" expanded="false" />
+            <element signature="e#5647#5648#0" expanded="false" />
+            <element signature="e#5674#5675#0" expanded="false" />
+            <element signature="e#7542#7543#0" expanded="false" />
+            <element signature="e#7586#7587#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/net/schmizz/sshj/0.9.0/sshj-0.9.0.jar!/net/schmizz/sshj/connection/channel/Channel.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="9" selection-start="959" selection-end="959" vertical-scroll-proportion="0.0" vertical-offset="236" max-vertical-offset="855">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachine.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="0" selection-start="1564" selection-end="1564" vertical-scroll-proportion="0.0" vertical-offset="229" max-vertical-offset="945">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/src/main/java/kontrol/api/Machine.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="8" selection-start="338" selection-end="338" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1095">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineGroup.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="143" column="34" selection-start="5757" selection-end="5757" vertical-scroll-proportion="0.0" vertical-offset="1182" max-vertical-offset="2220">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/src/main/java/kontrol/impl/String_SSH.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="19" selection-start="441" selection-end="441" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="660">
+          <folding>
+            <element signature="e#22#216#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="99" column="25" selection-start="3466" selection-end="3661" vertical-scroll-proportion="0.4605042" vertical-offset="1211" max-vertical-offset="1950">
+          <folding />
         </state>
       </provider>
     </entry>
