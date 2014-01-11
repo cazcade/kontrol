@@ -18,23 +18,17 @@ public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFa
     override fun start(target: Machine, stateMachine: StateMachine<MachineState, Machine>, monitorRules: List<MonitorRule<MachineState, Machine>>) {
         //        println(stateMachine.rules)
         timer.schedule(500, 5000) {
-            val targetStatus = (target as DigitalOceanMachine).droplet.getStatus()?.toLowerCase();
-            when (targetStatus) {
-                "active" -> {
-                    stateMachine.attemptTransition(MachineState.MACHINE_STARTING)
-                }
-                "off" -> {
-                    stateMachine.attemptTransition(MachineState.MACHINE_STOPPED)
-                }
-                "new" -> {
-                    stateMachine.attemptTransition(MachineState.MACHINE_STARTING)
-                }
-                "archive" -> {
-                    stateMachine.attemptTransition(MachineState.MACHINE_STOPPING)
-                }
-                else -> println("-> ${targetStatus}")
 
-            }
+            stateMachine.attemptTransition(
+                    when ((target as DigitalOceanMachine).droplet.status?.toLowerCase()) {
+                        "active" -> MachineState.MACHINE_STARTING
+                        "off" -> MachineState.MACHINE_STOPPED
+                        "new" -> MachineState.MACHINE_STARTING
+                        "archive" -> MachineState.MACHINE_STOPPING
+                        else -> null
+
+                    })
+
             monitorRules.forEach { it.evaluate(target) }
 
         }

@@ -1,7 +1,7 @@
 package kontrol.impl.ocean
 
 import kontrol.api.Machine
-import com.myjeeva.digitalocean.pojo.Droplet
+import kontrol.doclient.Droplet
 import kontrol.api.MachineState
 import kontrol.api.Monitor
 import kontrol.api.StateMachine
@@ -30,7 +30,7 @@ public final class DigitalOceanMachine(var droplet: Droplet,
     val timer = Timer("DO-" + id(), true);
 
     override fun id(): String {
-        return droplet.getId().toString();
+        return droplet.id.toString();
     }
 
 
@@ -39,7 +39,7 @@ public final class DigitalOceanMachine(var droplet: Droplet,
         timer.schedule((5000 * Math.random()).toLong(), 20000) {
             //            println("Updating ${droplet.getId()}")
             val doa = clientFactory.instance();
-            droplet = doa.getDropletInfo(droplet.getId()?:-1) ?: droplet;
+            droplet = doa.getDropletInfo(droplet.id?:-1) ?: droplet;
             if (state() in listOf(MachineState.BROKEN_MACHINE, MachineState.MACHINE_OK, MachineState.MACHINE_STARTING, MachineState.STALE_MACHINE)) {
                 sensorData.putAll(sensorArray.values(this@DigitalOceanMachine))
             } else {
@@ -56,13 +56,13 @@ public final class DigitalOceanMachine(var droplet: Droplet,
     }
 
     override fun ip(): String? {
-        val ip = droplet.getIpAddress()
+        val ip = droplet.ip_address
         return ip;
     }
 
 
     override fun name(): String {
-        return "${droplet.getName()} (${droplet.getId()})"
+        return "${droplet.name} (${droplet.id})"
     }
 
 

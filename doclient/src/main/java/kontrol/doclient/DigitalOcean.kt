@@ -1,11 +1,11 @@
-package com.myjeeva.digitalocean
+package kontrol.doclient
 
-import com.myjeeva.digitalocean.exception.AccessDeniedException
-import com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
-import com.myjeeva.digitalocean.exception.ResourceNotFoundException
-import com.myjeeva.digitalocean.pojo.*
+import kontrol.doclient.AccessDeniedException
+import kontrol.doclient.RequestUnsuccessfulException
+import kontrol.doclient.ResourceNotFoundException
+import kontrol.doclient.*
 
-/* The MIT License
+/* Original  MIT License from  Java version: https://github.com/jeevatkm/digitalocean-api-java
  *
  * Copyright (c) 2010-2013 Jeevanandam M. (myjeeva.com)
  *
@@ -82,9 +82,9 @@ public trait DigitalOcean {
      * account. All available API information is presented for each droplet.
      *
      * @return List&lt;Droplet>
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -97,7 +97,7 @@ public trait DigitalOcean {
      * </p>
      *
      * <p>
-     * Create a instance of {@link com.myjeeva.digitalocean.pojo.Droplet} object and populate following values
+     * Create a instance of {@link kontrol.doclient.Droplet} object and populate following values
      * </p>
      * <ul>
      * <li>Name Required, String, this is the name of the droplet must be
@@ -112,10 +112,10 @@ public trait DigitalOcean {
      *
      * @param droplet
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Droplet}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Droplet}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -128,7 +128,7 @@ public trait DigitalOcean {
      * </p>
      *
      * <p>
-     * Create a instance of {@link com.myjeeva.digitalocean.pojo.Droplet} object and populate following values
+     * Create a instance of {@link kontrol.doclient.Droplet} object and populate following values
      * </p>
      * <ul>
      * <li>Name Required, String, this is the name of the droplet must be
@@ -146,10 +146,10 @@ public trait DigitalOcean {
      * @param sshKeyIds
      *            Numeric CSV, comma separated list of ssh_key_ids that you
      *            would like to be added to the server
-     * @return {@link com.myjeeva.digitalocean.pojo.Droplet}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Droplet}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -160,10 +160,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Droplet}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Droplet}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -174,10 +174,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -188,10 +188,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -202,10 +202,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -216,10 +216,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -229,10 +229,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -243,10 +243,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -257,10 +257,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -272,10 +272,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -289,10 +289,10 @@ public trait DigitalOcean {
      *            the id of the droplet
      * @param snapshotName
      *            the name the snapshot to be created
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -304,10 +304,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -319,10 +319,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -333,10 +333,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -347,10 +347,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -360,10 +360,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -373,10 +373,10 @@ public trait DigitalOcean {
      *
      * @param dropletId
      *            the id of the droplet
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -389,9 +389,9 @@ public trait DigitalOcean {
      * cloud.
      *
      * @return List&ltRegion>
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -405,9 +405,9 @@ public trait DigitalOcean {
      * snapshots or backups that you have created in your own account.
      *
      * @return List&ltDropletImage>
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -417,10 +417,10 @@ public trait DigitalOcean {
      *
      * @param imageId
      *            the image Id of the droplet/snapshot/backup images
-     * @return {@link com.myjeeva.digitalocean.pojo.DropletImage}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.DropletImage}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -431,10 +431,10 @@ public trait DigitalOcean {
      *
      * @param imageId
      *            the image Id of the droplet/snapshot/backup images
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -446,10 +446,10 @@ public trait DigitalOcean {
      *            the image Id of the droplet/snapshot/backup images
      * @param regionId
      *            the region Id of the digitalocean data centers
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -462,9 +462,9 @@ public trait DigitalOcean {
      * be added to a droplet.
      *
      * @return <code>List&lt;SshKey></code>
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.2
      */
@@ -475,10 +475,10 @@ public trait DigitalOcean {
      *
      * @param sshKeyId
      *            the SSH key Id
-     * @return {@link com.myjeeva.digitalocean.pojo.SshKey}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.SshKey}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.2
      */
@@ -490,14 +490,14 @@ public trait DigitalOcean {
      *            the name you want to give this SSH key
      * @param sshPublicKey
      *            the actual public SSH key
-     * @return {@link com.myjeeva.digitalocean.pojo.SshKey}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.SshKey}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.2
      */
-    fun addSshKey(sshKeyName: String, sshPublicKey: String): SshKey
+    fun addSshKey(keyName: String, publicKey: String): SshKey
     /**
      * Method allows you to modify an existing public SSH key in your account.
      *
@@ -505,23 +505,23 @@ public trait DigitalOcean {
      *            the SSH key Id, you would like to edit
      * @param newSshPublicKey
      *            the new public SSH key
-     * @return {@link com.myjeeva.digitalocean.pojo.SshKey}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.SshKey}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.2
      */
-    fun editSshKey(sshKeyId: Int, newSshPublicKey: String): SshKey
+    fun editSshKey(sshKeyId: Int, newKey: String): SshKey
     /**
      * Method will delete the SSH key from your account.
      *
      * @param sshKeyId
      *            the SSH key Id, you would like to delete
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.RequestUnsuccessfulException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.AccessDeniedException
      *
      * @since v1.2
      */
@@ -534,9 +534,9 @@ public trait DigitalOcean {
      * droplet.
      *
      * @return List&lt;DropletSize>
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.0
      */
@@ -548,9 +548,9 @@ public trait DigitalOcean {
      * Method returns all of your available domains from DNS control panel
      *
      * @return <code>List&lt;Domain></code>
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.1
      */
@@ -563,10 +563,10 @@ public trait DigitalOcean {
      *            the name of the domain
      * @param ipAddress
      *            the IP Address for the domain
-     * @return {@link com.myjeeva.digitalocean.pojo.Domain}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Domain}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.1
      */
@@ -576,10 +576,10 @@ public trait DigitalOcean {
      *
      * @param domainId
      *            the Id of the domain
-     * @return {@link com.myjeeva.digitalocean.pojo.Domain}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Domain}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.1
      */
@@ -589,10 +589,10 @@ public trait DigitalOcean {
      *
      * @param domainId
      *            the Id of the domain
-     * @return {@link com.myjeeva.digitalocean.pojo.Response}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.Response}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.1
      */
@@ -604,9 +604,9 @@ public trait DigitalOcean {
      * @param domainId
      *            the Id of the domain
      * @return <code>List&lt;DomainRecord></code>
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.1
      */
@@ -618,10 +618,10 @@ public trait DigitalOcean {
      * @param domainRecord
      *            the domain record values domain Id, record type, data, name,
      *            priority, port, weight
-     * @return {@link com.myjeeva.digitalocean.pojo.DomainRecord}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.DomainRecord}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.1
      */
@@ -633,10 +633,10 @@ public trait DigitalOcean {
      *            the Id of the domain
      * @param recordId
      *            the record Id of the domain
-     * @return {@link com.myjeeva.digitalocean.pojo.DomainRecord}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.DomainRecord}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.1
      */
@@ -647,10 +647,10 @@ public trait DigitalOcean {
      * @param domainRecord
      *            the domain record values domain Id, record type, data, name,
      *            priority, port, weight
-     * @return {@link com.myjeeva.digitalocean.pojo.DomainRecord}
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
+     * @return {@link kontrol.doclient.DomainRecord}
+     * @throws kontrol.doclient.AccessDeniedException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
      *
      * @since v1.1
      */
@@ -658,9 +658,9 @@ public trait DigitalOcean {
     /**
      * Method deletes the specified domain record from domain.
      *
-     * @throws com.myjeeva.digitalocean.exception.RequestUnsuccessfulException
-     * @throws com.myjeeva.digitalocean.exception.ResourceNotFoundException
-     * @throws com.myjeeva.digitalocean.exception.AccessDeniedException
+     * @throws kontrol.doclient.RequestUnsuccessfulException
+     * @throws kontrol.doclient.ResourceNotFoundException
+     * @throws kontrol.doclient.AccessDeniedException
      *
      * @since v1.1
      */

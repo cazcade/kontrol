@@ -1,4 +1,4 @@
-/* The MIT License
+/* Original  MIT License from  Java version: https://github.com/jeevatkm/digitalocean-api-java
  *
  * Copyright (c) 2010-2013 Jeevanandam M. (myjeeva.com)
  *
@@ -21,67 +21,33 @@
  * THE SOFTWARE. 
  * 
  */
-package com.myjeeva.digitalocean.pojo;
+package kontrol.doclient;
 
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
- * Represents SSH Key attributes of DigitalOcean
+ * DigitalOcean API client Constants
  * 
  * @author Jeevanandam M. (jeeva@myjeeva.com)
  */
-public class SshKey {
+public interface Constants {
 
-	private Integer id;
 
-	private String name;
+	// Gson Type Tokens
+	Type TYPE_DROPLET_LIST = new TypeToken<List<Droplet>>() { }.getType();
 
-	@SerializedName("ssh_pub_key")
-	private String sshPublicKey;
+	Type TYPE_IMAGE_LIST = new TypeToken<List<DropletImage>>() { }.getType();
 
-	/**
-	 * @return the id
-	 */
-	public Integer getId() {
-		return id;
-	}
+	Type TYPE_REGION_LIST = new TypeToken<List<Region>>() { }.getType();
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(Integer id) {
-		this.id = id;
-	}
+	Type TYPE_SIZE_LIST = new TypeToken<List<DropletSize>>() { }.getType();
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+	Type TYPE_DOMAIN_LIST = new TypeToken<List<Domain>>() { }.getType();
 
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+	Type TYPE_DOMAIN_RECORD_LIST = new TypeToken<List<DomainRecord>>() { }.getType();
 
-	/**
-	 * @return the sshPublicKey
-	 */
-	public String getSshPublicKey() {
-		return sshPublicKey;
-	}
-
-	/**
-	 * @param sshPublicKey
-	 *            the sshPublicKey to set
-	 */
-	public void setSshPublicKey(String sshPublicKey) {
-		this.sshPublicKey = sshPublicKey;
-	}
-
+	Type TYPE_SSH_KEY_LIST = new TypeToken<List<SshKey>>() { }.getType();
 }

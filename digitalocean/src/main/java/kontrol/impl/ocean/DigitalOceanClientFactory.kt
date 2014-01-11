@@ -1,7 +1,7 @@
 package kontrol.impl.ocean
 
-import com.myjeeva.digitalocean.DigitalOcean
-import com.myjeeva.digitalocean.impl.DigitalOceanClient
+import kontrol.doclient.DigitalOcean
+import kontrol.doclient.impl.DigitalOceanClient
 
 
 /**

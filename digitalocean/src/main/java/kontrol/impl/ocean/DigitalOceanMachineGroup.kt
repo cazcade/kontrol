@@ -11,7 +11,7 @@ import java.util.ArrayList
 import java.util.concurrent.ConcurrentHashMap
 import kontrol.api.sensors.SensorArray
 import kontrol.api.MonitorRule
-import com.myjeeva.digitalocean.pojo.Droplet
+import kontrol.doclient.Droplet
 import kontrol.impl.onHost
 
 /**
@@ -51,9 +51,9 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         try {
 
             println("Destroying m/c")
-            val id = machines.values().filter { it.droplet.getStatus()?.toLowerCase() == "active" }.sortBy { it.id() }. first().droplet.getId()!!
+            val id = machines.values().filter { it.droplet.status?.toLowerCase() == "active" }.sortBy { it.id() }. first().droplet.id!!
             digitalOcean.deleteDroplet(id)
-            while (digitalOcean.getDropletInfo(id).getStatus()?.toLowerCase() == "active") {
+            while (digitalOcean.getDropletInfo(id).status?.toLowerCase() == "active") {
                 println("Awaiting Machine ${id} OFF")
                 Thread.sleep(5000);
             }
@@ -72,27 +72,27 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
 
     override fun expand(): MachineGroup {
         val droplet = Droplet()
-        droplet.setName(config.machinePrefix + name)
-        droplet.setSizeId(config.dropletSizeId)
+        droplet.name = (config.machinePrefix + name)
+        droplet.size_id = (config.dropletSizeId)
         val instance = apiFactory.instance()
         val availableRegions = instance.getAvailableRegions()
         //        droplet.setRegionId(availableRegions?.get((Math.random() * (availableRegions?.size()?.toDouble()?:0.0)).toInt())?.getId());
-        droplet.setRegionId(config.regionId)
-        val availableImages = instance.getAvailableImages()
-        for (availableImage in availableImages!!) {
-            if ((config.templatePrefix + name).equals(availableImage.getName())) {
-                droplet.setImageId(availableImage.getId())
+        droplet.region_id = (config.regionId)
+        val images = instance.getAvailableImages()
+        for (image in images) {
+            if ((config.templatePrefix + name) == image.name) {
+                droplet.image_id = image.id
             }
 
         }
         var createdDroplet = instance.createDroplet(droplet, "Neil Laptop")
 
-        println("Created droplet with ID " + createdDroplet?.getId() + " ip address " + createdDroplet?.getIpAddress())
+        println("Created droplet with ID " + createdDroplet?.id + " ip address " + createdDroplet?.ip_address)
         var count = 0
-        while (createdDroplet.getIpAddress() == null && count++ < 20) {
+        while (createdDroplet.ip_address == null && count++ < 20) {
             try {
                 println("Waiting for IP ...")
-                createdDroplet = instance.getDropletInfo(createdDroplet.getId()!!)
+                createdDroplet = instance.getDropletInfo(createdDroplet.id!!)
             } catch (e: Exception) {
                 e.printStackTrace();
             }
@@ -118,11 +118,11 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
 
     override fun reImage(machine: Machine): MachineGroup {
         val instance = apiFactory.instance()
-        val availableImages = instance.getAvailableImages()
+        val images = instance.getAvailableImages()
         var imageId: Int? = null;
-        for (availableImage in availableImages!!) {
-            if ((config.templatePrefix + name).equals(availableImage.getName())) {
-                imageId = availableImage.getId();
+        for (image in images) {
+            if ((config.templatePrefix + name) == image.name) {
+                imageId = image.id;
                 break;
             }
 
@@ -131,24 +131,24 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         println("Rebuilding ${machine.id()} with ${imageId}")
         if (imageId != null) {
             instance.rebuildDroplet(id, imageId!!)
-            while (instance.getDropletInfo(id)?.getStatus()?.toLowerCase() == "active") {
-                println("Awaiting Machine ${id} to stop being active")
-                Thread.sleep(5000);
-            }
-            while (instance.getDropletInfo(id)?.getStatus()?.toLowerCase() != "active") {
-                println("Awaiting Machine ${id} to become active")
-                Thread.sleep(5000);
-            }
-            println("Rebuilt ${machine.id()}")
-        } else {
-            println("No valid image to rebuild ${machine.id()}")
+            while (instance.getDropletInfo(id).status == "active") {
+            println("Awaiting Machine ${id} to stop being active")
+            Thread.sleep(5000);
         }
-        return this;
+        while (instance.getDropletInfo(id).status != "active") {
+            println("Awaiting Machine ${id} to become active")
+            Thread.sleep(5000);
+        }
+        println("Rebuilt ${machine.id()}")
+    } else {
+        println("No valid image to rebuild ${machine.id()}")
     }
+    return this;
+}
 
 
-    override fun restart(machine: Machine): MachineGroup {
-        "reboot".onHost(machine.ip())
-        return this;
-    }
+override fun restart(machine: Machine): MachineGroup {
+    "reboot".onHost(machine.ip())
+    return this;
+}
 }
