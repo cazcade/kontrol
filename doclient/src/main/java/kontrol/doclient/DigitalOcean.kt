@@ -56,7 +56,7 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun getAvailableDroplets(): MutableList<Droplet>
+    fun getAvailableDroplets(): List<Droplet>
     /**
      * <p>
      * Method allows you to create a new droplet. See the required parameters
@@ -363,7 +363,7 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun getAvailableRegions(): MutableList<Region>
+    fun getAvailableRegions(): List<Region>
     /*
 	 * Images manipulation (aka Distribution) methods
 	 */
@@ -379,7 +379,7 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun getAvailableImages(): MutableList<DropletImage>
+    fun getAvailableImages(): List<DropletImage>
     /**
      * Method retrieves the attributes of an image.
      *
@@ -436,7 +436,7 @@ public trait DigitalOcean {
      *
      * @since v1.2
      */
-    fun getAvailableSshKeys(): MutableList<SshKey>
+    fun getAvailableSshKeys(): List<SshKey>
     /**
      * Method shows a specific public SSH key in your account that can be added
      * to a droplet.
@@ -508,7 +508,7 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun getAvailableSizes(): MutableList<DropletSize>
+    fun getAvailableSizes(): List<DropletSize>
     /*
 	 * Domain manipulation methods
 	 */
@@ -522,7 +522,7 @@ public trait DigitalOcean {
      *
      * @since v1.1
      */
-    fun getAvailableDomains(): MutableList<Domain>
+    fun getAvailableDomains(): List<Domain>
     /**
      * Method creates a new domain name with an A record for the specified
      * [ip_address].
@@ -578,7 +578,7 @@ public trait DigitalOcean {
      *
      * @since v1.1
      */
-    fun getDomainRecords(domainId: Int): MutableList<DomainRecord>
+    fun getDomainRecords(domainId: Int): List<DomainRecord>
     /**
      * Method creates a new domain record name with an given domain record
      * values
