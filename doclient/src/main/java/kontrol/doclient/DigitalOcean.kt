@@ -29,48 +29,16 @@ import kontrol.doclient.*
  * 
  */
 /**
+ * <strong>DigitalOcean API client written in Kotlin based on https://github.com/jeevatkm/digitalocean-api-java </strong>
+ *
  * <p>
- * <strong>DigitalOcean API client written in Java</strong>
+ * A simple and meaningful wrapper methods for <a href="https://api.digitalocean.com/"title="DigitalOcean's API">DigitalOcean's API</a>.
+ * All of the RESTful that you find in DigitalOcean API's will be made available via simple Kotlin methods.
  * </p>
  *
  * <p>
- * A simple and meaningful wrapper methods for <a
- * href="https://api.digitalocean.com/"
- * title="DigitalOcean's API">DigitalOcean's API</a>. All of the RESTful that
- * you find in DigitalOcean API's will be made available via simple java
- * methods.
- * </p>
  *
- * <p>
- * <strong>Sample Code:</strong><br/>
- *
- * <pre>
- * // Create a DigitalOcean client
- * DigitalOcean apiClient = new DigitalOceanClient(clientId, apiKey);
- *
- * // Let's invoke the appropriate method as per need
- * // Fetching all the available droplets from control panel
- * List&lt;Droplet> droplets = apiClient.getAvailableDroplets();
- *
- * // Create a new droplet
- * Droplet newDroplet = new Droplet();
- * newDroplet.setName("api-cliet-test-host");
- * newDroplet.setSizeId(66); // 66 => 512MB plan
- * newDroplet.setRegionId(3); // 3 => San Francisco 1 Data center
- * newDroplet.setImageId(473123); // 473123 => Ubuntu 12.10 x64 Image
- * Droplet droplet = apiClient.createDroplet(newDroplet);
- *
- * // Fetch droplet information
- * Droplet droplet = apiClient.getDropletInfo(dropletId);
- *
- * // Fetch Available Plans/Sizes supported by DigitalOcean
- * List&lt;DropletSize> sizes = apiClient.getAvailableSizes();
- *
- * and so on... simple to use and effective!
- * </pre>
- *
- * </p>
- *
+ * @author Neil Ellis (neiL@cazcade.com)
  * @author Jeevanandam M. (jeeva@myjeeva.com)
  */
 public trait DigitalOcean {

@@ -18,7 +18,7 @@ import java.net.URI
 import com.google.gson.JsonElement
 import com.google.gson.Gson
 
-/* The MIT License
+/* Original  MIT License from  Java version: https://github.com/jeevatkm/digitalocean-api-java
  *
  * Copyright (c) 2010-2013 Jeevanandam M. (myjeeva.com)
  *
@@ -38,9 +38,10 @@ import com.google.gson.Gson
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE. 
- * 
+ * THE SOFTWARE.
+ *
  */
+
 /**
  * DigitalOcean API client wrapper methods Implementation
  *

@@ -26,44 +26,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c806a7ad-9094-4afb-b072-e526c70b2a8b" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Action.kt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DTO.kt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOceanClient.kt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Exceptions.kt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common/src/main/java/kontrol/impl/InputStream_Util.kt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/InputStream_Util.kt" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/Constants.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/Utils.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/common/Action.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/exception/AccessDeniedException.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/exception/RequestUnsuccessfulException.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/exception/ResourceNotFoundException.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/impl/DigitalOceanClient.kt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/Domain.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/DomainRecord.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/Droplet.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/DropletImage.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/DropletSize.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/Response.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/SshKey.java" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/DigitalOcean.kt" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOcean.kt" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/doclient/src/main/java/com/myjeeva/digitalocean/pojo/Region.java" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Constants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanClientFactory.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanClientFactory.kt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachine.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachine.kt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineGroup.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineGroup.kt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineGroupMonitor.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineGroupMonitor.kt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineMonitor.kt" afterPath="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachineMonitor.kt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/api/api.iml" afterPath="$PROJECT_DIR$/api/api.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common/common.iml" afterPath="$PROJECT_DIR$/common/common.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/digitalocean/digitalocean.iml" afterPath="$PROJECT_DIR$/digitalocean/digitalocean.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doclient/doclient.iml" afterPath="$PROJECT_DIR$/doclient/doclient.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/examples.iml" afterPath="$PROJECT_DIR$/examples/examples.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/kontrol.iml" afterPath="$PROJECT_DIR$/kontrol.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mock/mock.iml" afterPath="$PROJECT_DIR$/mock/mock.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common/pom.xml" afterPath="$PROJECT_DIR$/common/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doclient/pom.xml" afterPath="$PROJECT_DIR$/doclient/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sensors/sensors.iml" afterPath="$PROJECT_DIR$/sensors/sensors.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DTO.kt" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DTO.kt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOcean.kt" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOcean.kt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOceanClient.kt" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOceanClient.kt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Exceptions.kt" afterPath="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Exceptions.kt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="kontrol.iws" />
@@ -137,10 +103,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DigitalOceanClient.kt" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="DigitalOceanClient.kt" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOceanClient.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="194" column="89" selection-start="8898" selection-end="8898" vertical-scroll-proportion="1.1173708" vertical-offset="2196" max-vertical-offset="4110">
+            <state line="43" column="0" selection-start="1887" selection-end="1887" vertical-scroll-proportion="0.0" vertical-offset="117" max-vertical-offset="4125">
               <folding>
                 <element signature="e#31#649#0" expanded="true" />
               </folding>
@@ -157,10 +123,19 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="HackedSSLSocketFactory.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/doclient/src/main/java/org/apache/http/conn/ssl/HackedSSLSocketFactory.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="46" column="13" selection-start="1838" selection-end="1838" vertical-scroll-proportion="-1.2116317" vertical-offset="1230" max-vertical-offset="6030">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="Action.kt" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Action.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="64" selection-start="1337" selection-end="1337" vertical-scroll-proportion="0.0" vertical-offset="192" max-vertical-offset="1140">
+            <state line="3" column="0" selection-start="34" selection-end="1272" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1140">
               <folding />
             </state>
           </provider>
@@ -181,7 +156,7 @@
       <file leaf-file-name="DigitalOcean.kt" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOcean.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="499" column="25" selection-start="18442" selection-end="18442" vertical-scroll-proportion="0.0" vertical-offset="7272" max-vertical-offset="10140">
+            <state line="41" column="1" selection-start="1843" selection-end="1884" vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="9660">
               <folding>
                 <element signature="e#26#200#0" expanded="true" />
               </folding>
@@ -192,16 +167,7 @@
       <file leaf-file-name="DTO.kt" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DTO.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="0" selection-start="1198" selection-end="1198" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1785">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DigitalOceanMachine.kt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachine.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="7" selection-start="62" selection-end="62" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1125">
+            <state line="26" column="0" selection-start="1263" selection-end="1263" vertical-scroll-proportion="0.0" vertical-offset="1521" max-vertical-offset="2160">
               <folding />
             </state>
           </provider>
@@ -219,7 +185,7 @@
       <file leaf-file-name="Exceptions.kt" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Exceptions.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="0" selection-start="330" selection-end="330" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="300">
+            <state line="25" column="0" selection-start="1262" selection-end="1262" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="660">
               <folding />
             </state>
           </provider>
@@ -238,7 +204,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/mock/pom.xml" />
         <option value="$PROJECT_DIR$/digitalocean/pom.xml" />
         <option value="$PROJECT_DIR$/examples/pom.xml" />
         <option value="$PROJECT_DIR$/sensors/pom.xml" />
@@ -286,9 +251,10 @@
         <option value="$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachine.kt" />
         <option value="$PROJECT_DIR$/doclient/pom.xml" />
         <option value="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Action.kt" />
-        <option value="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DTO.kt" />
         <option value="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOcean.kt" />
         <option value="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOceanClient.kt" />
+        <option value="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DTO.kt" />
+        <option value="$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Exceptions.kt" />
       </list>
     </option>
   </component>
@@ -744,6 +710,10 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1352,21 +1322,25 @@
       <created>1389305764298</created>
       <updated>1389305764298</updated>
       <workItem from="1389305766740" duration="3520000" />
-      <workItem from="1389309463903" duration="33373000" />
+      <workItem from="1389309463903" duration="33828000" />
     </task>
     <task id="LOCAL-00001" summary="Refactoring into modules, dedicated DO client and more!!">
       <created>1389380392721</created>
       <updated>1389380392721</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Refactoring into modules, dedicated DO client and more!!&#10;">
+      <created>1389399445833</created>
+      <updated>1389399445833</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="36893000" />
+    <option name="totallyTimeSpent" value="37348000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1440" y="22" width="1920" height="1178" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1378,7 +1352,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.38688827" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1416,7 +1390,8 @@
       <TodoPanelSettings />
     </option>
     <MESSAGE value="Refactoring into modules, dedicated DO client and more!!" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactoring into modules, dedicated DO client and more!!" />
+    <MESSAGE value="Refactoring into modules, dedicated DO client and more!!&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactoring into modules, dedicated DO client and more!!&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1770,13 +1745,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/org/apache/http/conn/ssl/HackedSSLSocketFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="13" selection-start="1838" selection-end="1838" vertical-scroll-proportion="0.0" vertical-offset="253" max-vertical-offset="6030">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/digitalocean/src/main/java/kontrol/impl/ocean/DigitalOceanMachine.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state line="3" column="7" selection-start="62" selection-end="62" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1125">
@@ -1798,27 +1766,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DTO.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="0" selection-start="1198" selection-end="1198" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1785">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Exceptions.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="0" selection-start="330" selection-end="330" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="300">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/InputStream_Util.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="26" selection-start="79" selection-end="79" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Constants.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="35" column="48" selection-start="1486" selection-end="1486" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="885">
@@ -1831,7 +1778,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOcean.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="499" column="25" selection-start="18442" selection-end="18442" vertical-scroll-proportion="0.0" vertical-offset="7272" max-vertical-offset="10140">
+        <state line="41" column="1" selection-start="1843" selection-end="1884" vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="9660">
           <folding>
             <element signature="e#26#200#0" expanded="true" />
           </folding>
@@ -1840,17 +1787,45 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Action.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="64" selection-start="1337" selection-end="1337" vertical-scroll-proportion="0.0" vertical-offset="192" max-vertical-offset="1140">
+        <state line="3" column="0" selection-start="34" selection-end="1272" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1140">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DigitalOceanClient.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="194" column="89" selection-start="8898" selection-end="8898" vertical-scroll-proportion="1.1173708" vertical-offset="2196" max-vertical-offset="4110">
+        <state line="43" column="0" selection-start="1887" selection-end="1887" vertical-scroll-proportion="0.0" vertical-offset="117" max-vertical-offset="4125">
           <folding>
             <element signature="e#31#649#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/DTO.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="0" selection-start="1263" selection-end="1263" vertical-scroll-proportion="0.0" vertical-offset="1521" max-vertical-offset="2160">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/Exceptions.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="0" selection-start="1262" selection-end="1262" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="660">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/kontrol/doclient/InputStream_Util.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="3" column="26" selection-start="79" selection-end="79" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doclient/src/main/java/org/apache/http/conn/ssl/HackedSSLSocketFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="13" selection-start="1838" selection-end="1838" vertical-scroll-proportion="-1.2116317" vertical-offset="1230" max-vertical-offset="6030">
+          <folding />
         </state>
       </provider>
     </entry>
