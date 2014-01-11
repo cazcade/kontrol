@@ -22,6 +22,12 @@
             <artifactId>kontrol-sensors</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.cazcade</groupId>
+            <artifactId>kontrol-common</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
