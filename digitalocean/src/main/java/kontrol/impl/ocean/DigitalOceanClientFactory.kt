@@ -1,7 +1,7 @@
 package kontrol.impl.ocean
 
 import kontrol.doclient.DigitalOcean
-import kontrol.doclient.impl.DigitalOceanClient
+import kontrol.doclient.DigitalOceanClient
 
 
 /**

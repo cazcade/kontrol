@@ -3,8 +3,8 @@ package kontrol.doclient
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kontrol.doclient.Constants.*
-import kontrol.doclient.common.Action
-import kontrol.doclient.common.Action.*
+import kontrol.doclient.Action
+import kontrol.doclient.Action.*
 import kontrol.doclient.*
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.utils.URIBuilder
