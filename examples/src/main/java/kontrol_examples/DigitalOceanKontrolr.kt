@@ -1,4 +1,4 @@
-package kontrol_examples
+package kontrol.examples.docean
 
 import kontrol.impl.ocean.DigitalOceanMachineGroup
 import kontrol.impl.DigitalOceanCloud
