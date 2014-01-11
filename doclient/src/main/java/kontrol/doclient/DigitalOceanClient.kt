@@ -1,4 +1,4 @@
-package kontrol.doclient.impl
+package kontrol.doclient
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser

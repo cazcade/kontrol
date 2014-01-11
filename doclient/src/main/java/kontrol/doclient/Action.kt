@@ -1,4 +1,4 @@
-package kontrol.doclient.common
+package kontrol.doclient
 
 
 /* Original  MIT License from  Java version: https://github.com/jeevatkm/digitalocean-api-java
