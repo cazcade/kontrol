@@ -62,35 +62,32 @@ public fun snapitoSensorActions(infra: Infrastructure) {
         val GROUP = it;
 
         GROUP MACHINE_IS OK IF L(BROKEN, STARTING) AND { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } AFTER 5 CHECKS "http-ok"
-        GROUP MACHINE_IS DEAD IF L(BROKEN) AND { it["http-status"]?.I()?:0 > 400 } AFTER 100 CHECKS "dead"
+        GROUP MACHINE_IS DEAD IF L(BROKEN) AND { it["http-status"]?.I()?:0 > 400 } AFTER 100 CHECKS "broken-now-dead"
         GROUP MACHINE_IS DEAD IF L(STOPPED) AFTER 50 CHECKS "stopped-now-dead"
+
+        GROUP IS BUSY IF L(QUIET, BUSY, NORMAL, null) AND { it["http-load"]?:0.0 > 6.0 || GROUP.size() < GROUP.min }  AFTER 20 CHECKS "overload"
+        GROUP IS QUIET IF L(QUIET, BUSY, NORMAL, null) AND { it["http-load"]?:6.0 < 3.0 || GROUP.size() > GROUP.max }  AFTER 100 CHECKS "underload"
+        GROUP IS NORMAL IF L(QUIET, BUSY, null) AND { it["http-load"]?:1.0 in 3.0..6.0 && GROUP.size() in GROUP.min..GROUP.max }  AFTER 5 CHECKS "group-ok"
 
         when(it.name()) {
             "lb" -> {
                 val BALANCER = it;
-                BALANCER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:222 >= 400 } AFTER 2 CHECKS "http-broken"
+                BALANCER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:999 >= 400 } AFTER 5 CHECKS "http-broken"
                 BALANCER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 2 CHECKS "mega-overload"
-                GROUP IS BUSY IF L(QUIET, NORMAL, null) AND { it["load"]?:1.0 > 3.0 }  AFTER 2 CHECKS "overload"
-                GROUP IS QUIET IF L(BUSY, NORMAL, null) AND { it["load"]?:1.0 < 1.0 }  AFTER 5 CHECKS "underload"
-                GROUP IS NORMAL IF L(QUIET, BUSY, null) AND { it["load"]?:1.0 in 1.0..3.0 }  AFTER 5 CHECKS "group-ok"
+
             }
             "gateway" -> {
 
                 val GATEWAY = it;
-                GATEWAY MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:222 >= 400 } AFTER 3 CHECKS "http-broken"
+                GATEWAY MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:999 >= 400 } AFTER 3 CHECKS "http-broken"
                 GATEWAY MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 3 CHECKS "mega-overload"
 
-                GROUP IS BUSY IF L(QUIET, NORMAL, null) AND { it["load"]?:0.0 > 3.0 } AFTER 5 CHECKS "overload"
-                GROUP IS QUIET IF L(BUSY, NORMAL, null) AND { it["load"]?:1.0 < 1.0 }  AFTER 10 CHECKS "underload"
-                GROUP IS NORMAL IF L(QUIET, BUSY, null) AND { it["load"]?:1.0 in 1.0..3.0 }  AFTER 2 CHECKS "group-ok"
             }
             "worker" -> {
                 val WORKER = it;
                 WORKER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 2.0 } AFTER 30 CHECKS "http-broken"
                 WORKER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 5 CHECKS "mega-overload"
-                GROUP IS BUSY IF L(QUIET, BUSY, NORMAL, null) AND { it["http-load"]?:0.0 > 6.0 || GROUP.size() < GROUP.min }  AFTER 20 CHECKS "overload"
-                GROUP IS QUIET IF L(QUIET, BUSY, NORMAL, null) AND { it["http-load"]?:6.0 < 3.0 || GROUP.size() > GROUP.max }  AFTER 100 CHECKS "underload"
-                GROUP IS NORMAL IF L(QUIET, BUSY, null) AND { it["http-load"]?:1.0 in 3.0..6.0 && GROUP.size() in GROUP.min..GROUP.max }  AFTER 5 CHECKS "group-ok"
+
             }
         }
     }
@@ -102,21 +99,21 @@ public fun snapitoPolicy(infra: Infrastructure, controller: Controller) {
         when(it.name()) {
             "lb" -> {
                 val balancers = it;
-                balancers HAVE_A BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE ;
-                balancers HAVE_A DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE ;
-                balancers HAVE_A STALE RECHECK THEN  TELL controller TO REIMAGE_MACHINE;
+                balancers MACHINE BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE ;
+                balancers MACHINE DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE ;
+                balancers MACHINE STALE RECHECK THEN  TELL controller TO REIMAGE_MACHINE;
             }
             "gateway" -> {
                 val gateways = it;
-                gateways HAVE_A BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE;
-                gateways HAVE_A DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE ;
-                gateways HAVE_A STALE RECHECK THEN TELL controller   TO REIMAGE_MACHINE;
+                gateways MACHINE BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE;
+                gateways MACHINE DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE ;
+                gateways MACHINE STALE RECHECK THEN TELL controller   TO REIMAGE_MACHINE;
             }
             "worker" -> {
                 val workers = it;
-                workers HAVE_A DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE;
+                workers MACHINE DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE;
                 workers BECOME BUSY RECHECK THEN USE controller TO EXPAND;
-                workers HAVE_A STALE RECHECK THEN TELL controller TO  REIMAGE_MACHINE;
+                workers MACHINE STALE RECHECK THEN TELL controller TO  REIMAGE_MACHINE;
                 workers BECOME QUIET RECHECK THEN USE controller  TO CONTRACT;
             }
         }

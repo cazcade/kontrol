@@ -126,7 +126,7 @@ public trait DigitalOcean {
      * Method returns full information for a specific droplet ID that is passed
      * in the URL.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Droplet}
      * @throws kontrol.doclient.AccessDeniedException
@@ -135,12 +135,12 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun getDropletInfo(dropletId: Int): Droplet
+    fun getDropletInfo(id: Int): Droplet
     /**
      * Method allows you to reboot a droplet. This is the preferred method to
      * use if a server is not responding.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -149,12 +149,12 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun rebootDroplet(dropletId: Int): Response
+    fun rebootDroplet(id: Int): Response
     /**
      * Method allows you to power cycle a droplet. This will turn off the
      * droplet and then turn it back on.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -163,12 +163,12 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun powerCyleDroplet(dropletId: Int): Response
+    fun powerCyleDroplet(id: Int): Response
     /**
      * Method allows you to shutdown a running droplet. The droplet will remain
      * in your account.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -177,12 +177,12 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun shutdownDroplet(dropletId: Int): Response
+    fun shutdownDroplet(id: Int): Response
     /**
      * Method allows you to poweroff a running droplet. The droplet will remain
      * in your account.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -191,11 +191,11 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun powerOffDroplet(dropletId: Int): Response
+    fun powerOffDroplet(id: Int): Response
     /**
      * Method allows you to poweron a powered off droplet.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -204,12 +204,12 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun powerOnDroplet(dropletId: Int): Response
+    fun powerOnDroplet(id: Int): Response
     /**
      * Method will reset the root password for a droplet. Please be aware that
      * this will reboot the droplet to allow resetting the password.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -218,12 +218,12 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun resetDropletPassword(dropletId: Int): Response
+    fun resetDropletPassword(id: Int): Response
     /**
      * Method allows you to resize a specific droplet to a different size. This
      * will affect the number of processors and memory allocated to the droplet.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -232,13 +232,13 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun resizeDroplet(dropletId: Int, sizeId: Int): Response
+    fun resizeDroplet(id: Int, sizeId: Int): Response
     /**
      * Method allows you to take a snapshot of the running droplet, which can
      * later be restored or used to create a new droplet from the same image.
      * Please be aware this may cause a reboot.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -247,13 +247,13 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun takeDropletSnapshot(dropletId: Int): Response
+    fun takeDropletSnapshot(id: Int): Response
     /**
      * Method allows you to take a snapshot of the running droplet, which can
      * later be restored or used to create a new droplet from the same image.
      * Please be aware this may cause a reboot.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @param snapshotName
      *            the name the snapshot to be created
@@ -264,13 +264,13 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun takeDropletSnapshot(dropletId: Int, snapshotName: String?): Response
+    fun takeDropletSnapshot(id: Int, snapshotName: String?): Response
     /**
      * Method allows you to restore a droplet with a previous image or snapshot.
      * This will be a mirror copy of the image or snapshot to your droplet. Be
      * sure you have backed up any necessary information prior to restore.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -279,13 +279,13 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun restoreDroplet(dropletId: Int, imageId: Int): Response
+    fun restoreDroplet(id: Int, imageId: Int): Response
     /**
      * Method allows you to reinstall a droplet with a default image. This is
      * useful if you want to start again but retain the same IP address for your
      * droplet.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -294,12 +294,12 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun rebuildDroplet(dropletId: Int, imageId: Int): Response
+    fun rebuildDroplet(id: Int, imageId: Int): Response
     /**
      * Method enables automatic backups which run in the background daily to
      * backup your droplet's data.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -308,12 +308,12 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun enableDropletBackups(dropletId: Int): Response
+    fun enableDropletBackups(id: Int): Response
     /**
      * Method disables automatic backups from running to backup your droplet's
      * data.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -322,11 +322,11 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun disableDropletBackups(dropletId: Int): Response
+    fun disableDropletBackups(id: Int): Response
     /**
      * Method renames the droplet to the specified name.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -335,11 +335,11 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun renameDroplet(dropletId: Int, name: String): Response
+    fun renameDroplet(id: Int, name: String): Response
     /**
      * Method destroys one of your droplets this is irreversible.
      *
-     * @param dropletId
+     * @param id
      *            the id of the droplet
      * @return {@link kontrol.doclient.Response}
      * @throws kontrol.doclient.AccessDeniedException
@@ -348,7 +348,7 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun deleteDroplet(dropletId: Int): Response
+    fun deleteDroplet(id: Int): Response
     /*
 	 * Regions (aka Data Centers) methods
 	 */

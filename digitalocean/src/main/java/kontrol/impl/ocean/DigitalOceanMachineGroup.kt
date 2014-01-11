@@ -18,7 +18,7 @@ import kontrol.impl.onHost
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory, val name: String, override val sensors: SensorArray<Any?>, val config: DigitalOceanConfig, public override val minSize: Int, public override val maxSize: Int) : MachineGroup{
+public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory, val name: String, override val sensors: SensorArray<Any?>, val config: DigitalOceanConfig, public override val min: Int, public override val max: Int) : MachineGroup{
     override val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>> = ArrayList();
     override val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>> = ArrayList()
 

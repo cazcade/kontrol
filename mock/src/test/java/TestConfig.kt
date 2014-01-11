@@ -105,22 +105,22 @@ public fun snapitoPolicy(infra: Infrastructure, controller: Controller) {
         when(it.name()) {
             "lb" -> {
                 val balancers = it;
-                balancers HAVE_A BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE ;
-                balancers HAVE_A DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE ;
-                balancers HAVE_A STALE RECHECK THEN  TELL controller TO REIMAGE_MACHINE;
+                balancers MACHINE BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE ;
+                balancers MACHINE DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE ;
+                balancers MACHINE STALE RECHECK THEN  TELL controller TO REIMAGE_MACHINE;
             }
             "gateway" -> {
                 val gateways = it;
-                gateways HAVE_A BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE;
-                gateways HAVE_A DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE ;
-                gateways HAVE_A STALE RECHECK THEN TELL controller   TO REIMAGE_MACHINE;
+                gateways MACHINE BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE;
+                gateways MACHINE DEAD RECHECK THEN TELL controller  TO REIMAGE_MACHINE ;
+                gateways MACHINE STALE RECHECK THEN TELL controller   TO REIMAGE_MACHINE;
             }
             "worker" -> {
                 val workers = it;
-                workers HAVE_A BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE;
-                workers HAVE_A DEAD RECHECK THEN TELL controller  TO DESTROY_MACHINE;
+                workers MACHINE BROKEN RECHECK THEN TELL controller  TO RESTART_MACHINE;
+                workers MACHINE DEAD RECHECK THEN TELL controller  TO DESTROY_MACHINE;
                 workers BECOME BUSY RECHECK THEN USE controller   TO EXPAND;
-                workers HAVE_A STALE RECHECK THEN TELL controller TO  REIMAGE_MACHINE;
+                workers MACHINE STALE RECHECK THEN TELL controller TO  REIMAGE_MACHINE;
                 workers BECOME QUIET RECHECK THEN USE controller  TO CONTRACT;
             }
         }

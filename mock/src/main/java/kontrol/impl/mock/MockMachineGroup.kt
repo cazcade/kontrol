@@ -18,8 +18,8 @@ import kontrol.api.MonitorRule
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>) : MachineGroup{
-    override val minSize: Int = 0
-    override val maxSize: Int = 100000
+    override val min: Int = 0
+    override val max: Int = 100000
 
     override val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>> = ArrayList();
     override val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>> = ArrayList();

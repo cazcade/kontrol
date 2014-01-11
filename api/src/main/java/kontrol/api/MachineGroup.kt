@@ -237,7 +237,7 @@ public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
 
     }
 
-    fun HAVE_A(newState: MachineState): RuleBuilder1 {
+    fun MACHINE(newState: MachineState): RuleBuilder1 {
         return  RuleBuilder1(this, newState);
     }
     fun BECOME(newState: MachineGroupState): RuleBuilder2 {
