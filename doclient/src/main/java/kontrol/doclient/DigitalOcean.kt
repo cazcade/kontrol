@@ -38,7 +38,7 @@ import kontrol.doclient.*
  *
  * <p>
  *
- * @author Neil Ellis (neiL@cazcade.com)
+ * @author Neil Ellis (neiL@cazcade.com)  - Derived Work
  * @author Jeevanandam M. (jeeva@myjeeva.com)
  */
 public trait DigitalOcean {
