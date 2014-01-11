@@ -34,35 +34,8 @@ import java.lang.reflect.Type
 public trait Constants {
 
 
-    class object {
+    public class object {
         // Gson Type Tokens
-        val TYPE_DROPLET_LIST: Type = object : TypeToken<MutableList<Droplet>>() {
 
-
-        }.getType()!!
-        val TYPE_IMAGE_LIST: Type = object : TypeToken<MutableList<DropletImage>>() {
-
-
-        }.getType()!!
-        val TYPE_REGION_LIST: Type = object : TypeToken<MutableList<Region>>() {
-
-
-        }.getType()!!
-        val TYPE_SIZE_LIST: Type = object : TypeToken<MutableList<DropletSize>>() {
-
-
-        }.getType()!!
-        val TYPE_DOMAIN_LIST: Type = object : TypeToken<MutableList<Domain>>() {
-
-
-        }.getType()!!
-        val TYPE_DOMAIN_RECORD_LIST: Type = object : TypeToken<MutableList<DomainRecord>>() {
-
-
-        }.getType()!!
-        val TYPE_SSH_KEY_LIST: Type = object : TypeToken<MutableList<SshKey>>() {
-
-
-        }.getType()!!
     }
 }

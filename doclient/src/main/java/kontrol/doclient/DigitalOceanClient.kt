@@ -2,8 +2,6 @@ package kontrol.doclient
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import kontrol.doclient.Constants.*
-import kontrol.doclient.Action
 import kontrol.doclient.Action.*
 import kontrol.doclient.*
 import org.apache.http.client.methods.HttpGet
@@ -17,6 +15,7 @@ import java.lang.reflect.Type
 import java.net.URI
 import com.google.gson.JsonElement
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 /* Original  MIT License from  Java version: https://github.com/jeevatkm/digitalocean-api-java
  *
@@ -47,7 +46,35 @@ import com.google.gson.Gson
  *
  * @author Jeevanandam M. (jeeva@myjeeva.com)
  */
-public  class DigitalOceanClient(val clientId: String, val apiKey: String) : DigitalOcean, Constants {
+public  class DigitalOceanClient(val clientId: String, val apiKey: String) : DigitalOcean {
+    public val TYPE_DROPLET_LIST: Type = object : TypeToken<MutableList<Droplet>>() {
+
+
+    }.getType()!!
+    public val TYPE_IMAGE_LIST: Type = object : TypeToken<MutableList<DropletImage>>() {
+
+
+    }.getType()!!
+    public  val TYPE_REGION_LIST: Type = object : TypeToken<MutableList<Region>>() {
+
+
+    }.getType()!!
+    public  val TYPE_SIZE_LIST: Type = object : TypeToken<MutableList<DropletSize>>() {
+
+
+    }.getType()!!
+    public  val TYPE_DOMAIN_LIST: Type = object : TypeToken<MutableList<Domain>>() {
+
+
+    }.getType()!!
+    public val TYPE_DOMAIN_RECORD_LIST: Type = object : TypeToken<MutableList<DomainRecord>>() {
+
+
+    }.getType()!!
+    public  val TYPE_SSH_KEY_LIST: Type = object : TypeToken<MutableList<SshKey>>() {
+
+
+    }.getType()!!
 
     private val LOG: Logger = LoggerFactory.getLogger(javaClass<DigitalOceanClient>())!!
 
