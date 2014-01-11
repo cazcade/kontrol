@@ -1,3 +1,8 @@
+package kontrol.doclient
+
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
+
 /* Original  MIT License from  Java version: https://github.com/jeevatkm/digitalocean-api-java
  *
  * Copyright (c) 2010-2013 Jeevanandam M. (myjeeva.com)
@@ -21,33 +26,43 @@
  * THE SOFTWARE. 
  * 
  */
-package kontrol.doclient;
-
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.List;
-
 /**
  * DigitalOcean API client Constants
- * 
+ *
  * @author Jeevanandam M. (jeeva@myjeeva.com)
  */
-public interface Constants {
+public trait Constants {
 
 
-	// Gson Type Tokens
-	Type TYPE_DROPLET_LIST = new TypeToken<List<Droplet>>() { }.getType();
+    class object {
+        // Gson Type Tokens
+        val TYPE_DROPLET_LIST: Type = object : TypeToken<MutableList<Droplet>>() {
 
-	Type TYPE_IMAGE_LIST = new TypeToken<List<DropletImage>>() { }.getType();
 
-	Type TYPE_REGION_LIST = new TypeToken<List<Region>>() { }.getType();
+        }.getType()!!
+        val TYPE_IMAGE_LIST: Type = object : TypeToken<MutableList<DropletImage>>() {
 
-	Type TYPE_SIZE_LIST = new TypeToken<List<DropletSize>>() { }.getType();
 
-	Type TYPE_DOMAIN_LIST = new TypeToken<List<Domain>>() { }.getType();
+        }.getType()!!
+        val TYPE_REGION_LIST: Type = object : TypeToken<MutableList<Region>>() {
 
-	Type TYPE_DOMAIN_RECORD_LIST = new TypeToken<List<DomainRecord>>() { }.getType();
 
-	Type TYPE_SSH_KEY_LIST = new TypeToken<List<SshKey>>() { }.getType();
+        }.getType()!!
+        val TYPE_SIZE_LIST: Type = object : TypeToken<MutableList<DropletSize>>() {
+
+
+        }.getType()!!
+        val TYPE_DOMAIN_LIST: Type = object : TypeToken<MutableList<Domain>>() {
+
+
+        }.getType()!!
+        val TYPE_DOMAIN_RECORD_LIST: Type = object : TypeToken<MutableList<DomainRecord>>() {
+
+
+        }.getType()!!
+        val TYPE_SSH_KEY_LIST: Type = object : TypeToken<MutableList<SshKey>>() {
+
+
+        }.getType()!!
+    }
 }
