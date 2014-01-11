@@ -59,38 +59,38 @@ public fun defaultTranstitions(group: MachineGroup) {
 
 public fun snapitoSensorActions(infra: Infrastructure) {
     infra.topology().each {
-        val group = it;
+        val GROUP = it;
 
-        group MACHINE_IS OK IF L(BROKEN, STARTING) AND { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } AFTER 5 CHECKS "http-ok"
-        group MACHINE_IS DEAD IF L(BROKEN) AND { it["http-status"]?.I()?:0 > 400 } AFTER 100 CHECKS "dead"
-        group MACHINE_IS DEAD IF L(STOPPED) AFTER 50 CHECKS "stopped-now-dead"
+        GROUP MACHINE_IS OK IF L(BROKEN, STARTING) AND { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } AFTER 5 CHECKS "http-ok"
+        GROUP MACHINE_IS DEAD IF L(BROKEN) AND { it["http-status"]?.I()?:0 > 400 } AFTER 100 CHECKS "dead"
+        GROUP MACHINE_IS DEAD IF L(STOPPED) AFTER 50 CHECKS "stopped-now-dead"
 
         when(it.name()) {
             "lb" -> {
-                val balancers = it;
-                balancers MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:222 >= 400 } AFTER 2 CHECKS "http-broken"
-                balancers MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 2 CHECKS "mega-overload"
-                group IS BUSY IF L(QUIET, NORMAL, null) AND { it["load"]?:1.0 > 3.0 }  AFTER 2 CHECKS "overload"
-                group IS QUIET IF L(BUSY, NORMAL, null) AND { it["load"]?:1.0 < 1.0 }  AFTER 5 CHECKS "underload"
-                group IS NORMAL IF L(QUIET, BUSY, null) AND { it["load"]?:1.0 in 1.0..3.0 }  AFTER 5 CHECKS "group-ok"
+                val BALANCER = it;
+                BALANCER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:222 >= 400 } AFTER 2 CHECKS "http-broken"
+                BALANCER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 2 CHECKS "mega-overload"
+                GROUP IS BUSY IF L(QUIET, NORMAL, null) AND { it["load"]?:1.0 > 3.0 }  AFTER 2 CHECKS "overload"
+                GROUP IS QUIET IF L(BUSY, NORMAL, null) AND { it["load"]?:1.0 < 1.0 }  AFTER 5 CHECKS "underload"
+                GROUP IS NORMAL IF L(QUIET, BUSY, null) AND { it["load"]?:1.0 in 1.0..3.0 }  AFTER 5 CHECKS "group-ok"
             }
             "gateway" -> {
 
-                val gateways = it;
-                gateways MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:222 >= 400 } AFTER 3 CHECKS "http-broken"
-                gateways MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 3 CHECKS "mega-overload"
+                val GATEWAY = it;
+                GATEWAY MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:222 >= 400 } AFTER 3 CHECKS "http-broken"
+                GATEWAY MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 3 CHECKS "mega-overload"
 
-                group IS BUSY IF L(QUIET, NORMAL, null) AND { it["load"]?:0.0 > 3.0 } AFTER 5 CHECKS "overload"
-                group IS QUIET IF L(BUSY, NORMAL, null) AND { it["load"]?:1.0 < 1.0 }  AFTER 10 CHECKS "underload"
-                group IS NORMAL IF L(QUIET, BUSY, null) AND { it["load"]?:1.0 in 1.0..3.0 }  AFTER 2 CHECKS "group-ok"
+                GROUP IS BUSY IF L(QUIET, NORMAL, null) AND { it["load"]?:0.0 > 3.0 } AFTER 5 CHECKS "overload"
+                GROUP IS QUIET IF L(BUSY, NORMAL, null) AND { it["load"]?:1.0 < 1.0 }  AFTER 10 CHECKS "underload"
+                GROUP IS NORMAL IF L(QUIET, BUSY, null) AND { it["load"]?:1.0 in 1.0..3.0 }  AFTER 2 CHECKS "group-ok"
             }
             "worker" -> {
-                val workers = it;
-                workers MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 2.0 } AFTER 30 CHECKS "http-broken"
-                workers MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 5 CHECKS "mega-overload"
-                group IS BUSY IF L(QUIET, BUSY, NORMAL, null) AND { it["http-load"]?:0.0 > 6.0 || group.size() < group.minSize }  AFTER 20 CHECKS "overload"
-                group IS QUIET IF L(QUIET, BUSY, NORMAL, null) AND { it["http-load"]?:6.0 < 3.0 || group.size() > group.maxSize }  AFTER 100 CHECKS "underload"
-                group IS NORMAL IF L(QUIET, BUSY, null) AND { it["http-load"]?:1.0 in 3.0..6.0 && group.size() in group.minSize..group.maxSize }  AFTER 5 CHECKS "group-ok"
+                val WORKER = it;
+                WORKER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 2.0 } AFTER 30 CHECKS "http-broken"
+                WORKER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 5 CHECKS "mega-overload"
+                GROUP IS BUSY IF L(QUIET, BUSY, NORMAL, null) AND { it["http-load"]?:0.0 > 6.0 || GROUP.size() < GROUP.min }  AFTER 20 CHECKS "overload"
+                GROUP IS QUIET IF L(QUIET, BUSY, NORMAL, null) AND { it["http-load"]?:6.0 < 3.0 || GROUP.size() > GROUP.max }  AFTER 100 CHECKS "underload"
+                GROUP IS NORMAL IF L(QUIET, BUSY, null) AND { it["http-load"]?:1.0 in 3.0..6.0 && GROUP.size() in GROUP.min..GROUP.max }  AFTER 5 CHECKS "group-ok"
             }
         }
     }
@@ -136,21 +136,21 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                 val gateways = it;
                 controller USE {
                     gateways.failover(it);
-                    infra.topology().group("lb").configure();
+                    infra.topology().get("lb").configure();
                     gateways.reImage(it).failback(it);
-                    infra.topology().group("lb").configure()
+                    infra.topology().get("lb").configure()
                 } TO REIMAGE_MACHINE IN_GROUP gateways;
 
                 controller USE {
                     gateways.failover(it).destroy(it);
-                    infra.topology().group("lb").configure();
+                    infra.topology().get("lb").configure();
                 } TO DESTROY_MACHINE IN_GROUP gateways;
 
                 controller USE {
                     gateways.failover(it);
-                    infra.topology().group("lb").configure();
+                    infra.topology().get("lb").configure();
                     gateways.restart(it).failback(it);
-                    infra.topology().group("lb").configure()
+                    infra.topology().get("lb").configure()
                 } TO RESTART_MACHINE IN_GROUP gateways;
             }
             "worker" -> {
@@ -158,8 +158,8 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                 controller USE { workers.failover(it).reImage(it) } TO REIMAGE_MACHINE IN_GROUP workers;
                 controller USE { workers.failover(it).destroy(it) } TO DESTROY_MACHINE IN_GROUP workers;
                 controller USE { workers.failover(it).restart(it).failback(it) } TO RESTART_MACHINE IN_GROUP workers;
-                controller WILL { workers.expand() } TO EXPAND  UNLESS { workers.size() > workers.maxSize }  GROUP workers;
-                controller WILL { workers.contract() } TO CONTRACT UNLESS { workers.size() < workers.minSize } GROUP workers;
+                controller WILL { workers.expand() } TO EXPAND  UNLESS { workers.size() > workers.max }  GROUP workers;
+                controller WILL { workers.contract() } TO CONTRACT UNLESS { workers.size() < workers.min } GROUP workers;
             }
         }
     };

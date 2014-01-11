@@ -89,11 +89,11 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
 
                 workers MACHINE_IS BROKEN IF listOf(OK, STALE, STARTING) AND { it.data["load"]?.D()?:0.0 > 30 } AFTER 5 CHECKS "mega-overload"
 
-                group IS BUSY IF listOf(BUSY, QUIET, NORMAL, null) AND { it.get("http-load")?:1.0 > 5.0 || group.size() < group.minSize }  AFTER 20 CHECKS "overload"
+                group IS BUSY IF listOf(BUSY, QUIET, NORMAL, null) AND { it.get("http-load")?:1.0 > 5.0 || group.size() < group.min }  AFTER 20 CHECKS "overload"
 
-                group IS QUIET IF listOf(QUIET, BUSY, NORMAL, null) AND { it.get("http-load")?:1.0 < 3.0 || group.size() > group.maxSize }  AFTER 60 CHECKS "underload"
+                group IS QUIET IF listOf(QUIET, BUSY, NORMAL, null) AND { it.get("http-load")?:1.0 < 3.0 || group.size() > group.max }  AFTER 60 CHECKS "underload"
 
-                group IS NORMAL IF listOf(QUIET, BUSY, null) AND { it.get("http-load") ?:1.0 in 3.0..5.0 && group.size() in group.minSize..group.maxSize }  AFTER 5 CHECKS "group-ok"
+                group IS NORMAL IF listOf(QUIET, BUSY, null) AND { it.get("http-load") ?:1.0 in 3.0..5.0 && group.size() in group.min..group.max }  AFTER 5 CHECKS "group-ok"
             }
         }
     }
@@ -140,21 +140,21 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                 val gateways = it;
                 controller USE {
                     gateways.failover(it);
-                    infra.topology().group("lb").configure();
+                    infra.topology().get("lb").configure();
                     gateways.reImage(it).failback(it);
-                    infra.topology().group("lb").configure()
+                    infra.topology().get("lb").configure()
                 } TO REIMAGE_MACHINE IN_GROUP gateways;
 
                 controller USE {
                     gateways.failover(it).destroy(it);
-                    infra.topology().group("lb").configure();
+                    infra.topology().get("lb").configure();
                 } TO DESTROY_MACHINE IN_GROUP gateways;
 
                 controller USE {
                     gateways.failover(it);
-                    infra.topology().group("lb").configure();
+                    infra.topology().get("lb").configure();
                     gateways.restart(it).failback(it);
-                    infra.topology().group("lb").configure()
+                    infra.topology().get("lb").configure()
                 } TO RESTART_MACHINE IN_GROUP gateways;
             }
             "worker" -> {
@@ -162,8 +162,8 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                 controller USE { workers.failover(it).reImage(it) } TO REIMAGE_MACHINE IN_GROUP workers;
                 controller USE { workers.failover(it).destroy(it) } TO DESTROY_MACHINE IN_GROUP workers;
                 controller USE { workers.failover(it).restart(it).failback(it) } TO RESTART_MACHINE IN_GROUP workers;
-                controller WILL { workers.expand() } TO EXPAND  UNLESS { workers.size() > workers.maxSize }  GROUP workers;
-                controller WILL { workers.contract() } TO CONTRACT UNLESS { workers.size() < workers.minSize } GROUP workers;
+                controller WILL { workers.expand() } TO EXPAND  UNLESS { workers.size() > workers.max }  GROUP workers;
+                controller WILL { workers.contract() } TO CONTRACT UNLESS { workers.size() < workers.min } GROUP workers;
             }
         }
     };

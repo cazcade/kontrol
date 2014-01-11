@@ -18,8 +18,8 @@ public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
     val monitor: Monitor<MachineGroupState, MachineGroup>
     val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>>
     val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>>
-    val minSize: Int
-    val maxSize: Int
+    val min: Int
+    val max: Int
 
     override fun name(): String
 

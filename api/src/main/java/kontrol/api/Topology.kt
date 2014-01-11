@@ -32,7 +32,7 @@ public trait Topology {
         return this;
     }
 
-    fun group(name: String): MachineGroup {
+    fun get(name: String): MachineGroup {
         val machineGroup = members().get(name)
         return if (machineGroup != null) {
             machineGroup

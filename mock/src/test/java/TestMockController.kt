@@ -93,7 +93,7 @@ public class TestMockController {
 
         val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL, MachineGroupState.QUIET, MachineGroupState.BUSY, MachineGroupState.NORMAL, MachineGroupState.GROUP_BROKEN)));
         val mockController = runTestForScenario(map, groupStates);
-        assertEquals(1, mockController.topology().group("worker").machines().size);
+        assertEquals(1, mockController.topology().get("worker").machines().size);
         ;
     }
 
@@ -104,8 +104,8 @@ public class TestMockController {
         val map = buildSimpleWorkerToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
-        assertEquals(2, mockController.topology().group("worker").machines().size);
-        assertTrue(mockController.topology().group("worker").machines().all { it.state() == OK })
+        assertEquals(2, mockController.topology().get("worker").machines().size);
+        assertTrue(mockController.topology().get("worker").machines().all { it.state() == OK })
     }
 
     test fun test3(): Unit {
@@ -114,7 +114,7 @@ public class TestMockController {
         val map = buildSimpleWorkerToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
-        assertEquals(2, mockController.topology().group("worker").machines().size);
+        assertEquals(2, mockController.topology().get("worker").machines().size);
     }
 
     test fun test4(): Unit {
@@ -123,7 +123,7 @@ public class TestMockController {
         val map = buildSimpleLBToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("lb", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
-        assertEquals(2, mockController.topology().group("lb").machines().size);
+        assertEquals(2, mockController.topology().get("lb").machines().size);
     }
 
     test fun test5(): Unit {
@@ -132,8 +132,8 @@ public class TestMockController {
         val map = buildSimpleLBToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("lb", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
-        assertEquals(2, mockController.topology().group("lb").machines().size);
-        assertTrue(mockController.topology().group("lb").machines().all { it.state() == BROKEN })
+        assertEquals(2, mockController.topology().get("lb").machines().size);
+        assertTrue(mockController.topology().get("lb").machines().all { it.state() == BROKEN })
 
     }
 
