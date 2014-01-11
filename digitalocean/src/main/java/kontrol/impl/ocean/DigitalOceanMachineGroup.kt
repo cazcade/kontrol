@@ -18,12 +18,12 @@ import kontrol.impl.onHost
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory, val name: String, override val sensorArray: SensorArray<Any?>, val config: DigitalOceanConfig, public override val minSize: Int, public override val maxSize: Int) : MachineGroup{
+public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory, val name: String, override val sensors: SensorArray<Any?>, val config: DigitalOceanConfig, public override val minSize: Int, public override val maxSize: Int) : MachineGroup{
     override val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>> = ArrayList();
     override val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>> = ArrayList()
 
     override val stateMachine = DefaultStateMachine<MachineGroupState, MachineGroup>(this);
-    override val monitor: Monitor<MachineGroupState, MachineGroup> = DigitalOceanMachineGroupMonitor(this, sensorArray)
+    override val monitor: Monitor<MachineGroupState, MachineGroup> = DigitalOceanMachineGroupMonitor(this, sensors)
     override val defaultMachineRules = DefaultStateMachineRules<MachineState, Machine>();
 
     val machines = ConcurrentHashMap<String, DigitalOceanMachine>();
@@ -58,7 +58,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
                 Thread.sleep(5000);
             }
             println("Machine ${id} is OFF")
-            if (stateMachine.currentState != MachineGroupState.UNDERLOADED) {
+            if (stateMachine.currentState != MachineGroupState.QUIET) {
                 println("CONTRACTED GROUP ${name()}")
             } else {
                 Thread.sleep(10000)
@@ -98,7 +98,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
             }
             Thread.sleep(5000)
         }
-        if (stateMachine.currentState != MachineGroupState.OVERLOADED) {
+        if (stateMachine.currentState != MachineGroupState.BUSY) {
             println("EXPANDED GROUP ${name()}")
             Thread.sleep(20000);
         } else {

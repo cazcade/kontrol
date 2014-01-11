@@ -21,10 +21,10 @@ public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFa
 
             stateMachine.attemptTransition(
                     when ((target as DigitalOceanMachine).droplet.status?.toLowerCase()) {
-                        "active" -> MachineState.MACHINE_STARTING
-                        "off" -> MachineState.MACHINE_STOPPED
-                        "new" -> MachineState.MACHINE_STARTING
-                        "archive" -> MachineState.MACHINE_STOPPING
+                        "active" -> MachineState.STARTING
+                        "off" -> MachineState.STOPPED
+                        "new" -> MachineState.STARTING
+                        "archive" -> MachineState.STOPPING
                         else -> null
 
                     })

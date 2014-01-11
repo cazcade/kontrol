@@ -2,6 +2,7 @@ package kontrol.api
 
 import kontrol.api.sensors.SensorArray
 import java.util.ArrayList
+import kontrol.api.sensor.SensorValue
 
 
 /**
@@ -12,7 +13,7 @@ public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
 
 
     override val stateMachine: StateMachine<MachineGroupState, MachineGroup>
-    val sensorArray: SensorArray<Any?>;
+    val sensors: SensorArray<Any?>;
     val defaultMachineRules: StateMachineRules<MachineState, Machine>
     val monitor: Monitor<MachineGroupState, MachineGroup>
     val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>>
@@ -23,10 +24,15 @@ public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
     override fun name(): String
 
     fun size(): Int {
-        return machines().filter { it.state() == MachineState.MACHINE_OK }.size();
+        return machines().filter { it.state() == MachineState.OK }.size();
     }
 
     fun machines(): List<Machine>
+
+
+    fun get(value: String): Double? {
+        return (machines() filter { it.state() == MachineState.OK } map { it.data[value] }).avg()
+    }
 
     fun startMonitoring() {
         println("Started monitoring ${name()}")
@@ -181,21 +187,21 @@ public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
         var confirms = 0;
         var previousStates = ArrayList<MachineState>()
 
-        fun WHEN(condition: (Machine) -> Boolean): MachineStateRuleBuilder {
+        fun AND(condition: (Machine) -> Boolean): MachineStateRuleBuilder {
             this.condition = condition;
             return this;
         }
 
-        fun EVERY(confirms: Int): MachineStateRuleBuilder {
+        fun AFTER(confirms: Int): MachineStateRuleBuilder {
             this.confirms = confirms;
             return this;
         }
-        fun FROM(states: List<MachineState>): MachineStateRuleBuilder {
+        fun IF(states: List<MachineState>): MachineStateRuleBuilder {
             previousStates.addAll(states)
             return this;
         }
 
-        fun CALL_THIS(name: String) {
+        fun CHECKS(name: String) {
             machineGroup.machineMonitorRules.add(MonitorRule(state, condition, confirms, name, previousStates))
             println("Added rule for $name")
         }
@@ -209,21 +215,21 @@ public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
         var confirms = 0;
         var previousStates = ArrayList<MachineGroupState?>()
 
-        fun WHEN(condition: (MachineGroup) -> Boolean): MachineGroupStateRuleBuilder {
+        fun AND(condition: (MachineGroup) -> Boolean): MachineGroupStateRuleBuilder {
             this.condition = condition;
             return this;
         }
 
-        fun EVERY(confirms: Int): MachineGroupStateRuleBuilder {
+        fun AFTER(confirms: Int): MachineGroupStateRuleBuilder {
             this.confirms = confirms;
             return this;
         }
-        fun FROM(states: List<MachineGroupState?>): MachineGroupStateRuleBuilder {
+        fun IF(states: List<MachineGroupState?>): MachineGroupStateRuleBuilder {
             previousStates.addAll(states)
             return this;
         }
 
-        fun CALL_THIS(name: String) {
+        fun CHECKS(name: String) {
             machineGroup.groupMonitorRules.add(MonitorRule(state, condition, confirms, name, previousStates))
             println("Added rule for $name")
         }
@@ -231,17 +237,63 @@ public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
 
     }
 
-    fun HAVE(newState: MachineState): RuleBuilder1 {
+    fun HAVE_A(newState: MachineState): RuleBuilder1 {
         return  RuleBuilder1(this, newState);
     }
-    fun ARE(newState: MachineGroupState): RuleBuilder2 {
+    fun BECOME(newState: MachineGroupState): RuleBuilder2 {
         return  RuleBuilder2(this, newState);
     }
-    fun MACHINE_STATE(state: MachineState): MachineStateRuleBuilder {
+    fun MACHINE_IS(state: MachineState): MachineStateRuleBuilder {
         return  MachineStateRuleBuilder(this, state);
     }
-    fun STATE(state: MachineGroupState): MachineGroupStateRuleBuilder {
+    fun IS(state: MachineGroupState): MachineGroupStateRuleBuilder {
         return  MachineGroupStateRuleBuilder(this, state);
     }
 
 }
+
+
+fun List<SensorValue<Any?>?>.sumSensors(): Double? {
+    return if (this.size() > 0) this.map { if (it?.value != null) it?.value.toString().toDouble() else null } .reduce { x, y ->
+        when {
+            x == null -> y
+            y == null -> x
+            else -> x + y
+        }
+    } else null
+}
+
+
+
+fun List<SensorValue<Any?>?>.avg(): Double? {
+    val sum = this.sumSensors()
+    val size = this.filterNotNull().size
+    return when {
+        sum == null -> null
+        size == 0 -> 0.0
+        else -> sum / size
+    };
+}
+
+
+fun List<SensorValue<Any?>?>.max(): Double? {
+    return if (this.size() > 0) this.map { if (it?.value != null) it?.value.toString().toDouble() else null } .reduce { x, y ->
+        when {
+            x == null -> y
+            y == null -> x
+            x!! > y!! -> x
+            else -> y
+        }
+    } else null
+}
+fun List<SensorValue<Any?>?>.min(): Double? {
+    return if (this.size() > 0) this.map { if (it?.value != null) it?.value.toString().toDouble() else null } .reduce { x, y ->
+        when {
+            x == null -> y
+            y == null -> x
+            x!! < y!! -> x
+            else -> y
+        }
+    } else null
+}
+

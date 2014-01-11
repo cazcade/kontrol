@@ -4,7 +4,6 @@ import kontrol.api.Monitor
 import kontrol.api.MachineGroupState
 import kontrol.api.MachineGroup
 import kontrol.api.StateMachine
-import kontrol.doclient.Droplet
 import java.util.Timer
 import kotlin.concurrent.*;
 import java.util.HashMap
@@ -29,15 +28,12 @@ public class DigitalOceanMachineGroupMonitor(val group: DigitalOceanMachineGroup
             try {
                 val machines = HashMap<String, DigitalOceanMachine>();
 
-                val dropletList: MutableList<Droplet>? = group.apiFactory.instance().getAvailableDroplets()
-                if (dropletList != null) {
-                    for (droplet in dropletList) {
-                        if (droplet.name?.startsWith(group.config.machinePrefix + group.name)!!) {
-                            val digitalOceanMachine = DigitalOceanMachine(droplet, group.apiFactory, sensorArray)
-                            machines.put(droplet.id.toString(), digitalOceanMachine)
-                        }
-
+                for (droplet in group.apiFactory.instance().getAvailableDroplets()) {
+                    if (droplet.name?.startsWith(group.config.machinePrefix + group.name)!!) {
+                        val digitalOceanMachine = DigitalOceanMachine(droplet, group.apiFactory, sensorArray)
+                        machines.put(droplet.id.toString(), digitalOceanMachine)
                     }
+
                 }
 
                 synchronized(group.machines) {

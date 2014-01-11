@@ -2,8 +2,8 @@ package kontrol.api
 
 
 public enum class MachineGroupState {
-    GROUP_OK
+    NORMAL
     GROUP_BROKEN
-    UNDERLOADED
-    OVERLOADED
+    QUIET
+    BUSY
 }

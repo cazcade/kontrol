@@ -87,11 +87,11 @@ public class TestMockController {
     }
 
     test fun test1(): Unit {
-        val machine1States = listOf(MACHINE_STARTING, MACHINE_OK)
-        val machine2States = listOf(MACHINE_STARTING, MACHINE_OK)
+        val machine1States = listOf(STARTING, OK)
+        val machine2States = listOf(STARTING, OK)
         val map = buildSimpleWorkerToplogy(machine1States, machine2States);
 
-        val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.GROUP_OK, MachineGroupState.UNDERLOADED, MachineGroupState.OVERLOADED, MachineGroupState.GROUP_OK, MachineGroupState.GROUP_BROKEN)));
+        val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL, MachineGroupState.QUIET, MachineGroupState.BUSY, MachineGroupState.NORMAL, MachineGroupState.GROUP_BROKEN)));
         val mockController = runTestForScenario(map, groupStates);
         assertEquals(1, mockController.topology().group("worker").machines().size);
         ;
@@ -99,41 +99,41 @@ public class TestMockController {
 
 
     test fun test2(): Unit {
-        val machine1States = listOf(MACHINE_STARTING, MACHINE_OK)
-        val machine2States = listOf(MACHINE_STARTING, MACHINE_OK)
+        val machine1States = listOf(STARTING, OK)
+        val machine2States = listOf(STARTING, OK)
         val map = buildSimpleWorkerToplogy(machine1States, machine2States);
-        val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.GROUP_OK)));
+        val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
         assertEquals(2, mockController.topology().group("worker").machines().size);
-        assertTrue(mockController.topology().group("worker").machines().all { it.state() == MACHINE_OK })
+        assertTrue(mockController.topology().group("worker").machines().all { it.state() == OK })
     }
 
     test fun test3(): Unit {
-        val machine1States = listOf(MACHINE_STARTING, MACHINE_OK, BROKEN_MACHINE)
-        val machine2States = listOf(MACHINE_STARTING, MACHINE_OK, BROKEN_MACHINE)
+        val machine1States = listOf(STARTING, OK, BROKEN)
+        val machine2States = listOf(STARTING, OK, BROKEN)
         val map = buildSimpleWorkerToplogy(machine1States, machine2States);
-        val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.GROUP_OK)));
+        val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
         assertEquals(2, mockController.topology().group("worker").machines().size);
     }
 
     test fun test4(): Unit {
-        val machine1States = listOf(MACHINE_STARTING, MACHINE_OK, BROKEN_MACHINE, MACHINE_STOPPING, MACHINE_STARTING, MACHINE_OK)
-        val machine2States = listOf(MACHINE_STARTING, MACHINE_OK, BROKEN_MACHINE)
+        val machine1States = listOf(STARTING, OK, BROKEN, STOPPING, STARTING, OK)
+        val machine2States = listOf(STARTING, OK, BROKEN)
         val map = buildSimpleLBToplogy(machine1States, machine2States);
-        val groupStates = mapOf(Pair("lb", listOf(MachineGroupState.GROUP_OK)));
+        val groupStates = mapOf(Pair("lb", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
         assertEquals(2, mockController.topology().group("lb").machines().size);
     }
 
     test fun test5(): Unit {
-        val machine1States = listOf(MACHINE_STARTING, MACHINE_OK, BROKEN_MACHINE)
-        val machine2States = listOf(MACHINE_STARTING, MACHINE_OK, BROKEN_MACHINE)
+        val machine1States = listOf(STARTING, OK, BROKEN)
+        val machine2States = listOf(STARTING, OK, BROKEN)
         val map = buildSimpleLBToplogy(machine1States, machine2States);
-        val groupStates = mapOf(Pair("lb", listOf(MachineGroupState.GROUP_OK)));
+        val groupStates = mapOf(Pair("lb", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
         assertEquals(2, mockController.topology().group("lb").machines().size);
-        assertTrue(mockController.topology().group("lb").machines().all { it.state() == BROKEN_MACHINE })
+        assertTrue(mockController.topology().group("lb").machines().all { it.state() == BROKEN })
 
     }
 

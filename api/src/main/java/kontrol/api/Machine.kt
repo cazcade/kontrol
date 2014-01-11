@@ -10,7 +10,7 @@ import kontrol.api.sensor.SensorValue
  */
 public trait Machine : HasStateMachine<MachineState, Machine> {
 
-    var sensorData: ConcurrentMap<String, SensorValue<Any?>>;
+    var data: ConcurrentMap<String, SensorValue<Any?>>;
 
     fun ip(): String?
 
@@ -38,6 +38,10 @@ public trait Machine : HasStateMachine<MachineState, Machine> {
         return ip() ?: "";
     }
 
+    fun get(s:String) : SensorValue<Any?>? {
+        return data[s];
+    }
+
 
     fun state(): MachineState? {
         return stateMachine.state();
@@ -61,7 +65,7 @@ public trait Machine : HasStateMachine<MachineState, Machine> {
     override val stateMachine: StateMachine<MachineState, Machine>;
 
     fun toString(): String {
-        return "${name()}@${ip()} (${id()}) [${state()}]  - ${sensorData}";
+        return "${name()}@${ip()} (${id()}) [${state()}]  - ${data}";
     }
 
 

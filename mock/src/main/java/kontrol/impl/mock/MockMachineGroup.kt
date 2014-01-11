@@ -23,7 +23,7 @@ public class MockMachineGroup(val name: String, val machines: MutableList<MockMa
 
     override val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>> = ArrayList();
     override val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>> = ArrayList();
-    override val sensorArray: SensorArray<Any?> = DefaultSensorArray<Any?>(ArrayList())
+    override val sensors: SensorArray<Any?> = DefaultSensorArray<Any?>(ArrayList())
     override val stateMachine = DefaultStateMachine<MachineGroupState, MachineGroup>(this);
     override val defaultMachineRules = DefaultStateMachineRules<MachineState, Machine>();
 

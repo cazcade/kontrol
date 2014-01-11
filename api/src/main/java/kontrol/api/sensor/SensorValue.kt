@@ -10,7 +10,7 @@ public data class SensorValue<T>(public val value: T?) {
         return if (value == null) null else value.toString();
     }
 
-    fun toDouble(): Double? {
+    fun D(): Double? {
         return when (value) {
             null -> null
             is Double -> value as Double
@@ -18,7 +18,7 @@ public data class SensorValue<T>(public val value: T?) {
         }
     }
 
-    fun toInt(): Int? {
+    fun I(): Int? {
         return when (value) {
             null -> null
             is Int -> value as Int

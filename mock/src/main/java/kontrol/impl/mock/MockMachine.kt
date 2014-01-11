@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class MockMachine(val ip: String) : Machine{
-    override var sensorData: ConcurrentMap<String, SensorValue<Any?>> = ConcurrentHashMap();
+    override var data: ConcurrentMap<String, SensorValue<Any?>> = ConcurrentHashMap();
 
     override var monitor: Monitor<MachineState, Machine> = MockMachineMonitor();
     override val stateMachine: StateMachine<MachineState, Machine> = DefaultStateMachine<MachineState, Machine>(this);

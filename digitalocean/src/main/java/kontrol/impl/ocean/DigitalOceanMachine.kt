@@ -22,7 +22,7 @@ public final class DigitalOceanMachine(var droplet: Droplet,
                                        val clientFactory: DigitalOceanClientFactory,
 
                                        val sensorArray: SensorArray<Any?>) : Machine {
-    override var sensorData: ConcurrentMap<String, SensorValue<Any?>> = ConcurrentHashMap();
+    override var data: ConcurrentMap<String, SensorValue<Any?>> = ConcurrentHashMap();
 
     override var monitor: Monitor<MachineState, Machine> = DigitalOceanMachineMonitor(clientFactory);
     override val stateMachine: StateMachine<MachineState, Machine> = DefaultStateMachine<MachineState, Machine>(this);
@@ -40,10 +40,10 @@ public final class DigitalOceanMachine(var droplet: Droplet,
             //            println("Updating ${droplet.getId()}")
             val doa = clientFactory.instance();
             droplet = doa.getDropletInfo(droplet.id?:-1) ?: droplet;
-            if (state() in listOf(MachineState.BROKEN_MACHINE, MachineState.MACHINE_OK, MachineState.MACHINE_STARTING, MachineState.STALE_MACHINE)) {
-                sensorData.putAll(sensorArray.values(this@DigitalOceanMachine))
+            if (state() in listOf(MachineState.BROKEN, MachineState.OK, MachineState.STARTING, MachineState.STALE)) {
+                data.putAll(sensorArray.values(this@DigitalOceanMachine))
             } else {
-                sensorData.clear()
+                data.clear()
             }
         }
 
