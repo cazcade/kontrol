@@ -1,4 +1,5 @@
-package kontrol.impl
+package kontrol.test
+
 
 import kontrol.api.Infrastructure
 import kontrol.api.MachineState.*

@@ -1,4 +1,4 @@
-package kontrol.impl.ocean
+package kontrol.digitalocean
 
 import kontrol.doclient.DigitalOcean
 import kontrol.doclient.DigitalOceanClient

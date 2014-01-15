@@ -1,4 +1,4 @@
-package kontrol.impl.mock
+package kontrol.digitalocean
 
 import kontrol.api.Topology
 import kontrol.api.MachineGroup

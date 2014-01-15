@@ -1,3 +1,4 @@
+package kontrol.test
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
@@ -5,22 +6,25 @@
 import org.junit.Test as test
 import org.junit.Before as before
 import org.junit.After as after
-import kontrol.impl.mock.MockInfrastructure
+import kontrol.mock.MockInfrastructure
 import java.util.HashMap
-import kontrol.impl.DefaultController
-import kontrol.impl.snapitoPolicy
-import kontrol.impl.snapitoStrategy
-import kontrol.impl.mock.MockMachine
-import kontrol.impl.MockSequencedMonitor
+import kontrol.common.DefaultController
+import kontrol.test.snapitoPolicy
+import kontrol.test.snapitoStrategy
+import kontrol.mock.MockMachine
+import kontrol.mock.MockSequencedMonitor
 import kontrol.api.MachineState.*
 import java.util.concurrent.CopyOnWriteArrayList
-import kontrol.impl.mock.MockMachineGroup
+import kontrol.mock.MockMachineGroup
 import kontrol.api.MachineGroup
-import kontrol.impl.MockSequencedGroupMonitor
+import kontrol.mock.MockSequencedGroupMonitor
 import kontrol.api.MachineGroupState
 import kontrol.api.MachineState
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import java.util.ArrayList
+import java.util.LinkedHashMap
+import kontrol.mock.MockKonfigurator
 
 public class TestMockController {
 
@@ -40,7 +44,7 @@ public class TestMockController {
     }
 
     fun buildSimpleFullToplogy(machine1States: List<MachineState?>, machine2States: List<MachineState?>): MutableMap<String, MutableList<MockMachine>> {
-        val map: MutableMap<String, MutableList<MockMachine>> = HashMap();
+        val map: MutableMap<String, MutableList<MockMachine>> = LinkedHashMap();
         val group1: MutableList<MockMachine> = CopyOnWriteArrayList()
         val mockMachine1 = MockMachine("1.2.3.4")
         val mockMachine2 = MockMachine("1.2.3.5")
@@ -50,14 +54,14 @@ public class TestMockController {
         group1.add(mockMachine2)
         val group2: MutableList<MockMachine> = CopyOnWriteArrayList()
         val group3: MutableList<MockMachine> = CopyOnWriteArrayList()
-        map.put("worker", group1)
-        map.put("gateway", group2)
         map.put("lb", group3)
+        map.put("gateway", group2)
+        map.put("worker", group1)
         return map;
     }
 
     fun buildSimpleLBToplogy(machine1States: List<MachineState?>, machine2States: List<MachineState?>): MutableMap<String, MutableList<MockMachine>> {
-        val map: MutableMap<String, MutableList<MockMachine>> = HashMap();
+        val map: MutableMap<String, MutableList<MockMachine>> = LinkedHashMap();
         val group1: MutableList<MockMachine> = CopyOnWriteArrayList()
         val mockMachine1 = MockMachine("1.2.3.4")
         val mockMachine2 = MockMachine("1.2.3.5")
@@ -72,9 +76,12 @@ public class TestMockController {
     fun runTestForScenario(map: Map<String, MutableList<MockMachine>>, groupStates: Map<String, List<MachineGroupState?>>): MockInfrastructure {
 
         val members = HashMap<String, MachineGroup>();
+        var previous:List<MachineGroup> = ArrayList()
         map.entrySet().forEach {
             val gs: List<MachineGroupState?> = groupStates.get(it.key) ?: listOf();
-            members.put(it.key, MockMachineGroup(it.key, it.value, MockSequencedGroupMonitor(gs)))
+            val mockMachineGroup = MockMachineGroup(it.key, it.value, MockSequencedGroupMonitor(gs), previous, MockKonfigurator(), MockKonfigurator())
+            members.put(it.key, mockMachineGroup)
+            previous= listOf(mockMachineGroup)
         }
 
         val infra = MockInfrastructure(members) ;
@@ -82,6 +89,7 @@ public class TestMockController {
         snapitoPolicy(infra, controller);
         snapitoStrategy(infra, controller);
         infra.start();
+        Thread.sleep(4000)
         infra.stop();
         return infra;
     }
@@ -109,12 +117,13 @@ public class TestMockController {
     }
 
     test fun test3(): Unit {
-        val machine1States = listOf(STARTING, OK, BROKEN)
-        val machine2States = listOf(STARTING, OK, BROKEN)
-        val map = buildSimpleWorkerToplogy(machine1States, machine2States);
+        val machine1States = listOf(STARTING, OK, BROKEN,DEAD)
+        val machine2States = listOf(STARTING, OK, BROKEN,DEAD)
+        val map = buildSimpleFullToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
-        assertEquals(2, mockController.topology().get("worker").machines().size);
+        assertEquals(0, mockController.topology().get("worker").machines().size);
+        assertEquals(6,(mockController.topology().get("gateway") .downStreamKonfigurator as MockKonfigurator).downStreamConfigureCalls)
     }
 
     test fun test4(): Unit {

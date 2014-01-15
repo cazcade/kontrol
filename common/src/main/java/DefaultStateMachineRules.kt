@@ -1,8 +1,8 @@
-package kontrol.impl
+package kontrol.common
 
 import kontrol.api.StateMachineRules
 import java.util.ArrayList
-import kontrol.impl.DefaultStateMachineRules.Rule
+import kontrol.common.DefaultStateMachineRules.Rule
 
 /**
  * @todo document.

@@ -1,4 +1,5 @@
-package kontrol.impl
+package kontrol.common
+
 
 import kontrol.api.Controller
 import kontrol.api.Machine

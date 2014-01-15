@@ -1,4 +1,4 @@
-package kontrol.impl
+package kontrol.mock
 
 import kontrol.api.Monitor
 import kontrol.api.StateMachine

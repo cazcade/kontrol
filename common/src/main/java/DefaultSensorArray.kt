@@ -1,4 +1,5 @@
-package kontrol.impl
+package kontrol.common
+
 
 import kontrol.api.sensors.SensorArray
 import kontrol.api.Machine

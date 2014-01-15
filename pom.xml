@@ -16,6 +16,7 @@
         <module>digitalocean</module>
         <module>sensors</module>
         <module>examples</module>
+        <module>konfigurators</module>
     </modules>
     <properties>
         <kotlin.version>0.6.1910</kotlin.version>
@@ -101,6 +102,11 @@
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>2.2.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity</artifactId>
+                <version>1.7</version>
             </dependency>
 
         </dependencies>

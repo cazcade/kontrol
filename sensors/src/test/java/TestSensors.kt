@@ -5,10 +5,10 @@
 import org.junit.Test as test
 import org.junit.Before as before
 import org.junit.After as after
-import kontrol.impl.sensor.SSHLoadSensor
-import kontrol.impl.mock.MockMachine
-import kontrol.impl.DefaultSensorArray
-import kontrol.impl.mock.MockDoubleSensor
+import kontrol.sensor.SSHLoadSensor
+import kontrol.mock.MockMachine
+import kontrol.common.DefaultSensorArray
+import kontrol.mock.MockDoubleSensor
 
 public class TestSensors {
 

@@ -1,25 +1,32 @@
-package kontrol.impl.mock
+package kontrol.mock
 
 import kontrol.api.MachineGroup
 import kontrol.api.Machine
 import kontrol.api.MachineState
-import kontrol.impl.DefaultStateMachineRules
-import kontrol.impl.MockMachineMonitor
+import kontrol.common.DefaultStateMachineRules
+import kontrol.mock.MockMachineMonitor
 import kontrol.api.MachineGroupState
-import kontrol.impl.DefaultStateMachine
+import kontrol.common.DefaultStateMachine
 import kontrol.api.Monitor
 import kontrol.api.sensors.SensorArray
-import kontrol.impl.DefaultSensorArray
+import kontrol.common.DefaultSensorArray
 import java.util.ArrayList
 import kontrol.api.MonitorRule
+import kontrol.api.DownStreamKonfigurator
+import kontrol.api.UpStreamKonfigurator
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>) : MachineGroup{
+public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator?, override val upStreamKonfigurator: UpStreamKonfigurator?) : MachineGroup{
+    override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
+
+
+    override var enabled: Boolean = true
     override val min: Int = 0
     override val max: Int = 100000
+    var configureCalls: Int = 0
 
     override val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>> = ArrayList();
     override val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>> = ArrayList();
@@ -30,6 +37,9 @@ public class MockMachineGroup(val name: String, val machines: MutableList<MockMa
     {
         machines.forEach { it.stateMachine.rules = defaultMachineRules }
         stateMachine.rules = DefaultStateMachineRules<MachineGroupState, MachineGroup>();
+        println("${name()} has upstream group ${upstreamGroups}")
+        upstreamGroups.forEach { (it as MockMachineGroup).downStreamGroups.add(this) }
+
     }
 
     override fun name(): String {
@@ -61,5 +71,11 @@ public class MockMachineGroup(val name: String, val machines: MutableList<MockMa
     override fun destroy(machine: Machine): MachineGroup {
         machines.remove(machine);
         return this
+    }
+
+
+    override fun configure(): MachineGroup {
+        this.configureCalls++;
+        return super<MachineGroup>.configure()
     }
 }

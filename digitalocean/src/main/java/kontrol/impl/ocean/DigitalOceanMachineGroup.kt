@@ -1,24 +1,29 @@
-package kontrol.impl.ocean
+package kontrol.digitalocean
 
 import kontrol.api.MachineGroup
 import kontrol.api.Machine
 import kontrol.api.MachineState
 import kontrol.api.MachineGroupState
-import kontrol.impl.DefaultStateMachine
-import kontrol.impl.DefaultStateMachineRules
+import kontrol.common.DefaultStateMachine
+import kontrol.common.DefaultStateMachineRules
 import kontrol.api.Monitor
 import java.util.ArrayList
 import java.util.concurrent.ConcurrentHashMap
 import kontrol.api.sensors.SensorArray
 import kontrol.api.MonitorRule
 import kontrol.doclient.Droplet
-import kontrol.impl.onHost
+import kontrol.common.onHost
+import kontrol.api.DownStreamKonfigurator
+import kontrol.api.UpStreamKonfigurator
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory, val name: String, override val sensors: SensorArray<Any?>, val config: DigitalOceanConfig, public override val min: Int, public override val max: Int) : MachineGroup{
+public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory, val name: String, override val sensors: SensorArray<Any?>, val config: DigitalOceanConfig, public override val min: Int, public override val max: Int, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator? = null, override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
+    override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
+
+    override var enabled: Boolean = true
     override val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>> = ArrayList();
     override val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>> = ArrayList()
 
@@ -31,6 +36,8 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
     {
         machines().forEach { it.stateMachine.rules = defaultMachineRules }
         stateMachine.rules = DefaultStateMachineRules<MachineGroupState, MachineGroup>();
+        upstreamGroups.forEach { (it as DigitalOceanMachineGroup).downStreamGroups.add(this) }
+
     }
 
     override fun name(): String {
@@ -51,7 +58,8 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         try {
 
             println("Destroying m/c")
-            val id = machines.values().filter { it.droplet.status?.toLowerCase() == "active" }.sortBy { it.id() }. first().droplet.id!!
+            val machine = machines.values().filter { it.droplet.status?.toLowerCase() == "active" }.sortBy { it.id() }. first()
+            val id = machine.droplet.id!!
             digitalOcean.deleteDroplet(id)
             while (digitalOcean.getDropletInfo(id).status?.toLowerCase() == "active") {
                 println("Awaiting Machine ${id} OFF")
@@ -132,23 +140,28 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         if (imageId != null) {
             instance.rebuildDroplet(id, imageId!!)
             while (instance.getDropletInfo(id).status == "active") {
-            println("Awaiting Machine ${id} to stop being active")
-            Thread.sleep(5000);
+                println("Awaiting Machine ${id} to stop being active")
+                Thread.sleep(1000);
+            }
+            while (instance.getDropletInfo(id).status != "active") {
+                println("Awaiting Machine ${id} to become active")
+                Thread.sleep(1000);
+            }
+            println("Rebuilt ${machine.id()}")
+            Thread.sleep(60000);
+        } else {
+            println("No valid image to rebuild ${machine.id()}")
         }
-        while (instance.getDropletInfo(id).status != "active") {
-            println("Awaiting Machine ${id} to become active")
-            Thread.sleep(5000);
-        }
-        println("Rebuilt ${machine.id()}")
-    } else {
-        println("No valid image to rebuild ${machine.id()}")
+        return this;
     }
-    return this;
-}
 
 
-override fun restart(machine: Machine): MachineGroup {
-    "reboot".onHost(machine.ip())
-    return this;
-}
+    override fun restart(machine: Machine): MachineGroup {
+        println("Rebooting $machine")
+        "reboot".onHost(machine.ip())
+        val instance = apiFactory.instance()
+        Thread.sleep(60000);
+        println("Rebuilt ${machine.id()}")
+        return this;
+    }
 }

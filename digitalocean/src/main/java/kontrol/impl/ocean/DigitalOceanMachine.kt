@@ -1,11 +1,11 @@
-package kontrol.impl.ocean
+package kontrol.digitalocean
 
 import kontrol.api.Machine
 import kontrol.doclient.Droplet
 import kontrol.api.MachineState
 import kontrol.api.Monitor
 import kontrol.api.StateMachine
-import kontrol.impl.DefaultStateMachine
+import kontrol.common.DefaultStateMachine
 import java.util.Timer
 import kotlin.concurrent.*;
 import kontrol.api.sensors.SensorArray
@@ -22,10 +22,14 @@ public final class DigitalOceanMachine(var droplet: Droplet,
                                        val clientFactory: DigitalOceanClientFactory,
 
                                        val sensorArray: SensorArray<Any?>) : Machine {
+    override var disableAction: ((Machine) -> Unit)? = null
+    override var enableAction: ((Machine) -> Unit)? = null
     override var data: ConcurrentMap<String, SensorValue<Any?>> = ConcurrentHashMap();
 
     override var monitor: Monitor<MachineState, Machine> = DigitalOceanMachineMonitor(clientFactory);
     override val stateMachine: StateMachine<MachineState, Machine> = DefaultStateMachine<MachineState, Machine>(this);
+    override var enabled: Boolean= true;
+
 
     val timer = Timer("DO-" + id(), true);
 
@@ -33,6 +37,10 @@ public final class DigitalOceanMachine(var droplet: Droplet,
         return droplet.id.toString();
     }
 
+
+    override fun privateIp(): String? {
+        return droplet.private_ip_address
+    }
 
     override fun startMonitoring(rules: List<MonitorRule<MachineState, Machine>>) {
         super<Machine>.startMonitoring(rules);

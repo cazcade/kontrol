@@ -8,8 +8,10 @@ import kontrol.api.sensor.SensorValue
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  * @todo document.
  */
-public trait Machine : HasStateMachine<MachineState, Machine> {
+public trait Machine : Monitorable<MachineState, Machine> {
 
+    var disableAction: ((Machine) -> Unit)?;
+    var enableAction: ((Machine) -> Unit)?;
     var data: ConcurrentMap<String, SensorValue<Any?>>;
 
     fun ip(): String?
@@ -20,6 +22,16 @@ public trait Machine : HasStateMachine<MachineState, Machine> {
      */
     override fun name(): String {
         return ip() ?: "";
+    }
+
+
+
+
+    /**
+     * Override this.
+     */
+     fun privateIp(): String? {
+        return ip()
     }
 
 
@@ -38,7 +50,7 @@ public trait Machine : HasStateMachine<MachineState, Machine> {
         return ip() ?: "";
     }
 
-    fun get(s:String) : SensorValue<Any?>? {
+    fun get(s: String): SensorValue<Any?>? {
         return data[s];
     }
 
@@ -66,6 +78,20 @@ public trait Machine : HasStateMachine<MachineState, Machine> {
 
     fun toString(): String {
         return "${name()}@${ip()} (${id()}) [${state()}]  - ${data}";
+    }
+
+    fun disable() {
+        enabled = false;
+        if (disableAction != null) {
+            disableAction!!(this)
+        };
+    }
+
+    fun enable() {
+        enabled = true;
+        if (enableAction != null) {
+            enableAction!!(this)
+        };
     }
 
 

@@ -1,4 +1,5 @@
-package kontrol.impl
+package kontrol.common
+
 
 import java.io.InputStream
 import org.apache.commons.io.IOUtils

@@ -1,4 +1,4 @@
-package kontrol.impl.sensor
+package kontrol.sensor
 
 import kontrol.api.Sensor
 import kontrol.api.Machine

@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public  class MonitorRule<E : Enum<E>, T : HasStateMachine<E, T>>(val state: E,
+public  class MonitorRule<E : Enum<E>, T : Monitorable<E, T>>(val state: E,
                                                                   val eval: (T) -> Boolean,
                                                                   val confirms: Int,
                                                                   val name: String,
@@ -15,6 +15,10 @@ public  class MonitorRule<E : Enum<E>, T : HasStateMachine<E, T>>(val state: E,
     val confirmations: ConcurrentMap<T, Int> = ConcurrentHashMap();
 
     fun evaluate(target: T) {
+        if(!target.enabled) {
+            println("${target.name()} was disabled")
+            return
+        }
         if (eval(target)) {
             val count = (confirmations.get(target)?:0).inc() ;
             confirmations.put(target, count);

@@ -9,15 +9,18 @@ import kontrol.api.sensor.SensorValue
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  * @todo document.
  */
-public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
+public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
 
-
+    val upStreamKonfigurator: UpStreamKonfigurator?
+    val downStreamKonfigurator: DownStreamKonfigurator?
     override val stateMachine: StateMachine<MachineGroupState, MachineGroup>
     val sensors: SensorArray<Any?>;
     val defaultMachineRules: StateMachineRules<MachineState, Machine>
     val monitor: Monitor<MachineGroupState, MachineGroup>
     val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>>
     val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>>
+    val upstreamGroups: List<MachineGroup>
+    val downStreamGroups: List<MachineGroup>
     val min: Int
     val max: Int
 
@@ -48,16 +51,53 @@ public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
         return machines().filter { it != machine } [0];
     }
 
+
+    fun failAction(machine: Machine, action: (Machine) -> Unit) {
+        println("**** Fail Action for  Machine ${machine.ip()}");
+        failover(machine);
+        try {
+            action(machine);
+            failback(machine)
+        } catch(e:Exception) {
+            machine.enable();
+        }
+    }
+
     fun failover(machine: Machine): MachineGroup {
         println("**** Failover Machine ${machine.ip()}");
+        machine.disable();
+        downStreamKonfigurator?.onGroupMachineFail(machine,this);
+        upStreamKonfigurator?.onMachineFail(machine, this)
+        upstreamGroups.forEach { it.downstreamFailover(machine, this) }
         return this;
     }
+
     fun failback(machine: Machine): MachineGroup {
         println("**** Failback Machine ${machine.ip()}");
+        machine.enable()
+        downStreamKonfigurator?.onGroupMachineUnfail(machine,this);
+        upStreamKonfigurator?.onMachineUnfail(machine, this)
+        upstreamGroups.forEach { it.downstreamFailback(machine, this) }
         return this;
     }
+
+    fun downstreamFailover(machine: Machine,
+                           machineGroup: MachineGroup) {
+        println("**** Downstream Failover Machine ${machine.ip()} for Group ${machineGroup.name()}");
+        downStreamKonfigurator?.onDownStreamMachineFail(machine, machineGroup, this)
+        downStreamKonfigurator?.configureDownStream(this)
+    }
+
+    fun downstreamFailback(machine: Machine,
+                           machineGroup: MachineGroup) {
+        println("**** Downstream Failback Machine ${machine.ip()} for Group ${machineGroup.name()}");
+        downStreamKonfigurator?.onDownStreamMachineUnfail(machine, machineGroup, this)
+        downStreamKonfigurator?.configureDownStream(this)
+    }
+
     fun configure(): MachineGroup {
         println("**** Configure ${name()}");
+        upStreamKonfigurator?.configureUpStream(this)
         return this;
     }
     fun expand(): MachineGroup {
@@ -69,15 +109,15 @@ public trait MachineGroup : HasStateMachine<MachineGroupState, MachineGroup> {
         return this;
     }
     fun reImage(machine: Machine): MachineGroup {
-        println("**** Re Image Machine ${machine.ip()}");
+        println("**** Re Image Machine ${machine.name()}(${machine.id()})");
         return this;
     }
     fun restart(machine: Machine): MachineGroup {
-        println("**** Re Start Machine ${machine.ip()}");
+        println("**** Re Start Machine ${machine.name()}(${machine.id()})");
         return this;
     }
     fun destroy(machine: Machine): MachineGroup {
-        println("**** Destroy Machine ${machine.ip()}");
+        println("**** Destroy Machine ${machine.name()}(${machine.id()})");
         return this;
     }
 
@@ -262,7 +302,6 @@ fun List<SensorValue<Any?>?>.sumSensors(): Double? {
         }
     } else null
 }
-
 
 
 fun List<SensorValue<Any?>?>.avg(): Double? {

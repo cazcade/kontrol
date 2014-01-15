@@ -1,14 +1,16 @@
-package kontrol.impl
+package kontrol.common
+
 
 import kontrol.api.StateMachine
 import kontrol.api.StateMachineRules
-import kontrol.api.HasStateMachine
+import kontrol.api.Monitorable
+import kontrol.common.DefaultStateMachineRules
 
 /**
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  * @todo document.
  */
-public open class DefaultStateMachine<E : Enum<E>, T : HasStateMachine<E, T>>(val target: T) : StateMachine<E, T> {
+public open class DefaultStateMachine<E : Enum<E>, T : Monitorable<E, T>>(val target: T) : StateMachine<E, T> {
     override fun attemptTransition(newState: E?): StateMachine<E, T> {
         return transitionInternal(newState, false);
     }

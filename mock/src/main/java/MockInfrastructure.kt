@@ -1,4 +1,4 @@
-package kontrol.impl.mock
+package kontrol.mock
 
 import kontrol.api.Infrastructure
 import kontrol.api.Topology

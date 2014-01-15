@@ -1,4 +1,4 @@
-package kontrol.impl.ocean
+package kontrol.digitalocean
 
 import kontrol.api.MachineState
 import kontrol.api.Monitor

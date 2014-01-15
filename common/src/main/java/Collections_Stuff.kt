@@ -1,4 +1,4 @@
-package kontrol.impl
+package kontrol.common
 
 /**
  * @todo document.

@@ -1,10 +1,10 @@
-package kontrol.impl
+package kontrol.digitalocean
 
 import kontrol.api.Infrastructure
 import kontrol.api.Topology
-import kontrol.impl.mock.DigitalOceanTopology
+import kontrol.digitalocean.DigitalOceanTopology
 import kontrol.api.MachineGroup
-import kontrol.impl.ocean.DigitalOceanClientFactory
+import kontrol.digitalocean.DigitalOceanClientFactory
 
 /**
  * @todo document.
