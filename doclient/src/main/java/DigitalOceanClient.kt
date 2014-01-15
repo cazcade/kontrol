@@ -107,46 +107,46 @@ public  class DigitalOceanClient(val clientId: String, val apiKey: String) : Dig
                             P_SSH_KEY_IDS to sshKeyIds
                     )
             ) as Droplet
-    public override fun getDropletInfo(id: Int): Droplet = get(GET_DROPLET_INFO, javaClass<Droplet>(), id) as Droplet
-    public override fun rebootDroplet(id: Int): Response = call(REBOOT_DROPLET, id)
-    public override fun powerCyleDroplet(id: Int): Response = call(POWER_CYCLE_DROPLET, id)
-    public override fun shutdownDroplet(id: Int): Response = call(SHUTDOWN_DROPLET, id)
-    public override fun powerOffDroplet(id: Int): Response = call(POWER_OFF_DROPLET, id)
-    public override fun powerOnDroplet(id: Int): Response = call(POWER_ON_DROPLET, id)
-    public override fun resetDropletPassword(id: Int): Response = call(RESET_PASSWORD_DROPLET, id)
-    public override fun resizeDroplet(id: Int, sizeId: Int): Response = callWithParam(RESIZE_DROPLET, hashMapOf(P_SIZE_ID to sizeId), id)
-    public override fun takeDropletSnapshot(id: Int): Response = takeDropletSnapshot(id, null)
-    public override fun takeDropletSnapshot(id: Int, name: String?): Response = when (name) {
+    override fun getDropletInfo(id: Int): Droplet = get(GET_DROPLET_INFO, javaClass<Droplet>(), id) as Droplet
+    override fun rebootDroplet(id: Int): Response = call(REBOOT_DROPLET, id)
+    override fun powerCyleDroplet(id: Int): Response = call(POWER_CYCLE_DROPLET, id)
+    override fun shutdownDroplet(id: Int): Response = call(SHUTDOWN_DROPLET, id)
+    override fun powerOffDroplet(id: Int): Response = call(POWER_OFF_DROPLET, id)
+    override fun powerOnDroplet(id: Int): Response = call(POWER_ON_DROPLET, id)
+    override fun resetDropletPassword(id: Int): Response = call(RESET_PASSWORD_DROPLET, id)
+    override fun resizeDroplet(id: Int, sizeId: Int): Response = callWithParam(RESIZE_DROPLET, hashMapOf(P_SIZE_ID to sizeId), id)
+    override fun takeDropletSnapshot(id: Int): Response = takeDropletSnapshot(id, null)
+    override fun takeDropletSnapshot(id: Int, name: String?): Response = when (name) {
         null -> call(TAKE_DROPLET_SNAPSHOT, id)
         else -> callWithParam(TAKE_DROPLET_SNAPSHOT, hashMapOf(P_NAME to name), id)
     }
-    public override fun restoreDroplet(id: Int, imageId: Int): Response = callWithParam(RESTORE_DROPLET, hashMapOf(P_IMAGE_ID to imageId), id)
-    public override fun rebuildDroplet(id: Int, imageId: Int): Response = callWithParam(REBUILD_DROPLET, hashMapOf(P_IMAGE_ID to imageId), id)
-    public override fun enableDropletBackups(id: Int): Response = call(ENABLE_AUTOMATIC_BACKUPS, id)
-    public override fun disableDropletBackups(id: Int): Response = call(DISABLE_AUTOMATIC_BACKUPS, id)
-    public override fun renameDroplet(id: Int, name: String): Response = callWithParam(RENAME_DROPLET, hashMapOf(P_NAME to  name), id)
-    public override fun deleteDroplet(id: Int): Response = call(DELETE_DROPLET, id)
-    public override fun getAvailableRegions(): MutableList<Region> = get(AVAILABLE_REGIONS, TYPE_REGION_LIST) as MutableList<Region>
-    public override fun getAvailableImages(): MutableList<DropletImage> = get(AVAILABLE_IMAGES, TYPE_IMAGE_LIST) as MutableList<DropletImage>
-    public override fun getImageInfo(imageId: Int): DropletImage = get(GET_IMAGE_INFO, javaClass<DropletImage>(), imageId) as DropletImage
-    public override fun deleteImage(imageId: Int): Response = call(DELETE_IMAGE, imageId)
-    public override fun transferImage(imageId: Int, regionId: Int): Response = callWithParam(TRANSFER_IMAGE, hashMapOf(P_REGION_ID to regionId), imageId)
-    public override fun getAvailableSshKeys(): MutableList<SshKey> = get(AVAILABLE_SSH_KEYS, TYPE_SSH_KEY_LIST) as MutableList<SshKey>
-    public override fun getSshKeyInfo(sshKeyId: Int): SshKey = get(GET_SSH_KEY, javaClass<SshKey>(), sshKeyId) as SshKey
-    public override fun addSshKey(name: String, publicKey: String): SshKey = get(CREATE_SSH_KEY, javaClass<SshKey>(), hashMapOf(P_NAME to name, P_PUBLIC_KEY to publicKey)) as SshKey
-    public override fun editSshKey(sshKeyId: Int, newKey: String): SshKey = get(EDIT_SSH_KEY, javaClass<SshKey>(), hashMapOf(P_PUBLIC_KEY to newKey), sshKeyId) as SshKey
-    public override fun deleteSshKey(sshKeyId: Int): Response = call(DELETE_SSH_KEY, sshKeyId)
-    public override fun getAvailableSizes(): MutableList<DropletSize> = get(AVAILABLE_SIZES, TYPE_SIZE_LIST) as MutableList<DropletSize>
-    public override fun getAvailableDomains(): MutableList<Domain> = get(AVAILABLE_DOMAINS, TYPE_DOMAIN_LIST) as MutableList<Domain>
-    public override fun getDomainInfo(domainId: Int): Domain = get(GET_DOMAIN_INFO, javaClass<Domain>(), domainId) as Domain
-    public override fun createDomain(domainName: String, ipAddress: String): Domain = get(CREATE_DOMAIN, javaClass<Domain>(), hashMapOf(P_NAME to domainName, PARAM_IP_ADDRESS to ipAddress)) as Domain
-    public override fun deleteDomain(domainId: Int): Response = call(DELETE_DOMAIN, domainId)
-    public override fun getDomainRecords(domainId: Int): MutableList<DomainRecord> = get(GET_DOMAIN_RECORDS, TYPE_DOMAIN_RECORD_LIST, domainId) as MutableList<DomainRecord>
-    public override fun getDomainRecordInfo(domainId: Int, recordId: Int): DomainRecord = get(GET_DOMAIN_RECORD_INFO, javaClass<DomainRecord>(), array(domainId, recordId)) as DomainRecord
-    public override fun createDomainRecord(domainRecord: DomainRecord): DomainRecord =
+    override fun restoreDroplet(id: Int, imageId: Int): Response = callWithParam(RESTORE_DROPLET, hashMapOf(P_IMAGE_ID to imageId), id)
+    override fun rebuildDroplet(id: Int, imageId: Int): Response = callWithParam(REBUILD_DROPLET, hashMapOf(P_IMAGE_ID to imageId), id)
+    override fun enableDropletBackups(id: Int): Response = call(ENABLE_AUTOMATIC_BACKUPS, id)
+    override fun disableDropletBackups(id: Int): Response = call(DISABLE_AUTOMATIC_BACKUPS, id)
+    override fun renameDroplet(id: Int, name: String): Response = callWithParam(RENAME_DROPLET, hashMapOf(P_NAME to  name), id)
+    override fun deleteDroplet(id: Int): Response = call(DELETE_DROPLET, id)
+    override fun getAvailableRegions(): MutableList<Region> = get(AVAILABLE_REGIONS, TYPE_REGION_LIST) as MutableList<Region>
+    override fun getAvailableImages(): MutableList<DropletImage> = get(AVAILABLE_IMAGES, TYPE_IMAGE_LIST) as MutableList<DropletImage>
+    override fun getImageInfo(imageId: Int): DropletImage = get(GET_IMAGE_INFO, javaClass<DropletImage>(), imageId) as DropletImage
+    override fun deleteImage(imageId: Int): Response = call(DELETE_IMAGE, imageId)
+    override fun transferImage(imageId: Int, regionId: Int): Response = callWithParam(TRANSFER_IMAGE, hashMapOf(P_REGION_ID to regionId), imageId)
+    override fun getAvailableSshKeys(): MutableList<SshKey> = get(AVAILABLE_SSH_KEYS, TYPE_SSH_KEY_LIST) as MutableList<SshKey>
+    override fun getSshKeyInfo(sshKeyId: Int): SshKey = get(GET_SSH_KEY, javaClass<SshKey>(), sshKeyId) as SshKey
+    override fun addSshKey(name: String, publicKey: String): SshKey = get(CREATE_SSH_KEY, javaClass<SshKey>(), hashMapOf(P_NAME to name, P_PUBLIC_KEY to publicKey)) as SshKey
+    override fun editSshKey(sshKeyId: Int, newKey: String): SshKey = get(EDIT_SSH_KEY, javaClass<SshKey>(), hashMapOf(P_PUBLIC_KEY to newKey), sshKeyId) as SshKey
+    override fun deleteSshKey(sshKeyId: Int): Response = call(DELETE_SSH_KEY, sshKeyId)
+    override fun getAvailableSizes(): MutableList<DropletSize> = get(AVAILABLE_SIZES, TYPE_SIZE_LIST) as MutableList<DropletSize>
+    override fun getAvailableDomains(): MutableList<Domain> = get(AVAILABLE_DOMAINS, TYPE_DOMAIN_LIST) as MutableList<Domain>
+    override fun getDomainInfo(domainId: Int): Domain = get(GET_DOMAIN_INFO, javaClass<Domain>(), domainId) as Domain
+    override fun createDomain(domainName: String, ipAddress: String): Domain = get(CREATE_DOMAIN, javaClass<Domain>(), hashMapOf(P_NAME to domainName, PARAM_IP_ADDRESS to ipAddress)) as Domain
+    override fun deleteDomain(domainId: Int): Response = call(DELETE_DOMAIN, domainId)
+    override fun getDomainRecords(domainId: Int): MutableList<DomainRecord> = get(GET_DOMAIN_RECORDS, TYPE_DOMAIN_RECORD_LIST, domainId) as MutableList<DomainRecord>
+    override fun getDomainRecordInfo(domainId: Int, recordId: Int): DomainRecord = get(GET_DOMAIN_RECORD_INFO, javaClass<DomainRecord>(), array(domainId, recordId)) as DomainRecord
+    override fun createDomainRecord(domainRecord: DomainRecord): DomainRecord =
             getWithParam(CREATE_DOMAIN_RECORD, javaClass<DomainRecord>(), domainRecord.asParams(), domainRecord.domain_id) as DomainRecord
-    public override fun editDomainRecord(domainRecord: DomainRecord): DomainRecord = (getWithParam(EDIT_DOMAIN_RECORD, javaClass<DomainRecord>(), domainRecord.asParams(), array<Any>(domainRecord.domain_id?:-1, domainRecord.id?:-1)) as DomainRecord)
-    public override fun deleteDomainRecord(domainId: Int, recordId: Int): Response = call(DELETE_DOMAIN_RECORD, array<Any>(domainId, recordId))
+    override fun editDomainRecord(domainRecord: DomainRecord): DomainRecord = (getWithParam(EDIT_DOMAIN_RECORD, javaClass<DomainRecord>(), domainRecord.asParams(), array<Any>(domainRecord.domain_id?:-1, domainRecord.id?:-1)) as DomainRecord)
+    override fun deleteDomainRecord(domainId: Int, recordId: Int): Response = call(DELETE_DOMAIN_RECORD, array<Any>(domainId, recordId))
 
     private fun performAction(action: Action, queryParams: Map<String, Any?>?, vararg pathParams: Any?): JsonObject {
         try {
