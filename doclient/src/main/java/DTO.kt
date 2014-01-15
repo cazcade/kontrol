@@ -122,12 +122,14 @@ public data class DomainRecord(
         public var weight: Int? = null
 ) {
     public fun asParams(): Map<String, Any?> {
-        return hashMapOf(PARAM_RECORD_TYPE to this.record_type,
+        return hashMapOf(
+                PARAM_RECORD_TYPE to record_type,
                 PARAM_DATA to data,
                 P_NAME to name,
                 PARAM_PRIORITY to priority,
                 PARAM_PORT to port,
-                PARAM_WEIGHT to weight)
+                PARAM_WEIGHT to weight
+        )
     }
 }
 
