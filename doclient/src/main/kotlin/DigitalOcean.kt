@@ -57,37 +57,7 @@ public trait DigitalOcean {
      * @since v1.0
      */
     fun getAvailableDroplets(): List<Droplet>
-    /**
-     * <p>
-     * Method allows you to create a new droplet. See the required parameters
-     * section below for an explanation of the variables that are needed to
-     * create a new droplet.
-     * </p>
-     *
-     * <p>
-     * Create a instance of {@link kontrol.doclient.Droplet} object and populate following values
-     * </p>
-     * <ul>
-     * <li>Name Required, String, this is the name of the droplet must be
-     * formatted by hostname rules</li>
-     * <li>Side Id Required, Numeric, this is the id of the size you would like
-     * the droplet created at</li>
-     * <li>Image Id Required, Numeric, this is the id of the image you would
-     * like the droplet created with</li>
-     * <li>Region Id Required, Numeric, this is the id of the region you would
-     * like your server in</li>
-     * </ul>
-     *
-     * @param droplet
-     *            the id of the droplet
-     * @return {@link kontrol.doclient.Droplet}
-     * @throws kontrol.doclient.AccessDeniedException
-     * @throws kontrol.doclient.ResourceNotFoundException
-     * @throws kontrol.doclient.RequestUnsuccessfulException
-     *
-     * @since v1.0
-     */
-    fun createDroplet(droplet: Droplet): Droplet
+
     /**
      * <p>
      * Method allows you to create a new droplet. See the required parameters
@@ -121,7 +91,7 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun createDroplet(droplet: Droplet, sshKeyIds: String?): Droplet
+    fun createDroplet(droplet: Droplet, sshKeyIds: String?=null, backupsEnabled:Boolean=false, privateNetworking:Boolean=false): Droplet
     /**
      * Method returns full information for a specific droplet ID that is passed
      * in the URL.
@@ -264,7 +234,7 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun takeDropletSnapshot(id: Int, snapshotName: String?): Response
+    fun takeDropletSnapshot(id: Int, name: String?): Response
     /**
      * Method allows you to restore a droplet with a previous image or snapshot.
      * This will be a mirror copy of the image or snapshot to your droplet. Be
@@ -465,7 +435,7 @@ public trait DigitalOcean {
      *
      * @since v1.2
      */
-    fun addSshKey(keyName: String, publicKey: String): SshKey
+    fun addSshKey(name: String, publicKey: String): SshKey
     /**
      * Method allows you to modify an existing public SSH key in your account.
      *

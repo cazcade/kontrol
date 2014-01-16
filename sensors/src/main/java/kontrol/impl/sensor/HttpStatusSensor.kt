@@ -11,7 +11,7 @@ import kontrol.HttpUtil
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class HttpStatusSensor(val path: String) : Sensor<Int> {
+public class HttpStatusSensor(val path: String, val port:Int=80) : Sensor<Int> {
 
     override fun name(): String {
         return "http-status"
@@ -22,7 +22,7 @@ public class HttpStatusSensor(val path: String) : Sensor<Int> {
             return SensorValue(when {
                 machine.hostname().isNotEmpty() -> {
 
-                    val URI = URL("http", machine.hostname(), 80, path).toURI()
+                    val URI = URL("http", machine.hostname(), port, path).toURI()
                     val status = HttpUtil.getStatus(URI, Locale.getDefault(), 5000)
                     //                    println("$URI responded with $status")
                     status;

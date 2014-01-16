@@ -20,7 +20,7 @@ import kontrol.api.UpStreamKonfigurator
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory, val name: String, override val sensors: SensorArray<Any?>, val config: DigitalOceanConfig, public override val min: Int, public override val max: Int, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator? = null, override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
+public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory, val name: String, override val sensors: SensorArray<Any?>, val config: DigitalOceanConfig, val sshKeys: String, public override val min: Int, public override val max: Int, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator? = null, override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
     override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
 
     override var enabled: Boolean = true
@@ -74,6 +74,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         } catch(e: Exception) {
             println("(${name()}) DO: " + e.getMessage())
         }
+        configure()
         return this
     }
 
@@ -82,6 +83,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         val droplet = Droplet()
         droplet.name = (config.machinePrefix + name)
         droplet.size_id = (config.dropletSizeId)
+
         val instance = apiFactory.instance()
         val availableRegions = instance.getAvailableRegions()
         //        droplet.setRegionId(availableRegions?.get((Math.random() * (availableRegions?.size()?.toDouble()?:0.0)).toInt())?.getId());
@@ -93,7 +95,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
             }
 
         }
-        var createdDroplet = instance.createDroplet(droplet, "Neil Laptop")
+        var createdDroplet = instance.createDroplet(droplet, sshKeys, privateNetworking=true)
 
         println("Created droplet with ID " + createdDroplet?.id + " ip address " + createdDroplet?.ip_address)
         var count = 0
@@ -111,6 +113,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
             Thread.sleep(20000);
         } else {
         }
+        configure()
         return this;
 
     }
@@ -123,6 +126,22 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         return this;
     }
 
+
+    fun waitForRestart(id: Int) {
+        var count1:Int= 0;
+        val instance = apiFactory.instance()
+        while (instance.getDropletInfo(id).status == "active"&& count1++ < 100) {
+            println("Waiting for machine ${id} to stop being active")
+            Thread.sleep(1000);
+        }
+        var count2:Int= 0;
+        while (instance.getDropletInfo(id).status != "active" && count2++ < 100) {
+            println("Waiting for machine ${id} to become active")
+            Thread.sleep(1000);
+        }
+        Thread.sleep(60000);
+
+    }
 
     override fun reImage(machine: Machine): MachineGroup {
         val instance = apiFactory.instance()
@@ -139,16 +158,8 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         println("Rebuilding ${machine.id()} with ${imageId}")
         if (imageId != null) {
             instance.rebuildDroplet(id, imageId!!)
-            while (instance.getDropletInfo(id).status == "active") {
-                println("Awaiting Machine ${id} to stop being active")
-                Thread.sleep(1000);
-            }
-            while (instance.getDropletInfo(id).status != "active") {
-                println("Awaiting Machine ${id} to become active")
-                Thread.sleep(1000);
-            }
+            waitForRestart(id)
             println("Rebuilt ${machine.id()}")
-            Thread.sleep(60000);
         } else {
             println("No valid image to rebuild ${machine.id()}")
         }
@@ -160,8 +171,9 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         println("Rebooting $machine")
         "reboot".onHost(machine.ip())
         val instance = apiFactory.instance()
-        Thread.sleep(60000);
-        println("Rebuilt ${machine.id()}")
+        val id = machine.id().toInt()
+        waitForRestart(id)
+        println("Rebuilt ${id}")
         return this;
     }
 }

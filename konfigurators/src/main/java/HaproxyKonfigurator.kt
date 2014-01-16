@@ -46,14 +46,14 @@ public class HaproxyKonfigurator(val templateName: String) : DownStreamKonfigura
         machineGroup.downStreamGroups.forEach { configureInternal(machineGroup, null, it) }
     }
 
-    fun configureInternal(thisGroup: MachineGroup, downStreamMachine: Machine? = null, downstreamGroup: MachineGroup? = null) {
+    fun configureInternal(thisGroup: MachineGroup, downStreamMachine: Machine? = null, downstreamGroup: MachineGroup) {
         val template = ve.getTemplate(templateName)!!
         thisGroup.machines().filter { it.state() != MachineState.STOPPED } forEach {
             try {
                 println("Configuring HA Proxy on ${it.name()}")
                 val context = VelocityContext()
                 context["downstreamMachine"] = downStreamMachine;
-                context["downstreamWorkingMachines"] = downstreamGroup?.machines()?.filter { it.state() == MachineState.OK };
+                context["downstreamWorkingMachines"] = downstreamGroup.machines().filter { it.state() == MachineState.OK };
                 context["downstreamGroup"] = downstreamGroup
                 context["thisGroup"] = thisGroup
                 context["thisMachine"] = it
@@ -77,9 +77,10 @@ public class HaproxyKonfigurator(val templateName: String) : DownStreamKonfigura
     fun main(args: List<String>) {
 
     }
+    public fun <T> VelocityContext.set(key: String, value: T): T? {
+        return this.put(key, value) as T?
+
+    }
 }
 
-public fun <T> VelocityContext.set(key: String, value: T): T? {
-    return this.put(key, value) as T?
 
-}

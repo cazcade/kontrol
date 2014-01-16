@@ -10,21 +10,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.cazcade</groupId>
-    <artifactId>kontrol-konfigurators</artifactId>
+    <artifactId>kontrol-cfclient</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.cazcade</groupId>
             <artifactId>kontrol-common</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.cazcade</groupId>
-            <artifactId>kontrol-cfclient</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
 
     </dependencies>

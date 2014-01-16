@@ -26,15 +26,36 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
 
     override fun name(): String
 
-    fun size(): Int {
+    fun workingSize(): Int {
         return machines().filter { it.state() == MachineState.OK }.size();
+    }
+
+    fun activeSize(): Int {
+        return machines().filter { it.state() != MachineState.STOPPED }.size();
     }
 
     fun machines(): List<Machine>
 
 
     fun get(value: String): Double? {
-        return (machines() filter { it.state() == MachineState.OK } map { it.data[value] }).avg()
+        val values = machines() filter { it.state() == MachineState.OK } map { it.data[value] }
+        val average = values.avg()
+        val median = values.median()
+        //The average should be within a factor of 5 of the median, if not we use the median instead
+        val result = when {
+            average == null -> null
+            average!! > median * 5 -> {
+                median
+            }
+            average!! < median / 5 -> {
+                median
+            }
+            else -> {
+                average
+            }
+        }
+        //        println("$value was $result")
+        return result;
     }
 
     fun startMonitoring() {
@@ -47,8 +68,13 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
         machines().forEach { it.stopMonitoring() }
     }
 
-    fun other(machine: Machine): Machine {
-        return machines().filter { it != machine } [0];
+    fun other(machine: Machine): Machine? {
+        val list = machines().filter { it != machine && it.state() == MachineState.OK }
+        return if (list.size() > 0) {
+            list.first()
+        } else {
+            null
+        }
     }
 
 
@@ -58,24 +84,30 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
         try {
             action(machine);
             failback(machine)
-        } catch(e:Exception) {
+        } catch(e: Exception) {
             machine.enable();
+            throw e
         }
     }
 
     fun failover(machine: Machine): MachineGroup {
         println("**** Failover Machine ${machine.ip()}");
         machine.disable();
-        downStreamKonfigurator?.onGroupMachineFail(machine,this);
-        upStreamKonfigurator?.onMachineFail(machine, this)
-        upstreamGroups.forEach { it.downstreamFailover(machine, this) }
+        try {
+            downStreamKonfigurator?.onGroupMachineFail(machine, this);
+            upStreamKonfigurator?.onMachineFail(machine, this)
+            upstreamGroups.forEach { it.downstreamFailover(machine, this) }
+        } catch (e: Exception) {
+            machine.enable()
+            throw e
+        }
         return this;
     }
 
     fun failback(machine: Machine): MachineGroup {
         println("**** Failback Machine ${machine.ip()}");
         machine.enable()
-        downStreamKonfigurator?.onGroupMachineUnfail(machine,this);
+        downStreamKonfigurator?.onGroupMachineUnfail(machine, this);
         upStreamKonfigurator?.onMachineUnfail(machine, this)
         upstreamGroups.forEach { it.downstreamFailback(machine, this) }
         return this;
@@ -301,6 +333,18 @@ fun List<SensorValue<Any?>?>.sumSensors(): Double? {
             else -> x + y
         }
     } else null
+}
+
+fun List<SensorValue<Any?>?>.median(): Double {
+    val sorted = this
+            .map { if (it?.value != null) it?.value.toString().toDouble() else null }
+            .filterNotNull()
+            .sortBy { it }
+    if (sorted.size() > 0) {
+        return sorted.get(sorted.size() / 2)
+    } else {
+        return 0.0;
+    }
 }
 
 

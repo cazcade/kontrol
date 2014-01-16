@@ -43,6 +43,8 @@ val PARAM_PRIORITY: String = "priority"
 val PARAM_PORT: String = "port"
 val PARAM_WEIGHT: String = "weight"
 val P_PUBLIC_KEY: String = "ssh_pub_key"
+val P_PRIVATE_NETWORKING: String ="private_networking"
+val P_BACKUPS_ENABLED: String ="backups_enabled"
 
 // JSON Element Name
 val STATUS: String = "status"

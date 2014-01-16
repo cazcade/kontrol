@@ -17,6 +17,7 @@
         <module>sensors</module>
         <module>examples</module>
         <module>konfigurators</module>
+        <module>cfclient</module>
     </modules>
     <properties>
         <kotlin.version>0.6.1910</kotlin.version>
