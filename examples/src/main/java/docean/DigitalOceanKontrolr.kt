@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014 Cazcade Limited (http://cazcade.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package kontrol.examples.docean
 
 import kontrol.digitalocean.DigitalOceanMachineGroup
@@ -96,7 +112,7 @@ public fun snapitoSensorActions(infra: Infrastructure) {
                 WORKER MACHINE_IS BROKEN IF L(OK, STALE, STARTING) AND { it["load"]?.D()?:0.0 > 30 } AFTER 5 CHECKS "mega-overload"
                 WORKER MACHINE_IS DEAD IF L(BROKEN) AND { it["http-status"]?.I()?:0 > 400 } AFTER 100 CHECKS "broken-now-dead"
 
-                WORKER IS BUSY IF L(QUIET, BUSY, NORMAL, null) AND {  it["http-response-time"]?:0.0 > 2000 || it["http-load"]?:0.0 > 8.0 || WORKER.workingSize() < WORKER.min }  AFTER 20 CHECKS "overload"
+                WORKER IS BUSY IF L(QUIET, BUSY, NORMAL, null) AND { it["http-response-time"]?:0.0 > 2000 || it["http-load"]?:0.0 > 8.0 || WORKER.workingSize() < WORKER.min }  AFTER 20 CHECKS "overload"
                 WORKER IS QUIET IF L(QUIET, BUSY, NORMAL, null) AND { it["http-load"]?:8.0 < 5.0 || WORKER.activeSize() > WORKER.max }  AFTER 120 CHECKS "underload"
                 WORKER IS NORMAL IF L(QUIET, BUSY, null) AND { it["http-load"]?:1.0 in 5.0..8.0 && WORKER.activeSize() in WORKER.min..WORKER.max }  AFTER 5 CHECKS "group-ok"
             }
@@ -153,7 +169,7 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
 fun buildToplogy(client: DigitalOceanClientFactory, test: Boolean = true): Map<String, DigitalOceanMachineGroup> {
     val gatewaySensorArray = DefaultSensorArray<Any?>(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?status")));
     val loadBalancerSensorArray = DefaultSensorArray<Any?>(listOf(SSHLoadSensor(), HttpStatusSensor("/")));
-    val workerSensorArray = DefaultSensorArray<Any?>(listOf(SSHLoadSensor(), HttpLoadSensor("/api/load"), HttpStatusSensor("/api?url=google.com"),HttpResponseTimeSensor("/api?url=google.com")));
+    val workerSensorArray = DefaultSensorArray<Any?>(listOf(SSHLoadSensor(), HttpLoadSensor("/api/load"), HttpStatusSensor("/api?url=google.com"), HttpResponseTimeSensor("/api?url=google.com")));
     val lbConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 66)
     val gatewayConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
     val workerConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 65)
@@ -173,7 +189,7 @@ fun buildToplogy(client: DigitalOceanClientFactory, test: Boolean = true): Map<S
 fun main(args: Array<String>): Unit {
 
     val digitalOceanClient = DigitalOceanClientFactory(System.getProperty("do.cid")?:"", System.getProperty("do.apikey")?:"")
-    val groups = buildToplogy(digitalOceanClient,false);
+    val groups = buildToplogy(digitalOceanClient, false);
     val cloud = DigitalOceanCloud(digitalOceanClient, groups);
     val controller = DefaultController();
 

@@ -1,23 +1,21 @@
-package kontrol.doclient
-
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import kontrol.doclient.Action.*
-import kontrol.doclient.*
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.utils.URIBuilder
-import org.apache.http.conn.scheme.Scheme
-import org.apache.http.conn.ssl.HackedSSLSocketFactory
-import org.apache.http.impl.client.DefaultHttpClient
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import java.lang.reflect.Type
-import java.net.URI
-import com.google.gson.JsonElement
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-
-/* Original  MIT License from  Java version: https://github.com/jeevatkm/digitalocean-api-java
+/*
+ * Kotlin version Copyright (c) 2014 Cazcade Limited (http://cazcade.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ *
+ * Original Java codes was MIT License  https://github.com/jeevatkm/digitalocean-api-java
  *
  * Copyright (c) 2010-2013 Jeevanandam M. (myjeeva.com)
  *
@@ -38,8 +36,27 @@ import com.google.gson.reflect.TypeToken
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
  */
+
+package kontrol.doclient
+
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import kontrol.doclient.Action.*
+import kontrol.doclient.*
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.utils.URIBuilder
+import org.apache.http.conn.scheme.Scheme
+import org.apache.http.conn.ssl.HackedSSLSocketFactory
+import org.apache.http.impl.client.DefaultHttpClient
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.lang.reflect.Type
+import java.net.URI
+import com.google.gson.JsonElement
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+
 
 /**
  * DigitalOcean API client wrapper methods Implementation
