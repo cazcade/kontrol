@@ -49,8 +49,8 @@ public fun snapitoSensorActions(infra: Infrastructure) {
 
         group memberIs OK ifStateIn L(BROKEN, STARTING) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 5 checks "http-ok"
         group memberIs DEAD ifStateIn L(STOPPED) after 50 checks "stopped-now-dead"
-        group memberIs BROKEN ifStateIn L(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 12 checks "mega-overload"
-        group memberIs DEAD ifStateIn L(BROKEN) andTest { it["http-status"]?.I()?:0 > 400 } after 24 checks "broken-now-dead"
+        group memberIs BROKEN ifStateIn L(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 20 checks "mega-overload"
+        group memberIs DEAD ifStateIn L(BROKEN) andTest { it["http-status"]?.I()?:0 > 400 } after 40 checks "broken-now-dead"
 
 
         when(group.name()) {

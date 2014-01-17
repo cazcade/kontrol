@@ -160,9 +160,12 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
     }
 
     override fun reImage(machine: Machine): MachineGroup {
-        val instance = apiFactory.instance()
-        val images = instance.getAvailableImages()
-        var imageId: Int? = null;
+        val id = machine.id().toInt()
+        try {
+
+            val instance = apiFactory.instance()
+            val images = instance.getAvailableImages()
+            var imageId: Int? = null;
         for (image in images) {
             if ((config.templatePrefix + name) == image.name) {
                 imageId = image.id;
@@ -170,7 +173,6 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
             }
 
         }
-        val id = machine.id().toInt()
         println("Rebuilding ${machine.id()} with ${imageId}")
         if (imageId != null) {
             instance.rebuildDroplet(id, imageId!!)
@@ -179,17 +181,20 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         } else {
             println("No valid image to rebuild ${machine.id()}")
         }
+        } catch (e: Exception) {
+            println("Failed to reImage ${id} due to ${e.getMessage()}")
+        }
         return this;
     }
 
 
     override fun restart(machine: Machine): MachineGroup {
+        val id = machine.id().toInt()
         println("Rebooting $machine")
         "reboot".on(machine.ip())
-        val instance = apiFactory.instance()
-        val id = machine.id().toInt()
         waitForRestart(id)
         println("Rebuilt ${id}")
+
         return this;
     }
 }

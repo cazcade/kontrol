@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package kontrol.test
+package kontrol.test.mock
 
 /**
  * @todo document.
