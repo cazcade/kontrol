@@ -25,23 +25,15 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>kontrol-digitalocean</artifactId>
+    <groupId>com.cazcade</groupId>
+    <artifactId>kontrol-webserver</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>com.cazcade</groupId>
-            <artifactId>kontrol-api</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>com.cazcade</groupId>
             <artifactId>kontrol-common</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.cazcade</groupId>
-            <artifactId>kontrol-doclient</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
+
 
 </project>

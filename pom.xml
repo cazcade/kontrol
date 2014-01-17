@@ -27,19 +27,25 @@
     <modules>
         <module>api</module>
         <module>common</module>
+        <module>webserver</module>
         <module>mock</module>
         <module>doclient</module>
         <module>digitalocean</module>
         <module>sensors</module>
-        <module>examples</module>
-        <module>konfigurators</module>
         <module>cfclient</module>
+        <module>konfigurators</module>
+        <module>status</module>
+        <module>examples</module>
     </modules>
     <properties>
         <kotlin.version>0.6.1910</kotlin.version>
     </properties>
 
     <build>
+
+        <!--<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>-->
+        <!--<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>-->
+
         <plugins>
 
             <plugin>
@@ -50,7 +56,7 @@
                 <executions>
                     <execution>
                         <id>compile</id>
-                        <phase>compile</phase>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>

@@ -14,46 +14,29 @@
  * limitations under the License.
  */
 
-package kontrol.mock
+package kontrol.examples.docean
 
-import kontrol.api.DownStreamKonfigurator
 import kontrol.api.UpStreamKonfigurator
 import kontrol.api.Machine
 import kontrol.api.MachineGroup
+import kontrol.common.on
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class MockKonfigurator : DownStreamKonfigurator, UpStreamKonfigurator{
+public class WorkerKonfigurator : UpStreamKonfigurator {
 
 
-    public var calls: Int = 0;
-    public var downStreamConfigureCalls: Int = 0;
-
-    override fun onDownStreamMachineFail(machine: Machine, machineGroup: MachineGroup, thisGroup: MachineGroup) {
-        calls++
-
-    }
-    override fun onDownStreamMachineUnfail(machine: Machine, machineGroup: MachineGroup, thisGroup: MachineGroup) {
-        calls++
-
-    }
-    override fun configureDownStream(thisGroup: MachineGroup) {
-        calls++
-        downStreamConfigureCalls++
-
-    }
     override fun onMachineFail(machine: Machine, machineGroup: MachineGroup) {
-        calls++
-
+        "touch /tmp/snapito-disable" on machine.hostname()
+        Thread.sleep(30 * 1000)
     }
+
+
     override fun onMachineUnfail(machine: Machine, machineGroup: MachineGroup) {
-        calls++
-
+        "rm /tmp/snapito-disable" on machine.hostname()
     }
-    override fun configureUpStream(machineGroup: MachineGroup) {
-        calls++
 
-    }
+
 }
