@@ -18,13 +18,14 @@ package kontrol.common
 
 
 import net.schmizz.sshj.SSHClient
+import java.util.concurrent.TimeUnit
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 
-fun String.on(host: String? = "localhost", user: String = "root", retry: Int = 3): String {
+fun String.on(host: String? = "localhost", user: String = "root", retry: Int = 3, timeoutInSeconds: Int = 30): String {
     if (host == null) {
         return ""
     }
@@ -35,12 +36,10 @@ fun String.on(host: String? = "localhost", user: String = "root", retry: Int = 3
             ssh.connect(host);
             return ssh use {
                 ssh.authPublickey(user);
-                ssh.startSession()?.use {
-                    session ->
-                    session.exec(this)?.getInputStream()?.use {
-                        ins ->
-                        String(ins.readBytes(2048))
-                    }
+                ssh.startSession()?.use { session ->
+                    val result = session.exec(this)?.getInputStream()?.use { ins -> String(ins.readBytes(2048)) }
+                    session.join(timeoutInSeconds, TimeUnit.SECONDS)
+                    result
                 }?:throw Exception("Could not start session on $host")
             }
         } catch (e: Exception) {

@@ -117,7 +117,7 @@
                     </h2>
                     <table class="table">
 
-                        #foreach($machine in $group.machines())
+                        #foreach($machine in $group.enabledMachines())
 
                             #if($machine.state().toString() == "OK")
                             <tr class="success">

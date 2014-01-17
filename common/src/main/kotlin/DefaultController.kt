@@ -27,12 +27,13 @@ import kontrol.api.MachineState
 import kontrol.api.MachineGroupState
 import java.util.HashMap
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class DefaultController() : Controller{
+public class DefaultController(val timeoutInMinutes: Long = 30) : Controller{
 
     val actions = HashMap<String, (Machine) -> Unit>();
     val groupActions = HashMap<String, (MachineGroup) -> Unit>();
@@ -55,12 +56,12 @@ public class DefaultController() : Controller{
             val action = actions[key(machine, it)];
             if (action != null) {
                 println("Performing action for $action on ${machine.ip()}")
-                executor.execute { action(machine) }
+                executor.submit { action(machine) } .get(timeoutInMinutes, TimeUnit.MINUTES)
             };
             val action2 = actions[key(group, it)];
             if (action2 != null) {
                 println("Performing action for $action2 on ${machine.ip()}")
-                executor.execute { action2(machine) }
+                executor.submit { action2(machine) } .get(timeoutInMinutes, TimeUnit.MINUTES)
             };
         }
         return this;
@@ -73,7 +74,7 @@ public class DefaultController() : Controller{
             val action = groupActions[key];
             if (action != null) {
                 println("Performing action for $action on ${it.name()}")
-                executor.execute { action(group) }
+                executor.submit { action(group) }.get(timeoutInMinutes, TimeUnit.MINUTES)
             };
         }
         return this;
@@ -91,7 +92,7 @@ public class DefaultController() : Controller{
                 println("Action is not null")
                 group.machines().forEach {
                     println("Performing action for $action on ${it.ip()}")
-                    executor.execute { action(it) }
+                    executor.submit { action(it) } .get(timeoutInMinutes, TimeUnit.MINUTES)
                 };
             }
         }

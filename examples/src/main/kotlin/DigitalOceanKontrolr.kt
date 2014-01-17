@@ -45,8 +45,7 @@ import kontrol.common.allowDefaultTranstitions
 
 
 public fun snapitoSensorActions(infra: Infrastructure) {
-    infra.topology().each {
-        val group = it;
+    infra.topology().each { group ->
 
         group memberIs OK ifStateIn L(BROKEN, STARTING) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 5 checks "http-ok"
         group memberIs DEAD ifStateIn L(STOPPED) after 50 checks "stopped-now-dead"
@@ -54,7 +53,7 @@ public fun snapitoSensorActions(infra: Infrastructure) {
         group memberIs DEAD ifStateIn L(BROKEN) andTest { it["http-status"]?.I()?:0 > 400 } after 24 checks "broken-now-dead"
 
 
-        when(it.name()) {
+        when(group.name()) {
             "lb", "gateway" -> {
 
                 group memberIs BROKEN ifStateIn L(OK, STALE, STARTING) andTest {
@@ -70,8 +69,8 @@ public fun snapitoSensorActions(infra: Infrastructure) {
                     it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 30.0
                 } after 30 checks "http-broken"
 
-                group memberIs BROKEN ifStateIn L(OK, STALE, STARTING) andTest { it["http-response-time"]?.I()?:0 > 2000 } after 20 checks "response-too-long"
-                group.selectStateUsingSensorValues("http-response-time" to -1.0..2000.0, "http-load" to 4.0..8.0)
+                group memberIs BROKEN ifStateIn L(OK, STALE, STARTING) andTest { it["http-response-time"]?.I()?:0 > 2000 } after 50 checks "response-too-long"
+                group.selectStateUsingSensorValues("http-response-time" to -1.0..1000.0, "http-load" to 4.0..8.0)
 
             }
         }
@@ -81,26 +80,20 @@ public fun snapitoSensorActions(infra: Infrastructure) {
 public fun snapitoPolicy(infra: Infrastructure, controller: Controller) {
     infra.topology().each { group ->
         group.allowDefaultTranstitions();
+
         group whenMachine BROKEN recheck THEN tell controller  to RESTART_MACHINE;
         group whenMachine DEAD recheck THEN tell controller  to REIMAGE_MACHINE ;
         group whenMachine STALE recheck THEN tell controller   to REIMAGE_MACHINE;
         group whenGroup BUSY recheck THEN use controller to EXPAND;
         group whenGroup QUIET recheck THEN use controller  to CONTRACT;
 
-    }
-}
-
-public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
-    var workers = infra.topology().get("worker")
-    controller will { workers.failover(it).destroy(it) } to DESTROY_MACHINE inGroup workers;
-
-    infra.topology().each { group ->
         controller will { group.failAction(it) { group.reImage(it) } } to REIMAGE_MACHINE inGroup group;
         controller will { group.failAction(it) { group.restart(it) } } to RESTART_MACHINE inGroup group;
         controller use { group.expand() } to EXPAND  unless { group.activeSize() >= group.max }  group group;
         controller use { group.contract() } to CONTRACT unless { group.activeSize() <= group.min } group group;
     };
 }
+
 
 fun buildToplogy(client: DigitalOceanClientFactory, test: Boolean = true): Map<String, DigitalOceanMachineGroup> {
     val gatewaySensorArray = DefaultSensorArray<Any?>(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?status")));
@@ -133,7 +126,6 @@ fun main(args: Array<String>): Unit {
     val statusServer = StatusServer(cloud.topology());
     snapitoSensorActions(cloud);
     snapitoPolicy(cloud, controller);
-    snapitoStrategy(cloud, controller);
     cloud.start();
     statusServer.start()
     while (true) {

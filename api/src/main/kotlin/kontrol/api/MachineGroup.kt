@@ -52,6 +52,9 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
 
     fun machines(): List<Machine>
 
+    fun enabledMachines(): List<Machine> {
+        return machines().filter { it.enabled }
+    }
 
     fun get(value: String): Double? {
         val values = machines() filter { it.state() == MachineState.OK } map { it.data[value] }
