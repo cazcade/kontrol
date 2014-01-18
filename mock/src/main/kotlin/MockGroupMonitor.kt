@@ -34,7 +34,7 @@ public class MockGroupMonitor() : Monitor<MachineGroupState, MachineGroup> {
 
     val timer: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-    override fun start(target: MachineGroup, stateMachine: StateMachine<MachineGroupState, MachineGroup>, rules: List<MonitorRule<MachineGroupState, MachineGroup>>) {
+    override fun start(target: MachineGroup, stateMachine: StateMachine<MachineGroupState, MachineGroup>, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
         timer.scheduleWithFixedDelay({
             println("Random Transition")
             try {

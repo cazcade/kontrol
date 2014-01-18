@@ -16,6 +16,8 @@
 
 package kontrol.api
 
+import java.io.Serializable
+
 
 /**
  *
@@ -32,12 +34,12 @@ public trait Controller {
     fun monitor(machine: Machine, alerter: Alerter, vararg states: MachineState): Controller
     fun monitor(machineGroup: MachineGroup, alerter: Alerter, vararg states: MachineGroupState): Controller
 
-    fun register(group: MachineGroup, action: Action, machineAction: (Machine) -> Unit): Controller
-    fun register(machine: Machine, action: Action, machineAction: (Machine) -> Unit): Controller
-    fun register(group: MachineGroup, action: GroupAction, machineGroupAction: (MachineGroup) -> Unit): Controller
+    fun register(group: MachineGroup, action: Action, machineAction: (Machine) -> Serializable): Controller
+    fun register(machine: Machine, action: Action, machineAction: (Machine) -> Serializable): Controller
+    fun register(group: MachineGroup, action: GroupAction, machineGroupAction: (MachineGroup) -> Serializable): Controller
 
     class MachineRuleBuilder(val actionRegistry: Controller,
-                             val action: (Machine) -> Unit){
+                             val action: (Machine) -> Serializable){
         var machineAction: Action? = null;
         var unless: () -> Boolean = { false };
 
@@ -55,8 +57,10 @@ public trait Controller {
         fun inGroup(group: MachineGroup) {
             if (machineAction != null) {
                 actionRegistry.register(group, machineAction!!, {
-                    if (!unless()) action(it) else {
-                        println("Precondition stopped action ${machineAction}")
+                    if (!unless()) {
+                        action(it)
+                    } else {
+                        java.lang.String()
                     }
                 });
             }
@@ -67,7 +71,7 @@ public trait Controller {
 
     //todo: generify if possible
     class MachineGroupRuleBuilder(val actionRegistry: Controller,
-                                  val action: (MachineGroup) -> Unit){
+                                  val action: (MachineGroup) -> Serializable){
         var groupAction: GroupAction? = null;
         var unless: () -> Boolean = { false };
 
@@ -83,16 +87,16 @@ public trait Controller {
 
         fun group(group: MachineGroup) {
             if (groupAction != null) {
-                actionRegistry.register(group, groupAction!!, { if (!unless()) action(it) else println("Precondition stopped action ${groupAction}") });
+                actionRegistry.register(group, groupAction!!, { if (!unless()) action(it) else java.lang.String("Precondition stopped action ${groupAction}") });
             }
 
         }
     }
 
-    fun will(action: (Machine) -> Unit): MachineRuleBuilder {
+    fun will(action: (Machine) -> Serializable): MachineRuleBuilder {
         return MachineRuleBuilder(this, action);
     }
-    fun use(action: (MachineGroup) -> Unit): MachineGroupRuleBuilder {
+    fun use(action: (MachineGroup) -> Serializable): MachineGroupRuleBuilder {
         return MachineGroupRuleBuilder(this, action);
     }
 }

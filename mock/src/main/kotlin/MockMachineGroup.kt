@@ -29,12 +29,16 @@ import java.util.ArrayList
 import kontrol.api.MonitorRule
 import kontrol.api.DownStreamKonfigurator
 import kontrol.api.UpStreamKonfigurator
+import java.util.SortedSet
+import java.util.TreeSet
+import kontrol.api.Postmortem
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator?, override val upStreamKonfigurator: UpStreamKonfigurator?) : MachineGroup{
+    override val postmortems: List<Postmortem> = listOf()
     override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
 
 
@@ -43,8 +47,8 @@ public class MockMachineGroup(val name: String, val machines: MutableList<MockMa
     override val max: Int = 100000
     var configureCalls: Int = 0
 
-    override val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>> = ArrayList();
-    override val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>> = ArrayList();
+    override val machineMonitorRules: SortedSet<MonitorRule<MachineState, Machine>> = TreeSet();
+    override val groupMonitorRules: SortedSet<MonitorRule<MachineGroupState, MachineGroup>> = TreeSet();
     override val sensors: SensorArray<Any?> = DefaultSensorArray<Any?>(ArrayList())
     override val stateMachine = DefaultStateMachine<MachineGroupState, MachineGroup>(this);
     override val defaultMachineRules = DefaultStateMachineRules<MachineState, Machine>();

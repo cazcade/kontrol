@@ -17,8 +17,8 @@
 package kontrol.api
 
 import kontrol.api.sensors.SensorArray
-import java.util.ArrayList
 import kontrol.api.sensor.SensorValue
+import java.util.SortedSet
 
 
 /**
@@ -27,14 +27,15 @@ import kontrol.api.sensor.SensorValue
  */
 public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
 
+    val postmortems: List<Postmortem>
     val upStreamKonfigurator: UpStreamKonfigurator?
     val downStreamKonfigurator: DownStreamKonfigurator?
     override val stateMachine: StateMachine<MachineGroupState, MachineGroup>
     val sensors: SensorArray<Any?>;
     val defaultMachineRules: StateMachineRules<MachineState, Machine>
     val monitor: Monitor<MachineGroupState, MachineGroup>
-    val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>>
-    val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>>
+    val machineMonitorRules: SortedSet<MonitorRule<MachineState, Machine>>
+    val groupMonitorRules: SortedSet<MonitorRule<MachineGroupState, MachineGroup>>
     val upstreamGroups: List<MachineGroup>
     val downStreamGroups: List<MachineGroup>
     val min: Int
@@ -42,13 +43,9 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
 
     override fun name(): String
 
-    fun workingSize(): Int {
-        return machines().filter { it.state() == MachineState.OK }.size();
-    }
+    fun workingSize(): Int = machines().filter { it.state() == MachineState.OK }.size();
 
-    fun activeSize(): Int {
-        return machines().filter { it.state() != MachineState.STOPPED }.size();
-    }
+    fun activeSize(): Int = machines().filter { it.state() != MachineState.STOPPED }.size();
 
     fun machines(): List<Machine>
 
@@ -76,6 +73,8 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
         //        println("$value was $result")
         return result;
     }
+
+    fun postmortem(machine: Machine): List<PostmortemResult> = postmortems.map { it.perform(machine) }
 
     fun startMonitoring() {
         println("Started monitoring ${name()}")
@@ -231,10 +230,19 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
             return this;
         }
 
-        fun to(action: Action): MachineGroup {
-            machineGroup.defaultMachineRules.on(null, newState, {
-                if (!recheck || it.stateMachine.state() == newState) {
-                    registry?.execute(machineGroup, it, action)
+        fun takeAction(vararg action: Action): MachineGroup {
+            machineGroup.defaultMachineRules.on(null, newState, { machine ->
+                if (!recheck || machine.stateMachine.state() == newState) {
+                    action.forEach { action -> registry?.execute(machineGroup, machine, action) }
+                }
+            });
+            return machineGroup;
+        }
+
+        fun takeActions(action: List<Action>): MachineGroup {
+            machineGroup.defaultMachineRules.on(null, newState, { machine ->
+                if (!recheck || machine.stateMachine.state() == newState) {
+                    action.forEach { action -> registry?.execute(machineGroup, machine, action) }
                 }
             });
             return machineGroup;
@@ -244,7 +252,7 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
 
     class RuleBuilder2(val machineGroup: MachineGroup,
                        val newState: MachineGroupState) {
-        public val THEN: Boolean = true;
+        public val yes: Boolean = true;
 
 
         var registry: Controller? = null;
@@ -276,7 +284,7 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
                                   val state: MachineState) {
         var condition: (Machine) -> Boolean = { true };
         var confirms = 0;
-        var previousStates = ArrayList<MachineState>()
+        var previousStates = hashSetOf<MachineState?>()
 
         fun andTest(condition: (Machine) -> Boolean): MachineStateRuleBuilder {
             this.condition = condition;
@@ -287,7 +295,7 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
             this.confirms = confirms;
             return this;
         }
-        fun ifStateIn(states: List<MachineState>): MachineStateRuleBuilder {
+        fun ifStateIn(states: List<MachineState?>): MachineStateRuleBuilder {
             previousStates.addAll(states)
             return this;
         }
@@ -304,7 +312,7 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
                                        val state: MachineGroupState) {
         var condition: (MachineGroup) -> Boolean = { true };
         var confirms = 0;
-        var previousStates = ArrayList<MachineGroupState?>()
+        var previousStates = hashSetOf<MachineGroupState?>()
 
         fun andTest(condition: (MachineGroup) -> Boolean): MachineGroupStateRuleBuilder {
             this.condition = condition;

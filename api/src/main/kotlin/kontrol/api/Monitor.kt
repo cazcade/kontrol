@@ -22,6 +22,6 @@ package kontrol.api
  */
 public trait Monitor<E : Enum<E>, T : Monitorable<E, T>> {
 
-    fun start(target: T, stateMachine: StateMachine<E, T>, rules: List<MonitorRule<E, T>>);
+    fun start(target: T, stateMachine: StateMachine<E, T>, rules: Set<MonitorRule<E, T>>);
     fun stop();
 }

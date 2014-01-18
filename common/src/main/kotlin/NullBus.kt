@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package kontrol.api
+/**
+ * @todo document.
+ * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
+ */
+import kontrol.api.Bus
+import java.io.Serializable
 
-
-public enum class GroupAction {
-    EXPAND
-    CONTRACT
-    REBUILD
-    EMERGENCY_FIX
+public class NullBus : Bus {
+    override fun <T : Serializable> dispatch(address: String, value: T) {
+    }
+    override fun <T : Serializable> listen(address: String, listener: (T) -> Unit) {
+    }
+    override fun close() {
+    }
 }

@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
-package kontrol.status
-
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-import kontrol.webserver.VelocityWebServer
-import kontrol.common.*
-import kontrol.api.Infrastructure
-import kontrol.api.Bus
+package kontrol.hazelcast
 
-public class StatusServer(infra: Infrastructure, bus: Bus, prefix: String = "/status-server", refresh: Int = 60) {
-    val server = VelocityWebServer(prefix = prefix) { session, context ->
-        context["topology"] = infra.topology()
-        context["refresh"] = refresh
-    }
+import com.hazelcast.core.HazelcastInstance
+import com.hazelcast.config.Config
+import com.hazelcast.core.Hazelcast
 
-    fun start() {
-        server.startServer()
-    }
+var hazelcastInstance: HazelcastInstance? = null;
+var hazelcastConfig = Config();
 
-    fun stop() {
-        server.stopServer()
+fun initHazelcast(): HazelcastInstance {
+    hazelcastInstance = Hazelcast.newHazelcastInstance(hazelcastConfig);
+    return hazelcastInstance!!
+}
+
+fun hazelcast(): HazelcastInstance {
+    return synchronized(hazelcastConfig) {
+        if (hazelcastInstance == null) {
+            initHazelcast()
+        } else {
+            hazelcastInstance!!
+        }
     }
 
 }

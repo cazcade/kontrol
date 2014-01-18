@@ -14,12 +14,29 @@
  * limitations under the License.
  */
 
-package kontrol.api
+/**
+ * @todo document.
+ * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
+ */
+package kontrol.hazelcast
 
+import kontrol.api.Bus
+import java.io.Serializable
 
-public enum class GroupAction {
-    EXPAND
-    CONTRACT
-    REBUILD
-    EMERGENCY_FIX
+public class HazelcastBus : Bus {
+
+    override fun close() {
+
+    }
+
+    override fun <T : Serializable> dispatch(address: String, value: T) {
+        hazelcast().getTopic<T>("topic." + address)?.publish(value);
+    }
+
+    override fun <T : Serializable> listen(address: String, listener: (T) -> Unit) {
+        hazelcast().getTopic<T>("topic." + address)?.addMessageListener {
+            listener(it?.getMessageObject()!!);
+        }
+    }
 }
+

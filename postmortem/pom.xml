@@ -25,37 +25,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.cazcade</groupId>
-    <artifactId>kontrol-common</artifactId>
+    <artifactId>kontrol-postmortem</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.cazcade</groupId>
-            <artifactId>kontrol-api</artifactId>
+            <artifactId>kontrol-common</artifactId>
             <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.schmizz</groupId>
-            <artifactId>sshj</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast</artifactId>
         </dependency>
     </dependencies>
 

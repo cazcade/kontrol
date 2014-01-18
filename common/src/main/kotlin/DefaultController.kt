@@ -27,16 +27,17 @@ import kontrol.api.MachineState
 import kontrol.api.MachineGroupState
 import java.util.HashMap
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import kontrol.api.Bus
+import java.io.Serializable
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class DefaultController(val timeoutInMinutes: Long = 30) : Controller{
+public class DefaultController(val bus: Bus, val timeoutInMinutes: Long = 30) : Controller{
 
-    val actions = HashMap<String, (Machine) -> Unit>();
-    val groupActions = HashMap<String, (MachineGroup) -> Unit>();
+    val actions = HashMap<String, (Machine) -> Serializable>();
+    val groupActions = HashMap<String, (MachineGroup) -> Serializable>();
     val executor = Executors.newSingleThreadExecutor();
 
     fun key(group: MachineGroup, action: Action): String {
@@ -52,29 +53,32 @@ public class DefaultController(val timeoutInMinutes: Long = 30) : Controller{
 
     override fun execute(group: MachineGroup, machine: Machine, vararg actionArgs: Action): Controller {
         //        println(actions);
-        actionArgs.forEach {
-            val action = actions[key(machine, it)];
+        actionArgs.forEach { actionArg ->
+            val action = actions[key(machine, actionArg)];
             if (action != null) {
                 println("Performing action for $action on ${machine.ip()}")
-                executor.submit { action(machine) } .get(timeoutInMinutes, TimeUnit.MINUTES)
+                bus.dispatch("machine.action.pre", actionArg to machine.id());
+                executor.submit { bus.dispatch("machine.action.post", actionArg to action(machine)); }
             };
-            val action2 = actions[key(group, it)];
+            val action2 = actions[key(group, actionArg)];
             if (action2 != null) {
                 println("Performing action for $action2 on ${machine.ip()}")
-                executor.submit { action2(machine) } .get(timeoutInMinutes, TimeUnit.MINUTES)
+                bus.dispatch("machine.action.pre", actionArg to machine.id());
+                executor.submit { bus.dispatch("machine.action.post", actionArg to  action2(machine)); }
             };
         }
         return this;
     }
     override fun execute(group: MachineGroup, vararg actionArgs: GroupAction): Controller {
         //        println(groupActions);
-        actionArgs.forEach {
-            val key = key(group, it)
+        actionArgs.forEach { actionArg ->
+            val key = key(group, actionArg)
             println(key)
             val action = groupActions[key];
             if (action != null) {
-                println("Performing action for $action on ${it.name()}")
-                executor.submit { action(group) }.get(timeoutInMinutes, TimeUnit.MINUTES)
+                println("Performing action for $action on ${actionArg.name()}")
+                bus.dispatch("machine.group.pre", actionArg to group.name());
+                executor.submit { bus.dispatch("machine.group.post", actionArg to action(group)); }
             };
         }
         return this;
@@ -82,9 +86,7 @@ public class DefaultController(val timeoutInMinutes: Long = 30) : Controller{
 
     override fun execute(group: MachineGroup, vararg actionArgs: Action): Controller {
         println(actions);
-
-        actionArgs.forEach {
-            val actionArg = it;
+        actionArgs.forEach { actionArg ->
             val key = key(group, actionArg)
             println(key)
             val action = actions[key];
@@ -92,7 +94,8 @@ public class DefaultController(val timeoutInMinutes: Long = 30) : Controller{
                 println("Action is not null")
                 group.machines().forEach {
                     println("Performing action for $action on ${it.ip()}")
-                    executor.submit { action(it) } .get(timeoutInMinutes, TimeUnit.MINUTES)
+                    bus.dispatch("machine.group.pre", actionArg to group.name());
+                    executor.submit { bus.dispatch("machine.group.post", actionArg to  action(it)); }
                 };
             }
         }
@@ -105,15 +108,15 @@ public class DefaultController(val timeoutInMinutes: Long = 30) : Controller{
     override fun monitor(machineGroup: MachineGroup, alerter: Alerter, vararg states: MachineGroupState): Controller {
         throw UnsupportedOperationException()
     }
-    override fun register(group: MachineGroup, action: Action, machineAction: (Machine) -> Unit): Controller {
+    override fun register(group: MachineGroup, action: Action, machineAction: (Machine) -> Serializable): Controller {
         actions.put(key(group, action), machineAction);
         return this;
     }
-    override fun register(machine: Machine, action: Action, machineAction: (Machine) -> Unit): Controller {
+    override fun register(machine: Machine, action: Action, machineAction: (Machine) -> Serializable): Controller {
         actions.put(key(machine, action), machineAction);
         return this;
     }
-    override fun register(group: MachineGroup, action: GroupAction, machineGroupAction: (MachineGroup) -> Unit): Controller {
+    override fun register(group: MachineGroup, action: GroupAction, machineGroupAction: (MachineGroup) -> Serializable): Controller {
         groupActions.put(key(group, action), machineGroupAction);
         return this;
     }

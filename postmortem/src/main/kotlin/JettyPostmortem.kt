@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package kontrol.status
-
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-import kontrol.webserver.VelocityWebServer
-import kontrol.common.*
-import kontrol.api.Infrastructure
-import kontrol.api.Bus
+package kontrol.postmortem
 
-public class StatusServer(infra: Infrastructure, bus: Bus, prefix: String = "/status-server", refresh: Int = 60) {
-    val server = VelocityWebServer(prefix = prefix) { session, context ->
-        context["topology"] = infra.topology()
-        context["refresh"] = refresh
-    }
+import kontrol.api.Postmortem
+import kontrol.api.Machine
+import kontrol.common.on
+import kontrol.api.PostmortemResult
+import java.util.HashMap
 
-    fun start() {
-        server.startServer()
-    }
+public class JettyPostmortem(val jettyDir: String, val logMax: Int = 10000) : Postmortem{
 
-    fun stop() {
-        server.stopServer()
+    override fun perform(machine: Machine): PostmortemResult {
+
+        return PostmortemResult("jetty", machine, hashMapOf(
+                "jetty-log" to LogPart("cat $(ls $jettyDir/logs/ -t | head -1) | tail -${logMax}" on machine.ip())
+        ), HashMap(machine.data));
     }
 
 }

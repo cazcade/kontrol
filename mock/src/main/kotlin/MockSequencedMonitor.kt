@@ -33,7 +33,7 @@ public class MockSequencedMonitor(val states: List<MachineState?>) : Monitor<Mac
 
     val timer: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-    override fun start(target: Machine, stateMachine: StateMachine<MachineState, Machine>, rules: List<MonitorRule<MachineState, Machine>>) {
+    override fun start(target: Machine, stateMachine: StateMachine<MachineState, Machine>, rules: Set<MonitorRule<MachineState, Machine>>) {
         println("Sequenced Transition")
         for (count in 0..states.size - 1) {
             stateMachine.transition(states[count])

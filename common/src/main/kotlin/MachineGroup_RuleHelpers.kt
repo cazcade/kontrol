@@ -16,9 +16,15 @@
 
 package kontrol.common
 
-import kontrol.api.MachineGroup
+import kontrol.api.MachineGroup.Recheck.*
 import kontrol.api.MachineGroupState.*
+import kontrol.api.GroupAction.*
+import kontrol.api.Action.*
 import kontrol.api.MachineState.*
+import kontrol.api.Controller
+import kontrol.api.MachineGroup
+import kontrol.api.PostmortemResult
+import java.io.Serializable
 
 /**
  * @todo document.
@@ -38,8 +44,6 @@ public fun MachineGroup.allowDefaultTranstitions() {
     this allowMachine (STOPPING to STOPPED);
     this allowMachine (STOPPING to STARTING);
     this allowMachine (STOPPED to DEAD);
-    this allowMachine (BROKEN to STOPPING);
-    this allowMachine (BROKEN to STOPPED);
     this allowMachine (BROKEN to OK);
     this allowMachine (BROKEN to DEAD);
     this allowMachine (STALE to  STOPPING);
@@ -56,6 +60,24 @@ public fun MachineGroup.allowDefaultTranstitions() {
     this allow (GROUP_BROKEN to QUIET);
     this allow (GROUP_BROKEN to BUSY);
     this allow (GROUP_BROKEN to NORMAL);
+}
+
+
+public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemAction: (List<PostmortemResult>) -> Serializable) {
+
+    this whenMachine BROKEN recheck THEN tell controller takeActions L(POSTMORTEM, RESTART_MACHINE);
+    this whenMachine DEAD recheck THEN tell controller  takeActions L(POSTMORTEM, REIMAGE_MACHINE) ;
+    this whenMachine STALE recheck THEN tell controller   takeAction REIMAGE_MACHINE;
+    this whenGroup BUSY recheck THEN use controller to EXPAND;
+    this whenGroup QUIET recheck THEN use controller  to CONTRACT;
+    this whenGroup GROUP_BROKEN recheck THEN use controller  to EMERGENCY_FIX;
+
+    controller will { this.failAction(it) { this.reImage(it) } ;java.lang.String() } to REIMAGE_MACHINE inGroup this;
+    controller will { this.failAction(it) { this.restart(it) };java.lang.String() } to RESTART_MACHINE inGroup this;
+    controller will { postmortemAction(this.postmortem(it)) } to POSTMORTEM inGroup this;
+    controller use { this.expand();;java.lang.String() } to EXPAND  unless { this.activeSize() >= this.max }  group this;
+    controller use { this.contract();;java.lang.String() } to CONTRACT unless { this.activeSize() <= this.min } group this;
+    controller use { it.machines().forEach { this.reImage(it) };java.lang.String() } to EMERGENCY_FIX group this;
 }
 
 

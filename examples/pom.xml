@@ -52,7 +52,16 @@
             <artifactId>kontrol-status</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.cazcade</groupId>
+            <artifactId>kontrol-postmortem</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cazcade</groupId>
+            <artifactId>kontrol-hazelcast</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

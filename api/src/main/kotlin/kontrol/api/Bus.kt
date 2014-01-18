@@ -16,10 +16,17 @@
 
 package kontrol.api
 
+import java.io.Closeable
+import java.io.Serializable
 
-public enum class GroupAction {
-    EXPAND
-    CONTRACT
-    REBUILD
-    EMERGENCY_FIX
+/**
+ * @todo document.
+ * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
+ */
+public trait Bus : Closeable {
+
+    fun <T : Serializable> dispatch(address: String, value: T)
+    fun <T : Serializable> listen(address: String, listener: (T) -> Unit)
+
+
 }

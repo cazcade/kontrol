@@ -18,13 +18,14 @@ package kontrol.api
 
 import java.util.concurrent.ConcurrentMap
 import kontrol.api.sensor.SensorValue
+import java.io.Serializable
 
 
 /**
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  * @todo document.
  */
-public trait Machine : Monitorable<MachineState, Machine> {
+public trait Machine : Monitorable<MachineState, Machine>, Serializable {
 
     var disableAction: ((Machine) -> Unit)?;
     var enableAction: ((Machine) -> Unit)?;
@@ -75,7 +76,7 @@ public trait Machine : Monitorable<MachineState, Machine> {
 
     var monitor: Monitor<MachineState, Machine>;
 
-    fun startMonitoring(rules: List<MonitorRule<MachineState, Machine>>) {
+    fun startMonitoring(rules: Set<MonitorRule<MachineState, Machine>>) {
         println("Started monitoring ${ip()}");
         if (stateMachine.rules == null) {
             throw  IllegalArgumentException("Cannot monitor ${name()} without state machine rules.")
@@ -90,7 +91,7 @@ public trait Machine : Monitorable<MachineState, Machine> {
 
     override val stateMachine: StateMachine<MachineState, Machine>;
 
-    fun toString(): String {
+    override fun toString(): String {
         return "${name()}@${ip()} (${id()}) [${state()}]  - ${data}";
     }
 

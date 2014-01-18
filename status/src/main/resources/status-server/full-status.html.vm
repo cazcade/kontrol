@@ -142,38 +142,50 @@
                             <td class="col-md-1">$machine.state()</td>
                             <td class="col-md-2">$machine.hostname()</td>
                             <td class="col-md-1">$machine.ip()</td>
-                            <td class="col-md-5"><!--$machine.data-->
-                                #if($machine.data.load)
-                                    <div class="row">
-                                        <div class="col-md-3">Load</div>
-                                        <div class="col-md-9">
-                                            <div class="progress">
-                                                <div class="progress-bar progress-bar" role="progressbar"
-                                                     aria-valuenow="$machine.data.load" aria-valuemin="0"
-                                                     aria-valuemax="10"
-                                                     style="max-width:100%;width:${machine.data.load.I(10)}%">
-                                                    <span class="sr-only">Load $machine.data.load </span>
+                            <td class="col-md-5">
+                                <div class="details">
+                                    <!--$machine.data-->
+                                    #if($machine.data.load)
+                                        <div class="row">
+                                            <div class="col-md-3">Load</div>
+                                            <div class="col-md-9">
+                                                <div class="progress">
+                                                    <div class="progress-bar progress-bar" role="progressbar"
+                                                         aria-valuenow="$machine.data.load" aria-valuemin="0"
+                                                         aria-valuemax="10"
+                                                         style="max-width:100%;width:${machine.data.load.I(10)}%">
+                                                        <span class="sr-only">Load $machine.data.load </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                #end
-                                #if($machine.data['http-response-time'])
-                                    <div class="row">
-                                        <div class="col-md-3">Response</div>
-                                        #set($respVal= $machine.data['http-response-time'].value / 100)
-                                        <div class="col-md-9">
-                                            <div class="progress">
-                                                <div class="progress-bar progress-bar" role="progressbar"
-                                                     aria-valuenow="$machine.data['http-response-time']"
-                                                     aria-valuemin="0" aria-valuemax="10000"
-                                                     style="max-width:100%;width:${respVal}%">
-                                                    <span class="sr-only">Response $machine.data['http-response-time'] </span>
+                                    #end
+                                    #if($machine.data['http-response-time'])
+                                        <div class="row">
+                                            <div class="col-md-3">Response</div>
+                                            #set($respVal= $machine.data['http-response-time'].value / 100)
+                                            <div class="col-md-9">
+                                                <div class="progress">
+                                                    <div class="progress-bar progress-bar" role="progressbar"
+                                                         aria-valuenow="$machine.data['http-response-time']"
+                                                         aria-valuemin="0" aria-valuemax="10000"
+                                                         style="max-width:100%;width:${respVal}%">
+                                                        <span class="sr-only">Response $machine.data['http-response-time'] </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                #end
+                                    #end
+                                    #if($machine.data['http-status'])
+                                        <div class="row">
+                                            <div class="col-md-3">HTTP SC</div>
+                                            <div class="col-md-9">
+                                                $machine.data['http-status']
+                                            </div>
+                                        </div>
+                                    #end
+                                    </a>
+                                </div>
                             </td>
                         </tr>
 
@@ -189,8 +201,18 @@
         <p class="text-muted">Kontrol (C) 2014 Cazcade Limited - Released under Apache 2.0 License</p>
     </div>
 </div>
-
 <script src="https://code.jquery.com/jquery.js"></script>
+
+##<script>
+##    $(document).ready(function(){
+##        $('.details-button').popover({
+##            html : true,
+##            content: function(ele) {
+##                return $(ele).find(".detail").html();
+##            }
+##        });
+##    });
+##</script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 
 </body>

@@ -42,7 +42,8 @@ public class CloudFlareKonfigurator(val emailAddress: String, val apiKey: String
     }
 
     override fun configureUpStream(machineGroup: MachineGroup) {
-        configureCloudFlare(machineGroup.machines().first())
+        val machines = machineGroup.machines()
+        if (machines.size() > 0) configureCloudFlare(machines.first())
     }
 
     fun configureCloudFlare(machine: Machine) {

@@ -14,29 +14,30 @@
  * limitations under the License.
  */
 
-package kontrol.status
-
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-import kontrol.webserver.VelocityWebServer
-import kontrol.common.*
-import kontrol.api.Infrastructure
-import kontrol.api.Bus
+package kontrol.postmortem
 
-public class StatusServer(infra: Infrastructure, bus: Bus, prefix: String = "/status-server", refresh: Int = 60) {
-    val server = VelocityWebServer(prefix = prefix) { session, context ->
-        context["topology"] = infra.topology()
-        context["refresh"] = refresh
+import kontrol.api.PostmortemPart
+
+
+public open class TextPart(val text: String) : PostmortemPart {
+
+    public override fun toString(): String {
+        return text;
     }
 
-    fun start() {
-        server.startServer()
-    }
 
-    fun stop() {
-        server.stopServer()
-    }
+}
 
+public class LogPart(text: String) : TextPart(text) {
+    override fun toHTML(): String {
+        val stringBuilder = StringBuilder("<ul>")
+        var count = 1;
+        text.split("\n").map { "<li><emp>${count++}</emp><pre>$it</pre></li>" }.appendString(stringBuilder)
+        stringBuilder.append("</ul>")
+        return stringBuilder.toString()
+    }
 }

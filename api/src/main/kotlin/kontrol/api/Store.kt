@@ -16,10 +16,20 @@
 
 package kontrol.api
 
+import java.io.Serializable
 
-public enum class GroupAction {
-    EXPAND
-    CONTRACT
-    REBUILD
-    EMERGENCY_FIX
+/**
+ * @todo document.
+ * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
+ */
+public trait Store<K : Comparable<K>, T : Serializable> {
+
+    fun set(key: K, value: T)
+    fun get(key: K, value: T)
+    fun remove(key: K)
+    fun contains(key: K)
+    fun minus(key: K) {
+        remove(key)
+    }
+
 }

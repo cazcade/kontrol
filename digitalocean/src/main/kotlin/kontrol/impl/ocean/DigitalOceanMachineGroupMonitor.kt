@@ -34,7 +34,7 @@ public class DigitalOceanMachineGroupMonitor(val group: DigitalOceanMachineGroup
 
     val timer = Timer("DOGroupMon", true);
 
-    override fun start(target: MachineGroup, stateMachine: StateMachine<MachineGroupState, MachineGroup>, rules: List<MonitorRule<MachineGroupState, MachineGroup>>) {
+    override fun start(target: MachineGroup, stateMachine: StateMachine<MachineGroupState, MachineGroup>, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
 
         timer.schedule(1000, 5000) {
             rules.forEach { it.evaluate(target) }

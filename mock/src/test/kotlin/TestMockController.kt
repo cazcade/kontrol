@@ -100,7 +100,7 @@ public class TestMockController {
         }
 
         val infra = MockInfrastructure(members) ;
-        val controller = DefaultController();
+        val controller = DefaultController(NullBus());
         snapitoPolicy(infra, controller);
         snapitoStrategy(infra, controller);
         infra.start();

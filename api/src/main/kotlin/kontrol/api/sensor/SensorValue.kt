@@ -16,13 +16,15 @@
 
 package kontrol.api.sensor
 
+import java.io.Serializable
+
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public data class SensorValue<T>(public val value: T?) {
+public data class SensorValue<T>(public val value: T?) : Serializable {
 
-    fun toString(): String? {
+    override fun toString(): String? {
         return if (value == null) null else value.toString();
     }
 
@@ -36,7 +38,18 @@ public data class SensorValue<T>(public val value: T?) {
         }
     }
 
-    fun I(multiplier: Double = 1.0): Int? {
+
+    fun I(): Int? {
+        val v = value;
+        return when (v) {
+            null -> null
+            is Int -> v
+            is Double -> v.toInt()
+            else -> (v.toString().toDouble()).toInt()
+        }
+    }
+
+    fun I(multiplier: Double): Int? {
         val v = value;
         return when (v) {
             null -> null

@@ -31,7 +31,7 @@ import kontrol.api.MonitorRule
 public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFactory) : Monitor<MachineState, Machine>{
     val timer = Timer("DOGroupMon", true);
 
-    override fun start(target: Machine, stateMachine: StateMachine<MachineState, Machine>, monitorRules: List<MonitorRule<MachineState, Machine>>) {
+    override fun start(target: Machine, stateMachine: StateMachine<MachineState, Machine>, monitorRules: Set<MonitorRule<MachineState, Machine>>) {
         //        println(stateMachine.rules)
         timer.schedule(500, 5000) {
 

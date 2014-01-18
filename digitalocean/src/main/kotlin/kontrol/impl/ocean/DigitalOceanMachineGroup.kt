@@ -31,17 +31,30 @@ import kontrol.doclient.Droplet
 import kontrol.common.on
 import kontrol.api.DownStreamKonfigurator
 import kontrol.api.UpStreamKonfigurator
+import java.util.SortedSet
+import java.util.TreeSet
+import kontrol.api.Postmortem
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory, val name: String, override val sensors: SensorArray<Any?>, val config: DigitalOceanConfig, val sshKeys: String, public override val min: Int, public override val max: Int, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator? = null, override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
-    override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
+public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
+                                      val name: String,
+                                      override val sensors: SensorArray<Any?>,
+                                      val config: DigitalOceanConfig,
+                                      val sshKeys: String,
+                                      public override val min: Int,
+                                      public override val max: Int,
+                                      override val upstreamGroups: List<MachineGroup>,
+                                      override val postmortems: List<Postmortem>,
+                                      override val downStreamKonfigurator: DownStreamKonfigurator? = null,
+                                      override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
 
+    override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
     override var enabled: Boolean = true
-    override val machineMonitorRules: MutableList<MonitorRule<MachineState, Machine>> = ArrayList();
-    override val groupMonitorRules: MutableList<MonitorRule<MachineGroupState, MachineGroup>> = ArrayList()
+    override val machineMonitorRules: SortedSet<MonitorRule<MachineState, Machine>> = TreeSet();
+    override val groupMonitorRules: SortedSet<MonitorRule<MachineGroupState, MachineGroup>> = TreeSet()
 
     override val stateMachine = DefaultStateMachine<MachineGroupState, MachineGroup>(this);
     override val monitor: Monitor<MachineGroupState, MachineGroup> = DigitalOceanMachineGroupMonitor(this, sensors)
@@ -166,21 +179,21 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
             val instance = apiFactory.instance()
             val images = instance.getAvailableImages()
             var imageId: Int? = null;
-        for (image in images) {
-            if ((config.templatePrefix + name) == image.name) {
-                imageId = image.id;
-                break;
-            }
+            for (image in images) {
+                if ((config.templatePrefix + name) == image.name) {
+                    imageId = image.id;
+                    break;
+                }
 
-        }
-        println("Rebuilding ${machine.id()} with ${imageId}")
-        if (imageId != null) {
-            instance.rebuildDroplet(id, imageId!!)
-            waitForRestart(id)
-            println("Rebuilt ${machine.id()}")
-        } else {
-            println("No valid image to rebuild ${machine.id()}")
-        }
+            }
+            println("Rebuilding ${machine.id()} with ${imageId}")
+            if (imageId != null) {
+                instance.rebuildDroplet(id, imageId!!)
+                waitForRestart(id)
+                println("Rebuilt ${machine.id()}")
+            } else {
+                println("No valid image to rebuild ${machine.id()}")
+            }
         } catch (e: Exception) {
             println("Failed to reImage ${id} due to ${e.getMessage()}")
         }

@@ -40,10 +40,9 @@ public final class DigitalOceanMachine(var droplet: Droplet,
                                        val sensorArray: SensorArray<Any?>) : Machine {
     override var disableAction: ((Machine) -> Unit)? = null
     override var enableAction: ((Machine) -> Unit)? = null
-    override var data: ConcurrentMap<String, SensorValue<Any?>> = ConcurrentHashMap();
-
-    override var monitor: Monitor<MachineState, Machine> = DigitalOceanMachineMonitor(clientFactory);
-    override val stateMachine: StateMachine<MachineState, Machine> = DefaultStateMachine<MachineState, Machine>(this);
+    override final var data: ConcurrentMap<String, SensorValue<Any?>> = ConcurrentHashMap();
+    override final var monitor: Monitor<MachineState, Machine> = DigitalOceanMachineMonitor(clientFactory);
+    override final val stateMachine: StateMachine<MachineState, Machine> = DefaultStateMachine<MachineState, Machine>(this);
     override var enabled: Boolean = true;
 
 
@@ -58,7 +57,7 @@ public final class DigitalOceanMachine(var droplet: Droplet,
         return droplet.private_ip_address
     }
 
-    override fun startMonitoring(rules: List<MonitorRule<MachineState, Machine>>) {
+    override fun startMonitoring(rules: Set<MonitorRule<MachineState, Machine>>) {
         super<Machine>.startMonitoring(rules);
         timer.schedule((5000 * Math.random()).toLong(), 20000) {
             //            println("Updating ${droplet.getId()}")
