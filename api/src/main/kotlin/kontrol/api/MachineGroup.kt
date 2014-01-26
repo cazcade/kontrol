@@ -283,7 +283,12 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
             return this;
         }
 
-        fun to(action: GroupAction): MachineGroup {
+        fun takeActions(actions: List<GroupAction>): MachineGroup {
+            actions.forEach { takeAction(it) }
+            return machineGroup;
+        }
+
+        fun takeAction(action: GroupAction): MachineGroup {
             machineGroup.stateMachine.rules?.on<MachineGroup>(null, newState, {
                 if (!recheck || machineGroup.stateMachine.state() == newState) {
                     registry?.execute(machineGroup, { true }, action)

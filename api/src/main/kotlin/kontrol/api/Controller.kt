@@ -68,7 +68,7 @@ public trait Controller {
         }
 
 
-        fun to(machineAction: Action): MachineRuleBuilder {
+        fun takeAction(machineAction: Action): MachineRuleBuilder {
             this.machineAction = machineAction;
             return this;
         }
@@ -92,15 +92,15 @@ public trait Controller {
     class MachineGroupRuleBuilder(val actionRegistry: Controller,
                                   val action: (MachineGroup) -> Serializable){
         var groupAction: GroupAction? = null;
-        var ifClause: () -> Boolean = { false };
+        var ifClause: () -> Boolean = { true };
 
         fun to(groupAction: GroupAction): MachineGroupRuleBuilder {
             this.groupAction = groupAction;
             return this;
         }
 
-        fun IF(unless: () -> Boolean): MachineGroupRuleBuilder {
-            this.ifClause = unless;
+        fun IF(ifClause: () -> Boolean): MachineGroupRuleBuilder {
+            this.ifClause = ifClause;
             return this;
         }
 

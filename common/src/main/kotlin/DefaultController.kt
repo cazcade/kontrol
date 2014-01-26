@@ -132,8 +132,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             if (action != null && action.first()) {
                 println("Performing action for $action on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
-                eventLog.log(machine.name(), actionArg, LogContextualState.START)
                 groupExec.execute(false, machine.name()) {
+                    eventLog.log(machine.name(), actionArg, LogContextualState.START)
                     bus.dispatch("machine.action.post", actionArg to action.second(machine));
                     eventLog.log(machine.name(), actionArg, LogContextualState.END)
                 }
@@ -142,8 +142,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             if (action2 != null && action2.first()) {
                 println("Performing action for $action2 on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
-                eventLog.log(machine.name(), actionArg, LogContextualState.START)
                 groupExec.execute(false, machine.name()) {
+                    eventLog.log(machine.name(), actionArg, LogContextualState.START)
                     bus.dispatch("machine.action.post", actionArg to  action2.second(machine));
                     eventLog.log(machine.name(), actionArg, LogContextualState.END)
                 }
@@ -162,8 +162,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             if (action != null && action.first()) {
                 println("Performing action for $action on ${actionArg.name()}")
                 bus.dispatch("machine.group.pre", actionArg to group.name());
-                eventLog.log(group.name(), actionArg, LogContextualState.START)
                 groupExec.execute(false, group.name()) {
+                    eventLog.log(group.name(), actionArg, LogContextualState.START)
                     bus.dispatch("machine.group.post", actionArg to action.second(group));
                     eventLog.log(group.name(), actionArg, LogContextualState.END)
                 }
@@ -183,8 +183,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 group.machines().forEach {
                     println("Performing action for $action on ${it.ip()}")
                     bus.dispatch("machine.group.pre", actionArg to group.name());
-                    eventLog.log(group.name(), actionArg, LogContextualState.START)
                     groupExec.execute(false, it.name()) {
+                        eventLog.log(group.name(), actionArg, LogContextualState.START)
                         bus.dispatch("machine.group.post", actionArg to  action.second(it));
                         eventLog.log(group.name(), actionArg, LogContextualState.END)
                     }

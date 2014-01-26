@@ -76,13 +76,13 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
     this whenMachine DEAD recheck THEN tell controller takeAction REIMAGE_MACHINE ;
     this whenMachine STALE recheck THEN tell controller takeAction REIMAGE_MACHINE;
     this whenMachine FAILED recheck THEN tell controller takeAction DESTROY_MACHINE;
-    this whenGroup BUSY recheck THEN use controller to EXPAND;
-    this whenGroup QUIET recheck THEN use controller  to CONTRACT;
-    this whenGroup GROUP_BROKEN recheck THEN use controller  to listOf(EMERGENCY_FIX, EXPAND);
+    this whenGroup BUSY recheck THEN use controller takeAction EXPAND;
+    this whenGroup QUIET recheck THEN use controller  takeAction CONTRACT;
+    this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EXPAND, EMERGENCY_FIX);
 
-    controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.reImage(it) } ;java.lang.String() } to REIMAGE_MACHINE inGroup this;
-    controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.restart(it) };java.lang.String() } to RESTART_MACHINE inGroup this;
-    controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.destroy(it) };java.lang.String() } to DESTROY_MACHINE inGroup this;
+    controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.reImage(it) } ;java.lang.String() } takeAction REIMAGE_MACHINE inGroup this;
+    controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.restart(it) };java.lang.String() } takeAction RESTART_MACHINE inGroup this;
+    controller will { this.failAction(it) { this.expand(); postmortemStore.addAll(this.postmortem(it));this.destroy(it) };java.lang.String() } takeAction DESTROY_MACHINE inGroup this;
     controller use { this.expand();java.lang.String() } to EXPAND  IF { this.activeSize() < this.max }  group this;
     controller use { this.contract();java.lang.String() } to CONTRACT IF { this.workingSize() > this.min } group this;
     controller use { it.machines().forEach { postmortemStore.addAll(this.postmortem(it));    this.reImage(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
@@ -91,13 +91,13 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
 
 fun MachineGroup.selectStateUsingSensorValues(vararg ranges: Pair<String, Range<Double>>) {
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.activeSize() == 0 } after 180 seconds "no-working-machines-in-group"
+    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.activeSize() == 0 } after 30 seconds "no-working-machines-in-group"
 
     this becomes BUSY ifStateIn  listOf(QUIET, BUSY, NORMAL, null) andTest { it.activeSize() < it.min } after 180 seconds "not-enough-working-machines-in-group"
 
     this becomes BUSY ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
         ranges.any { this[it.first]?:it.second.end > it.second.end }
-    }  after 90 seconds "overload"
+    }  after 180 seconds "overload"
 
     this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
     this.activeSize() > this.max
@@ -106,7 +106,7 @@ fun MachineGroup.selectStateUsingSensorValues(vararg ranges: Pair<String, Range<
 
     this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
         ranges.any { this[it.first]?:it.second.start < it.second.start }
-    }  after 180 seconds "underload"
+    }  after 240 seconds "underload"
 
     this becomes NORMAL ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, null) andTest {
     ranges.all { this[it.first]?:it.second.start in it.second }

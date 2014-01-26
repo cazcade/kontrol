@@ -136,9 +136,9 @@ public fun snapitoPolicy(infra: Infrastructure, controller: Controller) {
                 val workers = it;
                 workers whenMachine BROKEN recheck THEN tell controller  takeAction RESTART_MACHINE;
                 workers whenMachine DEAD recheck THEN tell controller  takeAction DESTROY_MACHINE;
-                workers whenGroup BUSY recheck THEN use controller   to EXPAND;
+                workers whenGroup BUSY recheck THEN use controller   takeAction EXPAND;
                 workers whenMachine STALE recheck THEN tell controller takeAction  REIMAGE_MACHINE;
-                workers whenGroup QUIET recheck THEN use controller  to CONTRACT;
+                workers whenGroup QUIET recheck THEN use controller  takeAction CONTRACT;
             }
         }
     }
@@ -149,9 +149,9 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
         when(it.name()) {
             "lb" -> {
                 val balancers = it;
-                controller will { balancers.failover(it).reImage(it).configure().failback(it);java.lang.String() } to REIMAGE_MACHINE inGroup balancers;
-                controller will { balancers.failover(it).destroy(it);java.lang.String() } to DESTROY_MACHINE inGroup balancers;
-                controller will { balancers.failover(it).restart(it).failback(it);java.lang.String() } to RESTART_MACHINE inGroup balancers;
+                controller will { balancers.failover(it).reImage(it).configure().failback(it);java.lang.String() } takeAction REIMAGE_MACHINE inGroup balancers;
+                controller will { balancers.failover(it).destroy(it);java.lang.String() } takeAction DESTROY_MACHINE inGroup balancers;
+                controller will { balancers.failover(it).restart(it).failback(it);java.lang.String() } takeAction RESTART_MACHINE inGroup balancers;
             }
             "gateway" -> {
                 val gateways = it;
@@ -161,13 +161,13 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                     gateways.reImage(it).failback(it);
                     infra.topology().get("lb").configure()
                     ;java.lang.String()
-                } to REIMAGE_MACHINE inGroup gateways;
+                } takeAction REIMAGE_MACHINE inGroup gateways;
 
                 controller will {
                     gateways.failover(it).destroy(it);
                     infra.topology().get("lb").configure();
                     ;java.lang.String()
-                } to DESTROY_MACHINE inGroup gateways;
+                } takeAction DESTROY_MACHINE inGroup gateways;
 
                 controller will {
                     gateways.failover(it);
@@ -175,13 +175,13 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                     gateways.restart(it).failback(it);
                     infra.topology().get("lb").configure()
                     ;java.lang.String()
-                } to RESTART_MACHINE inGroup gateways;
+                } takeAction RESTART_MACHINE inGroup gateways;
             }
             "worker" -> {
                 val workers = it;
-                controller will { workers.failover(it).reImage(it);java.lang.String() } to REIMAGE_MACHINE inGroup workers;
-                controller will { workers.failover(it).destroy(it);java.lang.String() } to DESTROY_MACHINE inGroup workers;
-                controller will { workers.failover(it).restart(it).failback(it) ;java.lang.String() } to RESTART_MACHINE inGroup workers;
+                controller will { workers.failover(it).reImage(it);java.lang.String() } takeAction REIMAGE_MACHINE inGroup workers;
+                controller will { workers.failover(it).destroy(it);java.lang.String() } takeAction DESTROY_MACHINE inGroup workers;
+                controller will { workers.failover(it).restart(it).failback(it) ;java.lang.String() } takeAction RESTART_MACHINE inGroup workers;
                 controller use { workers.expand() ;java.lang.String() } to EXPAND  IF { workers.activeSize() < workers.max }  group workers;
                 controller use { workers.contract();java.lang.String() } to CONTRACT IF { workers.activeSize() > workers.min } group workers;
             }

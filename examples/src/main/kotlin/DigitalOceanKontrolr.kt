@@ -43,10 +43,10 @@ public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
 
         group memberIs OK ifStateIn listOf(BROKEN, STARTING) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 30 seconds "http-ok"
-        group memberIs DEAD ifStateIn listOf(STOPPED) after 250 seconds "stopped-now-dead"
+        group memberIs DEAD ifStateIn listOf(STOPPED) after 300 seconds "stopped-now-dead"
         group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 100 seconds "mega-overload"
         val HOUR: Long = 60 * 60 * 1000
-        group memberIs DEAD ifStateIn listOf(BROKEN) andTest { it.fsm.history.countInWindow(BROKEN, HOUR) > 5 } after 5 seconds "broken-now-dead"
+        group memberIs DEAD ifStateIn listOf(BROKEN) andTest { it.fsm.history.countInWindow(BROKEN, HOUR) > 3 } after 300 seconds "broken-now-dead"
         group memberIs FAILED ifStateIn listOf(BROKEN, DEAD) andTest { it.fsm.history.countInWindow(DEAD, 4 * HOUR) > 3 } after 1 seconds "dead-now-failed"
 
         when(group.name()) {
