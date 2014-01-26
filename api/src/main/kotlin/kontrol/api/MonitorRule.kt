@@ -23,11 +23,11 @@ import java.util.concurrent.ConcurrentHashMap
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public  class MonitorRule<E : Enum<E>, T : Monitorable<E, T>>(val state: E,
-                                                              val eval: (T) -> Boolean,
-                                                              val confirms: Int,
-                                                              val name: String,
-                                                              val previousStates: Set<E?>) : Comparable<MonitorRule<E, T>>{
+public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
+                                                           val eval: (T) -> Boolean,
+                                                           val confirms: Int,
+                                                           val name: String,
+                                                           val previousStates: Set<E?>) : Comparable<MonitorRule<E, T>>{
     override fun compareTo(other: MonitorRule<E, T>): Int {
         return toString().compareTo(other.toString())
     }
@@ -44,11 +44,11 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E, T>>(val state: E,
             confirmations.put(target, count);
             if (count >= confirms ) {
                 confirmations.put(target, 0);
-                if (previousStates.size() == 0 || target.stateMachine.state() in previousStates) {
-                    target.stateMachine.transition(state)
+                if (previousStates.size() == 0 || target.state() in previousStates) {
+                    target.transition(state)
                     println("Rule '$name' triggered $state on ${target.name()} after $confirms confirms")
                 } else {
-                    if (target.stateMachine.state() != state) {
+                    if (target.state() != state) {
                         //                                println("$name could not trigger $state on ${target} from state was ${target.stateMachine.state()} and allowed previous states are ${previousStates}")
                     }
                 }

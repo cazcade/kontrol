@@ -19,40 +19,50 @@ package kontrol.digitalocean
 import kontrol.api.MachineState
 import kontrol.api.Monitor
 import kontrol.api.StateMachine
-import java.util.Timer
-import kotlin.concurrent.*;
 import kontrol.api.Machine
 import kontrol.api.MonitorRule
+import kontrol.api.Controller
+import kontrol.common.BoundedComparableTemporalCollection
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFactory) : Monitor<MachineState, Machine>{
-    val timer = Timer("DOGroupMon", true);
+public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFactory, val target: DigitalOceanMachine, val stateMachine: StateMachine<MachineState>, val controller: Controller) : Monitor<MachineState, Machine>{
+    override fun target(): Machine {
 
-    override fun start(target: Machine, stateMachine: StateMachine<MachineState, Machine>, monitorRules: Set<MonitorRule<MachineState, Machine>>) {
-        //        println(stateMachine.rules)
-        timer.schedule(500, 5000) {
-
-            stateMachine.attemptTransition(
-                    when ((target as DigitalOceanMachine).droplet.status?.toLowerCase()) {
-                        "active" -> MachineState.STARTING
-                        "off" -> MachineState.STOPPED
-                        "new" -> MachineState.STARTING
-                        "archive" -> MachineState.STOPPING
-                        else -> null
-
-                    })
-
-            monitorRules.forEach { it.evaluate(target) }
-
-        }
-
+        return target;
+    }
+    override fun start(target: Machine, stateMachine: StateMachine<MachineState>, rules: Set<MonitorRule<MachineState, Machine>>) {
+        controller.addMachineMonitor(this, target, rules)
     }
 
 
+    override fun heartbeat() {
+        stateMachine.attemptTransition(
+                when (target.droplet.status?.toLowerCase()) {
+                    "active" -> MachineState.STARTING
+                    "off" -> MachineState.STOPPED
+                    "new" -> MachineState.STARTING
+                    "archive" -> MachineState.STOPPING
+                    else -> null
+
+                })
+    }
+    override fun update() {
+        val doa = clientFactory.instance();
+        target.droplet = doa.getDropletInfo(target.droplet.id?:-1) ?: target.droplet;
+        if (target.state() in listOf(MachineState.BROKEN, MachineState.DEAD, MachineState.OK, MachineState.STARTING, MachineState.STALE)) {
+            target.sensorArray.values(target).entrySet().forEach {
+                if (!target.data.containsKey(it.key)) {
+                    target.data.putIfAbsent(it.key, BoundedComparableTemporalCollection())
+                }
+                target.data[it.key]?.add(it.value);
+            }
+        }
+    }
+
     override fun stop() {
-        timer.cancel();
+        controller.removeMachineMonitor(this)
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package kontrol.common
+package kontrol.common.group.ext
 
 import kontrol.api.MachineGroup.Recheck.*
 import kontrol.api.MachineGroupState.*
@@ -23,8 +23,7 @@ import kontrol.api.Action.*
 import kontrol.api.MachineState.*
 import kontrol.api.Controller
 import kontrol.api.MachineGroup
-import kontrol.api.PostmortemResult
-import java.io.Serializable
+import kontrol.api.PostmortemStore
 
 /**
  * @todo document.
@@ -46,6 +45,14 @@ public fun MachineGroup.allowDefaultTranstitions() {
     this allowMachine (STOPPED to DEAD);
     this allowMachine (BROKEN to OK);
     this allowMachine (BROKEN to DEAD);
+    this allowMachine (BROKEN to FAILED);
+    this allowMachine (REBUILDING to STARTING);
+    this allowMachine (REBUILDING to OK);
+    this allowMachine (REBUILDING to BROKEN);
+    this allowMachine (DEAD to REBUILDING);
+    this allowMachine (DEAD to FAILED);
+    this allowMachine (DEAD to OK);
+    this allowMachine (OK to FAILED);
     this allowMachine (STALE to  STOPPING);
 
     this allow (QUIET to BUSY);
@@ -63,40 +70,48 @@ public fun MachineGroup.allowDefaultTranstitions() {
 }
 
 
-public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemAction: (List<PostmortemResult>) -> Serializable) {
+public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemStore: PostmortemStore) {
 
-    this whenMachine BROKEN recheck THEN tell controller takeActions L(POSTMORTEM, RESTART_MACHINE);
-    this whenMachine DEAD recheck THEN tell controller  takeActions L(POSTMORTEM, REIMAGE_MACHINE) ;
-    this whenMachine STALE recheck THEN tell controller   takeAction REIMAGE_MACHINE;
+    this whenMachine BROKEN recheck THEN tell controller takeActions listOf(RESTART_MACHINE);
+    this whenMachine DEAD recheck THEN tell controller takeAction REIMAGE_MACHINE ;
+    this whenMachine STALE recheck THEN tell controller takeAction REIMAGE_MACHINE;
+    this whenMachine FAILED recheck THEN tell controller takeAction DESTROY_MACHINE;
     this whenGroup BUSY recheck THEN use controller to EXPAND;
     this whenGroup QUIET recheck THEN use controller  to CONTRACT;
-    this whenGroup GROUP_BROKEN recheck THEN use controller  to EMERGENCY_FIX;
+    this whenGroup GROUP_BROKEN recheck THEN use controller  to listOf(EMERGENCY_FIX, EXPAND);
 
-    controller will { this.failAction(it) { this.reImage(it) } ;java.lang.String() } to REIMAGE_MACHINE inGroup this;
-    controller will { this.failAction(it) { this.restart(it) };java.lang.String() } to RESTART_MACHINE inGroup this;
-    controller will { postmortemAction(this.postmortem(it)) } to POSTMORTEM inGroup this;
-    controller use { this.expand();;java.lang.String() } to EXPAND  unless { this.activeSize() >= this.max }  group this;
-    controller use { this.contract();;java.lang.String() } to CONTRACT unless { this.activeSize() <= this.min } group this;
-    controller use { it.machines().forEach { this.reImage(it) };java.lang.String() } to EMERGENCY_FIX group this;
+    controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.reImage(it) } ;java.lang.String() } to REIMAGE_MACHINE inGroup this;
+    controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.restart(it) };java.lang.String() } to RESTART_MACHINE inGroup this;
+    controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.destroy(it) };java.lang.String() } to DESTROY_MACHINE inGroup this;
+    controller use { this.expand();java.lang.String() } to EXPAND  IF { this.activeSize() < this.max }  group this;
+    controller use { this.contract();java.lang.String() } to CONTRACT IF { this.workingSize() > this.min } group this;
+    controller use { it.machines().forEach { postmortemStore.addAll(this.postmortem(it));    this.reImage(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
 }
 
 
 fun MachineGroup.selectStateUsingSensorValues(vararg ranges: Pair<String, Range<Double>>) {
 
-    this becomes BUSY ifStateIn L(QUIET, BUSY, NORMAL, null) andTest {
-        ranges.any { this[it.first]?:it.second.start > it.second.end }
-        this.workingSize() < this.min
-    }  after 20 checks "overload"
+    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.activeSize() == 0 } after 180 seconds "no-working-machines-in-group"
 
-    this becomes QUIET ifStateIn L(QUIET, BUSY, NORMAL, null) andTest {
+    this becomes BUSY ifStateIn  listOf(QUIET, BUSY, NORMAL, null) andTest { it.activeSize() < it.min } after 180 seconds "not-enough-working-machines-in-group"
+
+    this becomes BUSY ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
+        ranges.any { this[it.first]?:it.second.end > it.second.end }
+    }  after 90 seconds "overload"
+
+    this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
+    this.activeSize() > this.max
+    }  after 1 seconds "too-many-machines"
+
+
+    this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
         ranges.any { this[it.first]?:it.second.start < it.second.start }
-        this.activeSize() > this.max
-    }  after 120 checks "underload"
+    }  after 180 seconds "underload"
 
-    this becomes NORMAL ifStateIn L(QUIET, BUSY, null) andTest {
-        ranges.all { this[it.first]?:it.second.start in it.second }
+    this becomes NORMAL ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, null) andTest {
+    ranges.all { this[it.first]?:it.second.start in it.second }
         && this.activeSize() in this.min..this.max
 
-    }  after 5 checks "group-ok"
+    }  after 30 seconds "group-ok"
 
 }

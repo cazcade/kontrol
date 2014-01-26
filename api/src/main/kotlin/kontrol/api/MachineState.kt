@@ -22,8 +22,10 @@ public enum class MachineState {
     STARTING
     OK
     STOPPING
+    REBUILDING
     STOPPED
     BROKEN
     DEAD
+    FAILED
     STALE
 }

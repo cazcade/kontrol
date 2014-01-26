@@ -22,10 +22,10 @@ import kontrol.api.sensor.SensorValue
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public trait Sensor<out T> {
+public trait Sensor {
 
     fun name(): String
-    fun value(machine: Machine): SensorValue<T>
+    fun value(machine: Machine): SensorValue
     fun start() {
     }
     fun stop() {

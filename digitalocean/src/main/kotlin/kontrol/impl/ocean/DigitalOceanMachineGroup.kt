@@ -20,28 +20,29 @@ import kontrol.api.MachineGroup
 import kontrol.api.Machine
 import kontrol.api.MachineState
 import kontrol.api.MachineGroupState
-import kontrol.common.DefaultStateMachine
-import kontrol.common.DefaultStateMachineRules
 import kontrol.api.Monitor
 import java.util.ArrayList
 import java.util.concurrent.ConcurrentHashMap
 import kontrol.api.sensors.SensorArray
 import kontrol.api.MonitorRule
 import kontrol.doclient.Droplet
-import kontrol.common.on
 import kontrol.api.DownStreamKonfigurator
 import kontrol.api.UpStreamKonfigurator
 import java.util.SortedSet
 import java.util.TreeSet
 import kontrol.api.Postmortem
+import kontrol.api.Controller
+import kontrol.common.*
+import kontrol.ext.string.ssh.onHost
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
+                                      public override val controller: Controller,
                                       val name: String,
-                                      override val sensors: SensorArray<Any?>,
+                                      override val sensors: SensorArray,
                                       val config: DigitalOceanConfig,
                                       val sshKeys: String,
                                       public override val min: Int,
@@ -50,21 +51,24 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
                                       override val postmortems: List<Postmortem>,
                                       override val downStreamKonfigurator: DownStreamKonfigurator? = null,
                                       override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
+    override fun groupName(): String {
+        return name;
+    }
 
     override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
     override var enabled: Boolean = true
     override val machineMonitorRules: SortedSet<MonitorRule<MachineState, Machine>> = TreeSet();
     override val groupMonitorRules: SortedSet<MonitorRule<MachineGroupState, MachineGroup>> = TreeSet()
 
-    override val stateMachine = DefaultStateMachine<MachineGroupState, MachineGroup>(this);
-    override val monitor: Monitor<MachineGroupState, MachineGroup> = DigitalOceanMachineGroupMonitor(this, sensors)
-    override val defaultMachineRules = DefaultStateMachineRules<MachineState, Machine>();
+    override val stateMachine = DefaultStateMachine<MachineGroupState>(this);
+    override val monitor: Monitor<MachineGroupState, MachineGroup> = DigitalOceanMachineGroupMonitor(this, sensors, controller)
+    override val defaultMachineRules = DefaultStateMachineRules<MachineState>();
 
     val machines = ConcurrentHashMap<String, DigitalOceanMachine>();
 
     {
-        machines().forEach { it.stateMachine.rules = defaultMachineRules }
-        stateMachine.rules = DefaultStateMachineRules<MachineGroupState, MachineGroup>();
+        machines().forEach { it.fsm.rules = defaultMachineRules }
+        stateMachine.rules = DefaultStateMachineRules<MachineGroupState>();
         upstreamGroups.forEach { (it as DigitalOceanMachineGroup).downStreamGroups.add(this) }
 
     }
@@ -104,6 +108,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
             println("(${name()}) DO: " + e.getMessage())
         }
         configure()
+        Thread.sleep(60 * 1000)
         return this
     }
 
@@ -126,7 +131,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         }
         var createdDroplet = instance.createDroplet(droplet, sshKeys, privateNetworking = true)
 
-        println("Created droplet with ID " + createdDroplet?.id + " ip address " + createdDroplet?.ip_address)
+        println("Created droplet with ID " + createdDroplet.id + " ip address " + createdDroplet.ip_address)
         var count = 0
         while (createdDroplet.ip_address == null && count++ < 20) {
             try {
@@ -159,12 +164,12 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
     fun waitForRestart(id: Int) {
         var count1: Int = 0;
         val instance = apiFactory.instance()
-        while (instance.getDropletInfo(id).status == "active" && count1++ < 100) {
+        while (instance.getDropletInfo(id).status == "active" && count1++ < 30) {
             println("Waiting for machine ${id} to stop being active")
             Thread.sleep(1000);
         }
         var count2: Int = 0;
-        while (instance.getDropletInfo(id).status != "active" && count2++ < 100) {
+        while (instance.getDropletInfo(id).status != "active" && count2++ < 60) {
             println("Waiting for machine ${id} to become active")
             Thread.sleep(1000);
         }
@@ -173,6 +178,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
     }
 
     override fun reImage(machine: Machine): MachineGroup {
+        super.reImage(machine)
         val id = machine.id().toInt()
         try {
 
@@ -204,7 +210,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
     override fun restart(machine: Machine): MachineGroup {
         val id = machine.id().toInt()
         println("Rebooting $machine")
-        "reboot".on(machine.ip())
+        "reboot".onHost(machine.ip())
         waitForRestart(id)
         println("Rebuilt ${id}")
 

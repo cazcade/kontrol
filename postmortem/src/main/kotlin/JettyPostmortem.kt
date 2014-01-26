@@ -22,17 +22,18 @@ package kontrol.postmortem
 
 import kontrol.api.Postmortem
 import kontrol.api.Machine
-import kontrol.common.on
+import kontrol.ext.string.ssh.onHost
 import kontrol.api.PostmortemResult
 import java.util.HashMap
 
-public class JettyPostmortem(val jettyDir: String, val logMax: Int = 10000) : Postmortem{
+public class JettyPostmortem(val jettyDir: String, val logMax: Int = 2000) : Postmortem{
 
     override fun perform(machine: Machine): PostmortemResult {
+        println("Performing Jetty Postmortem for ${machine.name()}")
 
-        return PostmortemResult("jetty", machine, hashMapOf(
-                "jetty-log" to LogPart("cat $(ls $jettyDir/logs/ -t | head -1) | tail -${logMax}" on machine.ip())
-        ), HashMap(machine.data));
+        return PostmortemResult("jetty", machine, arrayListOf(
+                LogPart("jetty-log", "cat $jettyDir/logs/$(ls $jettyDir/logs/ -t | head -1) | tail -${logMax}" onHost machine.ip())
+        ), HashMap(machine.latestDataValues()));
     }
 
 }

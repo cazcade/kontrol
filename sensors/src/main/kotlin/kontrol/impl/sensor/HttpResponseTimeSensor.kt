@@ -27,20 +27,20 @@ import java.util.Locale
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class HttpResponseTimeSensor(val path: String) : Sensor<Long?> {
+public class HttpResponseTimeSensor(val path: String) : Sensor {
 
     override fun name(): String {
         return "http-response-time"
     }
 
-    override fun value(machine: Machine): SensorValue<Long?> {
+    override fun value(machine: Machine): SensorValue {
         try {
-            return SensorValue(when {
+            return SensorValue(name(), when {
                 machine.hostname().isNotEmpty() -> {
 
                     val start = System.currentTimeMillis();
                     val URI = URL("http", machine.hostname(), 80, path).toURI()
-                    HttpUtil.getStatus(URI, Locale.getDefault(), 60 * 60 * 1000)
+                    HttpUtil.getStatus(URI, Locale.getDefault(), 10 * 1000)
                     System.currentTimeMillis() - start
 
                 }
@@ -50,7 +50,7 @@ public class HttpResponseTimeSensor(val path: String) : Sensor<Long?> {
             });
         } catch (e: Exception) {
             println("HttpResponseTimeSensor: ${e.javaClass} for ${machine.name()}")
-            return SensorValue(null);
+            return SensorValue(name(), null);
         }
 
     }

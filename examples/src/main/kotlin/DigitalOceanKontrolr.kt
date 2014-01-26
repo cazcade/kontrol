@@ -19,7 +19,6 @@ package kontrol.examples.docean
 import kontrol.digitalocean.DigitalOceanMachineGroup
 import kontrol.digitalocean.DigitalOceanCloud
 import kontrol.digitalocean.DigitalOceanClientFactory
-import kontrol.common.DefaultController
 import kontrol.sensor.SSHLoadSensor
 import kontrol.sensor.HttpStatusSensor
 import kontrol.digitalocean.DigitalOceanConfig
@@ -27,59 +26,61 @@ import kontrol.sensor.HttpLoadSensor
 import kontrol.common.DefaultSensorArray
 import kontrol.api.Infrastructure
 import kontrol.api.MachineState.*
-import kontrol.common.L
 import kontrol.konfigurators.HaproxyKonfigurator
 import kontrol.sensor.HttpResponseTimeSensor
-import kontrol.status.StatusServer
-import kontrol.common.selectStateUsingSensorValues
-import kontrol.common.allowDefaultTranstitions
-import kontrol.common.applyDefaultPolicies
 import kontrol.postmortem.CentosPostmortem
 import kontrol.postmortem.JettyPostmortem
+import kontrol.server.Server
+import kontrol.api.Controller
+import kontrol.common.group.ext.selectStateUsingSensorValues
 
 /**
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 
 
-public fun snapitoSensorActions(infra: Infrastructure) {
+public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
 
-        group memberIs OK ifStateIn L(BROKEN, STARTING) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 5 checks "http-ok"
-        group memberIs DEAD ifStateIn L(STOPPED) after 50 checks "stopped-now-dead"
-        group memberIs BROKEN ifStateIn L(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 20 checks "mega-overload"
-        group memberIs DEAD ifStateIn L(BROKEN) andTest { it["http-status"]?.I()?:0 > 400 } after 80 checks "broken-now-dead"
-
+        group memberIs OK ifStateIn listOf(BROKEN, STARTING) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 30 seconds "http-ok"
+        group memberIs DEAD ifStateIn listOf(STOPPED) after 250 seconds "stopped-now-dead"
+        group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 100 seconds "mega-overload"
+        val HOUR: Long = 60 * 60 * 1000
+        group memberIs DEAD ifStateIn listOf(BROKEN) andTest { it.fsm.history.countInWindow(BROKEN, HOUR) > 5 } after 5 seconds "broken-now-dead"
+        group memberIs FAILED ifStateIn listOf(BROKEN, DEAD) andTest { it.fsm.history.countInWindow(DEAD, 4 * HOUR) > 3 } after 1 seconds "dead-now-failed"
 
         when(group.name()) {
             "lb", "gateway" -> {
 
-                group memberIs BROKEN ifStateIn L(OK, STALE, STARTING) andTest {
-                    it["http-status"]?.I()?:999 >= 400
-                } after 20 checks "http-broken"
+                group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest {
+                it["http-status"]?.I()?:999 >= 400
+                } after 300 seconds "http-broken"
 
-                group.selectStateUsingSensorValues("load" to 1.0..5.0)
+                group.selectStateUsingSensorValues("http-response-time" to -1.0..1000.0, "load" to 1.0..5.0)
             }
 
             "worker" -> {
 
-                group memberIs BROKEN ifStateIn L(OK, STALE, STARTING) andTest {
-                    it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 30.0
-                } after 30 checks "http-broken"
+                group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest {
+                it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 30.0
+                } after 240 seconds "http-broken"
 
-                group memberIs BROKEN ifStateIn L(OK, STALE, STARTING) andTest { it["http-response-time"]?.I()?:0 > 2000 } after 50 checks "response-too-long"
+                group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-response-time"]?.I()?:9000 > 2000 } after 60 seconds "response-too-long"
                 group.selectStateUsingSensorValues("http-response-time" to -1.0..1000.0, "http-load" to 4.0..8.0)
 
             }
         }
     }
+    return infra;
 }
 
 
-fun buildToplogy(client: DigitalOceanClientFactory, test: Boolean = true): Map<String, DigitalOceanMachineGroup> {
-    val gatewaySensorArray = DefaultSensorArray<Any?>(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?status")));
-    val loadBalancerSensorArray = DefaultSensorArray<Any?>(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?status")));
-    val workerSensorArray = DefaultSensorArray<Any?>(listOf(SSHLoadSensor(), HttpLoadSensor("/api/load"), HttpStatusSensor("/api?url=google.com"), HttpResponseTimeSensor("/api?url=google.com&freshness=1")));
+fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = true): Map<String, DigitalOceanMachineGroup> {
+    val cloudFlareKonfigurator = CloudFlareKonfigurator(System.getProperty("cf.email")?:"", System.getProperty("cf.apikey")?:"", "snapito.com", if (test) "test.api" else "api")
+
+    val gatewaySensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?status"), HttpResponseTimeSensor("/gateway?status")));
+    val loadBalancerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?status"), HttpResponseTimeSensor("/gateway?status")));
+    val workerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpLoadSensor("/api/load"), HttpStatusSensor("/api?url=google.com"), HttpResponseTimeSensor("/api?url=google.com&freshness=1")));
 
     val lbConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 66)
     val gatewayConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
@@ -87,14 +88,13 @@ fun buildToplogy(client: DigitalOceanClientFactory, test: Boolean = true): Map<S
 
     val keys = "Neil Laptop,Eric New"
 
-    val cloudFlareKonfigurator = CloudFlareKonfigurator(System.getProperty("cf.email")?:"", System.getProperty("cf.apikey")?:"", "snapito.com", if (test) "test.api" else "api")
 
-    val loadBalancerGroup = DigitalOceanMachineGroup(client, "lb", loadBalancerSensorArray, lbConfig, keys, 2, 2, listOf(), listOf(CentosPostmortem()), downStreamKonfigurator = HaproxyKonfigurator("/haproxy.cfg.vm"), upStreamKonfigurator = cloudFlareKonfigurator
+    val loadBalancerGroup = DigitalOceanMachineGroup(client, controller, "lb", loadBalancerSensorArray, lbConfig, keys, 2, 2, listOf(), listOf(CentosPostmortem()), downStreamKonfigurator = HaproxyKonfigurator("/haproxy.cfg.vm"), upStreamKonfigurator = cloudFlareKonfigurator
     )
 
-    val gatewayGroup = DigitalOceanMachineGroup(client, "gateway", gatewaySensorArray, gatewayConfig, keys, 2, 2, listOf(loadBalancerGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty")))
+    val gatewayGroup = DigitalOceanMachineGroup(client, controller, "gateway", gatewaySensorArray, gatewayConfig, keys, 2, 2, listOf(loadBalancerGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty")))
 
-    val workerGroup = DigitalOceanMachineGroup(client, "worker", workerSensorArray, workerConfig, keys, 3, 20, listOf(gatewayGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty")), upStreamKonfigurator = WorkerKonfigurator())
+    val workerGroup = DigitalOceanMachineGroup(client, controller, "worker", workerSensorArray, workerConfig, keys, 3, 8, listOf(gatewayGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty")), upStreamKonfigurator = WorkerKonfigurator())
 
 
     return hashMapOf(
@@ -107,23 +107,24 @@ fun buildToplogy(client: DigitalOceanClientFactory, test: Boolean = true): Map<S
 
 fun main(args: Array<String>): Unit {
 
-    val digitalOceanClient = DigitalOceanClientFactory(System.getProperty("do.cid")?:"", System.getProperty("do.apikey")?:"")
-    val cloud = DigitalOceanCloud(digitalOceanClient, buildToplogy(digitalOceanClient, false))
-    val bus = NullBus()
-    val controller = DefaultController(bus)
-    val statusServer = StatusServer(cloud, bus)
 
-    snapitoSensorActions(cloud);
-    cloud.topology().each { group -> group.allowDefaultTranstitions(); group.applyDefaultPolicies(controller, { println(it.toString());java.lang.String(it.toString()) }) }
-
-    cloud.start()
-    statusServer.start()
-
-    while (true) {
-        Thread.sleep(10000)
-        //            println(cloud.topology().toString());
+    val server = Server { controller ->
+        val cient = DigitalOceanClientFactory(System.getProperty("do.cid")?:"", System.getProperty("do.apikey")?:"")
+        val groups = buildGroups(cient, controller, false)
+        val cloud = DigitalOceanCloud(cient, groups)
+        snapitoSensorActions(cloud);
     }
-    //        cloud.stop();
+
+    server.start()
+    try {
+
+        while (true) {
+            Thread.sleep(10000)
+        }
+    } finally  {
+        server.stop();
+    }
+
 }
 
 

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+#* @vtlvariable name="postmortems" type="java.util.List<kontrol.api.PostmortemResult>" *#
+    #set($Integer = 0)
+<html>
+<head>
+    <title>Server Status Page</title>
+    #parse("head.vm")
+</head>
+<body>
+
+    #parse("style.vm")
+
+<div id="wrap">
+    <!-- Fixed navbar -->
+    #parse("navbar.vm")
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Postmortems</h1>
+        </div>
+        #foreach($postmortem in $postmortems)
+            <div class="row">
+                <div class="col-md-3">$postmortem.name</div>
+                <div class="col-md-2">$!postmortem.machineName</div>
+                <div class="col-md-2"><a class="btn primary-btn"
+                                         href="postmortem_detail.do?id=${postmortem.id}">Details</a></div>
+            ##                <div class="col-md-7">
+            ##                    #foreach($part in $postmortem.parts)
+            ##                        <div class="col-md-2">$part.k</div>
+            ##                        <div class="col-md-10">$part.toHTML()</div>
+            ##                    #end
+            ##                </div>
+            </div>
+        #end
+    </div>
+</div>
+
+    #parse("footer.vm")
+</body>
+</html>

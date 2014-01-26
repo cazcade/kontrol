@@ -40,6 +40,7 @@ import kotlin.test.assertTrue
 import java.util.ArrayList
 import java.util.LinkedHashMap
 import kontrol.mock.MockKonfigurator
+import kontrol.common.NullEventLog
 
 public class TestMockController {
 
@@ -92,15 +93,15 @@ public class TestMockController {
 
         val members = HashMap<String, MachineGroup>();
         var previous: List<MachineGroup> = ArrayList()
+        val controller = DefaultController(NullBus(), NullEventLog());
         map.entrySet().forEach {
             val gs: List<MachineGroupState?> = groupStates.get(it.key) ?: listOf();
-            val mockMachineGroup = MockMachineGroup(it.key, it.value, MockSequencedGroupMonitor(gs), previous, MockKonfigurator(), MockKonfigurator())
+            val mockMachineGroup = MockMachineGroup(it.key, it.value, MockSequencedGroupMonitor(gs), previous, MockKonfigurator(), MockKonfigurator(), controller)
             members.put(it.key, mockMachineGroup)
             previous = listOf(mockMachineGroup)
         }
 
         val infra = MockInfrastructure(members) ;
-        val controller = DefaultController(NullBus());
         snapitoPolicy(infra, controller);
         snapitoStrategy(infra, controller);
         infra.start();

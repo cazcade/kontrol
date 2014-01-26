@@ -1,112 +1,25 @@
 <!DOCTYPE html>
 #* @vtlvariable name="topology" type="kontrol.api.Topology" *#
+
+
     #set($Integer = 0)
+
 <html>
 <head>
     <title>Server Status Page</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="${refresh}">
-    <!-- Bootstrap -->
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
-    <link href="//netdna.bootstrapcdn.com/bootswatch/3.0.3/slate/bootstrap.min.css" rel="stylesheet">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
+    #parse("./head.vm")
 </head>
 <body>
 
-<style>
-    /* Sticky footer styles
-    -------------------------------------------------- */
-
-    html,
-    body {
-        height: 100%;
-        /* The html and body elements cannot have any padding or margin. */
-    }
-
-    /* Wrapper for page content to push down footer */
-    #wrap {
-        min-height: 100%;
-        height: auto;
-        /* Negative indent footer by its height */
-        margin: 0 auto -60px;
-        /* Pad bottom by footer height */
-        padding: 0 0 60px;
-    }
-
-    /* Set the fixed height of the footer here */
-    #footer {
-        height: 60px;
-        background-color: #f5f5f5;
-    }
-
-    /* Custom page CSS
-    -------------------------------------------------- */
-    /* Not required for template or sticky footer method. */
-
-    #wrap > .container {
-        padding: 60px 15px 0;
-    }
-
-    .container .text-muted {
-        margin: 20px 0;
-    }
-
-    #footer > .container {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    code {
-        font-size: 80%;
-    }
-</style>
+    #include("style.vm")
 
 <div id="wrap">
     <!-- Fixed navbar -->
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">Kontrol</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Status</a></li>
-                    <li><a href="https://github.com/cazcade/kontrol">About</a></li>
-                    <li><a href="mailto:support@cazcade.com">Contact</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">Nav header</li>
-                            <li><a href="#">Separated link</a></li>
-                            <li><a href="#">One more separated link</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-            <!--/.nav-collapse -->
-        </div>
-    </div>
+    #include("navbar.vm")
 
     <div class="container">
         <div class="page-header">
-            <h1>Server Status</h1>
+            <h1>Status</h1>
         </div>
         #foreach($group in $topology.members.values())
             <div class="row">
@@ -114,6 +27,7 @@
                 <div>
                     <h2>$group.name()
                         <small>($!group.stateMachine.state())</small>
+                        <small>${group.activeSize()}/${group.machines().size()} Active</small>
                     </h2>
                     <table class="table">
 
@@ -124,6 +38,10 @@
                             #elseif($machine.state().toString() == "BROKEN")
                             <tr class="warning">
                             #elseif($machine.state().toString() == "DEAD")
+                            <tr class="warning">
+                            #elseif($machine.state().toString() == "REBUILDING")
+                            <tr class="danger">
+                            #elseif($machine.state().toString() == "FAILED")
                             <tr class="danger">
                             #elseif($machine.state().toString() == "STOPPING")
                             <tr class="warning">
@@ -145,42 +63,42 @@
                             <td class="col-md-5">
                                 <div class="details">
                                     <!--$machine.data-->
-                                    #if($machine.data.load)
+                                    #if($machine.load)
                                         <div class="row">
                                             <div class="col-md-3">Load</div>
                                             <div class="col-md-9">
                                                 <div class="progress">
                                                     <div class="progress-bar progress-bar" role="progressbar"
-                                                         aria-valuenow="$machine.data.load" aria-valuemin="0"
+                                                         aria-valuenow="$machine.load" aria-valuemin="0"
                                                          aria-valuemax="10"
-                                                         style="max-width:100%;width:${machine.data.load.I(10)}%">
-                                                        <span class="sr-only">Load $machine.data.load </span>
+                                                         style="max-width:100%;width:${machine.load.I(10)}%">
+                                                        <span class="sr-only">Load $machine.load </span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     #end
-                                    #if($machine.data['http-response-time'])
+                                    #if($machine['http-response-time'])
                                         <div class="row">
                                             <div class="col-md-3">Response</div>
-                                            #set($respVal= $machine.data['http-response-time'].value / 100)
+                                            #set($respVal= $machine['http-response-time'].value / 100)
                                             <div class="col-md-9">
                                                 <div class="progress">
                                                     <div class="progress-bar progress-bar" role="progressbar"
-                                                         aria-valuenow="$machine.data['http-response-time']"
+                                                         aria-valuenow="$machine['http-response-time']"
                                                          aria-valuemin="0" aria-valuemax="10000"
                                                          style="max-width:100%;width:${respVal}%">
-                                                        <span class="sr-only">Response $machine.data['http-response-time'] </span>
+                                                        <span class="sr-only">Response $machine['http-response-time'] </span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     #end
-                                    #if($machine.data['http-status'])
+                                    #if($machine['http-status'])
                                         <div class="row">
                                             <div class="col-md-3">HTTP SC</div>
                                             <div class="col-md-9">
-                                                $machine.data['http-status']
+                                                $machine['http-status']
                                             </div>
                                         </div>
                                     #end
@@ -194,26 +112,10 @@
                 </div>
             </div>
         #end
+
     </div>
 </div>
-<div id="footer">
-    <div class="container">
-        <p class="text-muted">Kontrol (C) 2014 Cazcade Limited - Released under Apache 2.0 License</p>
-    </div>
-</div>
-<script src="https://code.jquery.com/jquery.js"></script>
 
-##<script>
-##    $(document).ready(function(){
-##        $('.details-button').popover({
-##            html : true,
-##            content: function(ele) {
-##                return $(ele).find(".detail").html();
-##            }
-##        });
-##    });
-##</script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-
+    #include("footer.vm")
 </body>
 </html>

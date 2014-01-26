@@ -32,12 +32,17 @@ import kontrol.api.UpStreamKonfigurator
 import java.util.SortedSet
 import java.util.TreeSet
 import kontrol.api.Postmortem
+import kontrol.api.Controller
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator?, override val upStreamKonfigurator: UpStreamKonfigurator?) : MachineGroup{
+public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator?, override val upStreamKonfigurator: UpStreamKonfigurator?, override val controller: Controller) : MachineGroup{
+
+    override fun groupName(): String {
+        return name;
+    }
     override val postmortems: List<Postmortem> = listOf()
     override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
 
@@ -49,13 +54,13 @@ public class MockMachineGroup(val name: String, val machines: MutableList<MockMa
 
     override val machineMonitorRules: SortedSet<MonitorRule<MachineState, Machine>> = TreeSet();
     override val groupMonitorRules: SortedSet<MonitorRule<MachineGroupState, MachineGroup>> = TreeSet();
-    override val sensors: SensorArray<Any?> = DefaultSensorArray<Any?>(ArrayList())
-    override val stateMachine = DefaultStateMachine<MachineGroupState, MachineGroup>(this);
-    override val defaultMachineRules = DefaultStateMachineRules<MachineState, Machine>();
+    override val sensors: SensorArray = DefaultSensorArray(ArrayList())
+    override val stateMachine = DefaultStateMachine<MachineGroupState>(this);
+    override val defaultMachineRules = DefaultStateMachineRules<MachineState>();
 
     {
-        machines.forEach { it.stateMachine.rules = defaultMachineRules }
-        stateMachine.rules = DefaultStateMachineRules<MachineGroupState, MachineGroup>();
+        machines.forEach { it.fsm.rules = defaultMachineRules }
+        stateMachine.rules = DefaultStateMachineRules<MachineGroupState>();
         println("${name()} has upstream group ${upstreamGroups}")
         upstreamGroups.forEach { (it as MockMachineGroup).downStreamGroups.add(this) }
 
@@ -73,7 +78,7 @@ public class MockMachineGroup(val name: String, val machines: MutableList<MockMa
         println("**** Expand $name");
         val mockMachine = MockMachine("10.10.10." + (Math.random() * 256));
         mockMachine.monitor = MockMachineMonitor();
-        mockMachine.stateMachine.rules = defaultMachineRules;
+        mockMachine.fsm.rules = defaultMachineRules;
         machines.add(mockMachine);
         return this;
     }

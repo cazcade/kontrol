@@ -19,7 +19,7 @@ package kontrol.examples.docean
 import kontrol.api.UpStreamKonfigurator
 import kontrol.api.Machine
 import kontrol.api.MachineGroup
-import kontrol.common.on
+import kontrol.ext.string.ssh.onHost
 
 /**
  * @todo document.
@@ -29,13 +29,13 @@ public class WorkerKonfigurator : UpStreamKonfigurator {
 
 
     override fun onMachineFail(machine: Machine, machineGroup: MachineGroup) {
-        "touch /tmp/snapito-disable" on machine.hostname()
+        "touch /tmp/snapito-disable" onHost machine.hostname()
         Thread.sleep(30 * 1000)
     }
 
 
     override fun onMachineUnfail(machine: Machine, machineGroup: MachineGroup) {
-        "rm /tmp/snapito-disable" on machine.hostname()
+        "rm /tmp/snapito-disable" onHost machine.hostname()
     }
 
 

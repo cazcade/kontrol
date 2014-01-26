@@ -30,9 +30,12 @@ import kontrol.api.MonitorRule
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class MockMachineMonitor() : Monitor<MachineState, Machine> {
+    override fun target(): Machine? {
+        throw UnsupportedOperationException()
+    }
     val timer: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-    override fun start(target: Machine, stateMachine: StateMachine<MachineState, Machine>, rules: Set<MonitorRule<MachineState, Machine>>) {
+    override fun start(target: Machine, stateMachine: StateMachine<MachineState>, rules: Set<MonitorRule<MachineState, Machine>>) {
         timer.scheduleWithFixedDelay({
             println("Random Transition")
             try {

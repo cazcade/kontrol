@@ -24,11 +24,34 @@ import kontrol.webserver.VelocityWebServer
 import kontrol.common.*
 import kontrol.api.Infrastructure
 import kontrol.api.Bus
+import kontrol.api.PostmortemStore
+import kontrol.api.EventLog
 
-public class StatusServer(infra: Infrastructure, bus: Bus, prefix: String = "/status-server", refresh: Int = 60) {
+public class StatusServer(infra: Infrastructure, bus: Bus, postmortem: PostmortemStore, eventLog: EventLog, prefix: String = "/status-server", val refresh: Int = 60) {
+    var infra: Infrastructure = infra
+
     val server = VelocityWebServer(prefix = prefix) { session, context ->
         context["topology"] = infra.topology()
         context["refresh"] = refresh
+        if (session.uri.endsWith(".do")) {
+            when(session.uri.substring(1, session.uri.length - 3)) {
+                "log" -> {
+                    context["events"] = eventLog.last(100)
+                    "log.html.vm"
+                }
+                "postmortems" -> {
+                    context["postmortems"] = postmortem.last(50)
+                    "postmortems.html.vm"
+                }
+                "postmortem_detail" -> {
+                    context["postmortem"] = postmortem.getWithParts(session.parms["id"]?.toInt()?:-1)
+                    "postmortem_detail.html.vm"
+                }
+                else -> "404.html"
+            }
+        } else {
+            session.uri.substring(1) + ".vm"
+        }
     }
 
     fun start() {
@@ -37,6 +60,10 @@ public class StatusServer(infra: Infrastructure, bus: Bus, prefix: String = "/st
 
     fun stop() {
         server.stopServer()
+    }
+
+    fun updateInfrastructure(infra: Infrastructure) {
+        this.infra = infra
     }
 
 }

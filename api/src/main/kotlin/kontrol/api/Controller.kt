@@ -27,24 +27,43 @@ import java.io.Serializable
  * @todo document.
  */
 public trait Controller {
-    fun execute(group: MachineGroup, machine: Machine, vararg actionArgs: Action): Controller
-    fun execute(group: MachineGroup, vararg actionArgs: GroupAction): Controller
-    fun execute(group: MachineGroup, vararg actionArgs: Action): Controller
+    val frequency: Int
+    fun execute(group: MachineGroup, machine: Machine, pre: () -> Boolean = { true }, vararg actionArgs: Action): Controller
+    fun execute(group: MachineGroup, pre: () -> Boolean = { true }, vararg actionArgs: GroupAction): Controller
+    fun execute(group: MachineGroup, pre: () -> Boolean = { true }, vararg actionArgs: Action): Controller
 
     fun monitor(machine: Machine, alerter: Alerter, vararg states: MachineState): Controller
     fun monitor(machineGroup: MachineGroup, alerter: Alerter, vararg states: MachineGroupState): Controller
 
-    fun register(group: MachineGroup, action: Action, machineAction: (Machine) -> Serializable): Controller
-    fun register(machine: Machine, action: Action, machineAction: (Machine) -> Serializable): Controller
-    fun register(group: MachineGroup, action: GroupAction, machineGroupAction: (MachineGroup) -> Serializable): Controller
+    fun register(group: MachineGroup, action: Action, pre: () -> Boolean = { true }, machineAction: (Machine) -> Serializable): Controller
+    fun register(machine: Machine, action: Action, pre: () -> Boolean = { true }, machineAction: (Machine) -> Serializable): Controller
+    fun register(group: MachineGroup, action: GroupAction, pre: () -> Boolean = { true }, machineGroupAction: (MachineGroup) -> Serializable): Controller
+
+
+    fun start()
+    fun stop()
+
+    fun addGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>,
+                        target: MachineGroup,
+                        rules: Set<MonitorRule<MachineGroupState, MachineGroup>>)
+
+    fun removeGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>)
+
+
+    fun addMachineMonitor(monitor: Monitor<MachineState, Machine>,
+                          target: Machine,
+                          rules: Set<MonitorRule<MachineState, Machine>>)
+
+    fun removeMachineMonitor(monitor: Monitor<MachineState, Machine>)
+
 
     class MachineRuleBuilder(val actionRegistry: Controller,
                              val action: (Machine) -> Serializable){
         var machineAction: Action? = null;
-        var unless: () -> Boolean = { false };
+        var ifClause: () -> Boolean = { true };
 
-        fun UNLESS(unless: () -> Boolean): MachineRuleBuilder {
-            this.unless = unless;
+        fun IF(unless: () -> Boolean): MachineRuleBuilder {
+            this.ifClause = unless;
             return this;
         }
 
@@ -56,8 +75,8 @@ public trait Controller {
 
         fun inGroup(group: MachineGroup) {
             if (machineAction != null) {
-                actionRegistry.register(group, machineAction!!, {
-                    if (!unless()) {
+                actionRegistry.register(group, machineAction!!, ifClause, {
+                    if (!ifClause()) {
                         action(it)
                     } else {
                         java.lang.String()
@@ -73,21 +92,21 @@ public trait Controller {
     class MachineGroupRuleBuilder(val actionRegistry: Controller,
                                   val action: (MachineGroup) -> Serializable){
         var groupAction: GroupAction? = null;
-        var unless: () -> Boolean = { false };
+        var ifClause: () -> Boolean = { false };
 
         fun to(groupAction: GroupAction): MachineGroupRuleBuilder {
             this.groupAction = groupAction;
             return this;
         }
 
-        fun unless(unless: () -> Boolean): MachineGroupRuleBuilder {
-            this.unless = unless;
+        fun IF(unless: () -> Boolean): MachineGroupRuleBuilder {
+            this.ifClause = unless;
             return this;
         }
 
         fun group(group: MachineGroup) {
             if (groupAction != null) {
-                actionRegistry.register(group, groupAction!!, { if (!unless()) action(it) else java.lang.String("Precondition stopped action ${groupAction}") });
+                actionRegistry.register(group, groupAction!!, ifClause, { action(it) });
             }
 
         }

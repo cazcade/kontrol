@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package kontrol.common
+package kontrol.ext.string.ssh
 
 
 import net.schmizz.sshj.SSHClient
@@ -25,7 +25,8 @@ import java.util.concurrent.TimeUnit
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 
-fun String.on(host: String? = "localhost", user: String = "root", retry: Int = 3, timeoutInSeconds: Int = 30): String {
+public fun String.onHost(host: String? = "localhost", user: String = "root", retry: Int = 3, timeoutInSeconds: Int = 30): String {
+    println("ssh ${user}@${host}  '$this' ")
     if (host == null) {
         return ""
     }
@@ -36,6 +37,7 @@ fun String.on(host: String? = "localhost", user: String = "root", retry: Int = 3
             ssh.connect(host);
             return ssh use {
                 ssh.authPublickey(user);
+
                 ssh.startSession()?.use { session ->
                     val result = session.exec(this)?.getInputStream()?.use { ins -> String(ins.readBytes(2048)) }
                     session.join(timeoutInSeconds, TimeUnit.SECONDS)

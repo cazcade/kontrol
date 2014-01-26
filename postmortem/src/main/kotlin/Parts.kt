@@ -21,23 +21,31 @@
 package kontrol.postmortem
 
 import kontrol.api.PostmortemPart
+import javax.persistence.Entity as entity
+import javax.persistence.Id as id
+import javax.persistence.GeneratedValue as generated
 
 
-public open class TextPart(val text: String) : PostmortemPart {
+public open entity  class TextPart(key: String? = null, text: String? = null) : PostmortemPart(key, text) {
 
     public override fun toString(): String {
-        return text;
+        return v?:"";
+    }
+
+    override fun toHTML(): String {
+        return "<pre>$v</pre>"
     }
 
 
 }
 
-public class LogPart(text: String) : TextPart(text) {
+public entity class LogPart(key: String? = null, text: String? = null) : TextPart(key, text) {
+
     override fun toHTML(): String {
-        val stringBuilder = StringBuilder("<ul>")
+        val stringBuilder = StringBuilder("<div>")
         var count = 1;
-        text.split("\n").map { "<li><emp>${count++}</emp><pre>$it</pre></li>" }.appendString(stringBuilder)
-        stringBuilder.append("</ul>")
+        v?.split("\n")?.map { "<div class='row ${when {it.contains("WARN") -> "warning";it.contains("ERROR") -> "error";it.contains("INFO") -> "success" else -> ""}}'><div class='col-md-1'>${count++}</div><div class='col-md-11'>$it</div></div>" }?.appendString(stringBuilder, separator = "")
+        stringBuilder.append("</div>")
         return stringBuilder.toString()
     }
 }

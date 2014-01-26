@@ -68,49 +68,49 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
         val group = it;
 
         group memberIs OK ifStateIn listOf(BROKEN, STARTING) andTest {
-            it.data["http-status"]?.I()?:999 < 400 && it.data["load"]?.D()?:0.0 < 30
-        } after 5 checks "http-ok"
+            it.data["http-status"]?.lastEntry()?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30
+        } after 5 seconds "http-ok"
 
-        group memberIs DEAD ifStateIn listOf(BROKEN) andTest { it.data["http-status"]?.I()?:0 > 400 } after 100 checks "dead"
+        group memberIs DEAD ifStateIn listOf(BROKEN) andTest { it["http-status"]?.I()?:0 > 400 } after 100 seconds "dead"
 
         when(it.name()) {
             "lb" -> {
                 val balancers = it;
-                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it.data["http-status"]?.I()?:222 >= 400 } after 2 checks "http-broken"
+                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-status"]?.I()?:222 >= 400 } after 2 seconds "http-broken"
 
-                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it.data["load"]?.D()?:0.0 > 30 } after 2 checks "mega-overload"
-                group becomes BUSY ifStateIn listOf(QUIET, NORMAL, null) andTest { it.get("load")?:0.0 > 3.0 }  after 2 checks "overload"
-                group becomes QUIET ifStateIn listOf(BUSY, NORMAL, null) andTest { it.get("load")?:1.0 < 1.0 }  after 5 checks "underload"
-                group becomes NORMAL ifStateIn listOf(QUIET, BUSY, null) andTest { it.get("load")?:1.0 in 1.0..3.0 }  after 5 checks "group-ok"
+                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 2 seconds "mega-overload"
+                group becomes BUSY ifStateIn listOf(QUIET, NORMAL, null) andTest { it.get("load")?:0.0 > 3.0 }  after 2 seconds "overload"
+                group becomes QUIET ifStateIn listOf(BUSY, NORMAL, null) andTest { it.get("load")?:1.0 < 1.0 }  after 5 seconds "underload"
+                group becomes NORMAL ifStateIn listOf(QUIET, BUSY, null) andTest { it.get("load")?:1.0 in 1.0..3.0 }  after 5 seconds "group-ok"
             }
             "gateway" -> {
 
                 val gateways = it;
                 gateways memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest {
-                    it.data["http-status"]?.I()?:222 >= 400
-                } after 3 checks "http-broken"
+                    it["http-status"]?.I()?:222 >= 400
+                } after 3 seconds "http-broken"
 
                 gateways memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest {
-                    it.data["load"]?.D()?:0.0 > 30
-                } after 3 checks "mega-overload"
+                    it["load"]?.D()?:0.0 > 30
+                } after 3 seconds "mega-overload"
 
-                group becomes BUSY ifStateIn listOf(QUIET, NORMAL, null) andTest { it.get("load")?:0.0 > 3.0 }  after 5 checks "overload"
+                group becomes BUSY ifStateIn listOf(QUIET, NORMAL, null) andTest { it.get("load")?:0.0 > 3.0 }  after 5 seconds "overload"
 
-                group becomes QUIET ifStateIn listOf(BUSY, NORMAL, null) andTest { it.get("load")?:1.0 < 1.0 }  after 10 checks "underload"
+                group becomes QUIET ifStateIn listOf(BUSY, NORMAL, null) andTest { it.get("load")?:1.0 < 1.0 }  after 10 seconds "underload"
 
-                group becomes NORMAL ifStateIn listOf(QUIET, BUSY, null) andTest { it.get("load")?:1.0 in 1.0..3.0 }  after 2 checks "group-ok"
+                group becomes NORMAL ifStateIn listOf(QUIET, BUSY, null) andTest { it.get("load")?:1.0 in 1.0..3.0 }  after 2 seconds "group-ok"
             }
             "worker" -> {
                 val workers = it;
-                workers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it.data["http-status"]?.I()?:999 >= 400 && it.data["http-load"]?.D()?:2.0 < 2.0 } after 30 checks "http-broken"
+                workers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 2.0 } after 30 seconds "http-broken"
 
-                workers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it.data["load"]?.D()?:0.0 > 30 } after 5 checks "mega-overload"
+                workers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 5 seconds "mega-overload"
 
-                group becomes BUSY ifStateIn listOf(BUSY, QUIET, NORMAL, null) andTest { it.get("http-load")?:1.0 > 5.0 || group.activeSize() < group.min }  after 20 checks "overload"
+                group becomes BUSY ifStateIn listOf(BUSY, QUIET, NORMAL, null) andTest { it.get("http-load")?:1.0 > 5.0 || group.activeSize() < group.min }  after 20 seconds "overload"
 
-                group becomes QUIET ifStateIn listOf(QUIET, BUSY, NORMAL, null) andTest { it.get("http-load")?:1.0 < 3.0 || group.activeSize() > group.max }  after 60 checks "underload"
+                group becomes QUIET ifStateIn listOf(QUIET, BUSY, NORMAL, null) andTest { it.get("http-load")?:1.0 < 3.0 || group.activeSize() > group.max }  after 60 seconds "underload"
 
-                group becomes NORMAL ifStateIn listOf(QUIET, BUSY, null) andTest { it.get("http-load") ?:1.0 in 3.0..5.0 && group.activeSize() in group.min..group.max }  after 5 checks "group-ok"
+                group becomes NORMAL ifStateIn listOf(QUIET, BUSY, null) andTest { it.get("http-load") ?:1.0 in 3.0..5.0 && group.activeSize() in group.min..group.max }  after 5 seconds "group-ok"
             }
         }
     }
@@ -182,8 +182,8 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                 controller will { workers.failover(it).reImage(it);java.lang.String() } to REIMAGE_MACHINE inGroup workers;
                 controller will { workers.failover(it).destroy(it);java.lang.String() } to DESTROY_MACHINE inGroup workers;
                 controller will { workers.failover(it).restart(it).failback(it) ;java.lang.String() } to RESTART_MACHINE inGroup workers;
-                controller use { workers.expand() ;java.lang.String() } to EXPAND  unless { workers.activeSize() > workers.max }  group workers;
-                controller use { workers.contract();java.lang.String() } to CONTRACT unless { workers.activeSize() < workers.min } group workers;
+                controller use { workers.expand() ;java.lang.String() } to EXPAND  IF { workers.activeSize() < workers.max }  group workers;
+                controller use { workers.contract();java.lang.String() } to CONTRACT IF { workers.activeSize() > workers.min } group workers;
             }
         }
     };

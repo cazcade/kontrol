@@ -23,8 +23,8 @@ package kontrol.api
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  * @todo document.
  */
-public trait StateMachineRules<in E : Enum<E>, in C> {
-    fun on(currentState: E?, newState: E?, action: ((C) -> Unit)?): StateMachineRules<E, C>
-    fun allow(currentState: E, newState: E): StateMachineRules<E, C>;
+public trait StateMachineRules<in E : Enum<E>> {
+    fun <C> on(currentState: E?, newState: E?, action: ((C) -> Unit)?): StateMachineRules<E>
+    fun allow(currentState: E, newState: E): StateMachineRules<E>;
 
 }

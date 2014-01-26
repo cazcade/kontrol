@@ -37,7 +37,7 @@ public class TestSensors {
 
     test fun testArray(): Unit {
         val sensors = listOf(MockDoubleSensor(50..100))
-        val array = DefaultSensorArray<Double>(sensors)
+        val array = DefaultSensorArray(sensors)
         val machines = listOf(MockMachine("1.2.3.4"), MockMachine("1.2.3.5"))
         //
         //        println(array.avg(machines, "mock"));

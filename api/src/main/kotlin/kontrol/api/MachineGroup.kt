@@ -17,22 +17,24 @@
 package kontrol.api
 
 import kontrol.api.sensors.SensorArray
-import kontrol.api.sensor.SensorValue
 import java.util.SortedSet
+import kontrol.ext.collections.avgAsDouble
+import kontrol.ext.collections.median
 
 
 /**
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  * @todo document.
  */
-public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
+public trait MachineGroup : Monitorable<MachineGroupState> {
 
+    val controller: Controller
     val postmortems: List<Postmortem>
     val upStreamKonfigurator: UpStreamKonfigurator?
     val downStreamKonfigurator: DownStreamKonfigurator?
-    override val stateMachine: StateMachine<MachineGroupState, MachineGroup>
-    val sensors: SensorArray<Any?>;
-    val defaultMachineRules: StateMachineRules<MachineState, Machine>
+    val stateMachine: StateMachine<MachineGroupState>
+    val sensors: SensorArray;
+    val defaultMachineRules: StateMachineRules<MachineState>
     val monitor: Monitor<MachineGroupState, MachineGroup>
     val machineMonitorRules: SortedSet<MonitorRule<MachineState, Machine>>
     val groupMonitorRules: SortedSet<MonitorRule<MachineGroupState, MachineGroup>>
@@ -41,29 +43,34 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
     val min: Int
     val max: Int
 
+
+    override fun state(): MachineGroupState? {
+        return stateMachine.state()
+    }
+    override fun transition(state: MachineGroupState) {
+        stateMachine.transition(state)
+    }
     override fun name(): String
-
-    fun workingSize(): Int = machines().filter { it.state() == MachineState.OK }.size();
-
-    fun activeSize(): Int = machines().filter { it.state() != MachineState.STOPPED }.size();
 
     fun machines(): List<Machine>
 
-    fun enabledMachines(): List<Machine> {
-        return machines().filter { it.enabled }
-    }
+    fun workingSize(): Int = workingMachines().size();
+    fun activeSize(): Int = enabledMachines().filter { !(it.state() in listOf(MachineState.STOPPED, MachineState.STOPPING, MachineState.FAILED, null)) }.size();
+    fun enabledMachines(): List<Machine> = machines().filter { it.enabled }
+    fun workingMachines(): List<Machine> = enabledMachines().filter { it.state() == MachineState.OK }
 
     fun get(value: String): Double? {
-        val values = machines() filter { it.state() == MachineState.OK } map { it.data[value] }
-        val average = values.avg()
-        val median = values.median()
+        val values = machines()  map { it[value] }
+        val average = values.map { it?.D() }.avgAsDouble()
+        val median = values.map { it?.D() }.median()
         //The average should be within a factor of 5 of the median, if not we use the median instead
         val result = when {
             average == null -> null
-            average!! > median * 5 -> {
+            median == null -> null
+            average!! > median!! * 5 -> {
                 median
             }
-            average!! < median / 5 -> {
+            average!! < median!! / 5 -> {
                 median
             }
             else -> {
@@ -74,7 +81,13 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
         return result;
     }
 
-    fun postmortem(machine: Machine): List<PostmortemResult> = postmortems.map { it.perform(machine) }
+    fun postmortem(machine: Machine): List<PostmortemResult> = postmortems.map {
+        try {
+            it.perform(machine)
+        } catch(e: Exception) {
+            e.printStackTrace(); null
+        }
+    }.filterNotNull()
 
     fun startMonitoring() {
         println("Started monitoring ${name()}")
@@ -87,7 +100,7 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
     }
 
     fun other(machine: Machine): Machine? {
-        val list = machines().filter { it != machine && it.state() == MachineState.OK }
+        val list = workingMachines().filter { it != machine }
         return if (list.size() > 0) {
             list.first()
         } else {
@@ -159,6 +172,7 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
         return this;
     }
     fun reImage(machine: Machine): MachineGroup {
+        machine.fsm.transition(MachineState.REBUILDING)
         println("**** Re Image Machine ${machine.name()}(${machine.id()})");
         return this;
     }
@@ -231,18 +245,18 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
         }
 
         fun takeAction(vararg action: Action): MachineGroup {
-            machineGroup.defaultMachineRules.on(null, newState, { machine ->
-                if (!recheck || machine.stateMachine.state() == newState) {
-                    action.forEach { action -> registry?.execute(machineGroup, machine, action) }
+            machineGroup.defaultMachineRules.on<Machine>(null, newState, { machine ->
+                if (!recheck || machine.fsm.state() == newState) {
+                    action.forEach { action -> registry?.execute(machineGroup, machine, { true }, action) }
                 }
             });
             return machineGroup;
         }
 
         fun takeActions(action: List<Action>): MachineGroup {
-            machineGroup.defaultMachineRules.on(null, newState, { machine ->
-                if (!recheck || machine.stateMachine.state() == newState) {
-                    action.forEach { action -> registry?.execute(machineGroup, machine, action) }
+            machineGroup.defaultMachineRules.on<Machine>(null, newState, { machine ->
+                if (!recheck || machine.fsm.state() == newState) {
+                    action.forEach { action -> registry?.execute(machineGroup, machine, { true }, action) }
                 }
             });
             return machineGroup;
@@ -270,9 +284,9 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
         }
 
         fun to(action: GroupAction): MachineGroup {
-            machineGroup.stateMachine.rules?.on(null, newState, {
-                if (!recheck || it.stateMachine.state() == newState) {
-                    registry?.execute(machineGroup, action)
+            machineGroup.stateMachine.rules?.on<MachineGroup>(null, newState, {
+                if (!recheck || machineGroup.stateMachine.state() == newState) {
+                    registry?.execute(machineGroup, { true }, action)
                 }
             });
             return machineGroup;
@@ -291,8 +305,8 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
             return this;
         }
 
-        fun after(confirms: Int): MachineStateRuleBuilder {
-            this.confirms = confirms;
+        fun after(seconds: Int): MachineStateRuleBuilder {
+            this.confirms = seconds / machineGroup.controller.frequency;
             return this;
         }
         fun ifStateIn(states: List<MachineState?>): MachineStateRuleBuilder {
@@ -300,7 +314,7 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
             return this;
         }
 
-        fun checks(name: String) {
+        fun seconds(name: String) {
             machineGroup.machineMonitorRules.add(MonitorRule(state, condition, confirms, name, previousStates))
             println("Added rule for $name")
         }
@@ -319,8 +333,8 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
             return this;
         }
 
-        fun after(confirms: Int): MachineGroupStateRuleBuilder {
-            this.confirms = confirms;
+        fun after(seconds: Int): MachineGroupStateRuleBuilder {
+            this.confirms = seconds / machineGroup.controller.frequency;
             return this;
         }
         fun ifStateIn(states: List<MachineGroupState?>): MachineGroupStateRuleBuilder {
@@ -328,7 +342,7 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
             return this;
         }
 
-        fun checks(name: String) {
+        fun seconds(name: String) {
             machineGroup.groupMonitorRules.add(MonitorRule(state, condition, confirms, name, previousStates))
             println("Added rule for $name")
         }
@@ -351,9 +365,10 @@ public trait MachineGroup : Monitorable<MachineGroupState, MachineGroup> {
 
 }
 
+/*
 
-fun List<SensorValue<Any?>?>.sumSensors(): Double? {
-    return if (this.size() > 0) this.map { if (it?.value != null) it?.value.toString().toDouble() else null } .reduce { x, y ->
+fun List<SensorValue?>.sumSensors(): Double? {
+    return if (this.size() > 0) this.map { if (it?.v != null) it?.D() else null } .reduce { x, y ->
         when {
             x == null -> y
             y == null -> x
@@ -362,9 +377,9 @@ fun List<SensorValue<Any?>?>.sumSensors(): Double? {
     } else null
 }
 
-fun List<SensorValue<Any?>?>.median(): Double {
+fun List<SensorValue?>.median(): Double {
     val sorted = this
-            .map { if (it?.value != null) it?.value.toString().toDouble() else null }
+            .map { if (it?.v != null) it?.D() else null }
             .filterNotNull()
             .sortBy { it }
     if (sorted.size() > 0) {
@@ -375,7 +390,7 @@ fun List<SensorValue<Any?>?>.median(): Double {
 }
 
 
-fun List<SensorValue<Any?>?>.avg(): Double? {
+fun List<SensorValue?>.avg(): Double? {
     val sum = this.sumSensors()
     val size = this.filterNotNull().size
     return when {
@@ -386,8 +401,8 @@ fun List<SensorValue<Any?>?>.avg(): Double? {
 }
 
 
-fun List<SensorValue<Any?>?>.max(): Double? {
-    return if (this.size() > 0) this.map { if (it?.value != null) it?.value.toString().toDouble() else null } .reduce { x, y ->
+fun List<SensorValue?>.max(): Double? {
+    return if (this.size() > 0) this.map { if (it?.v != null) it?.v.toString().toDouble() else null } .reduce { x, y ->
         when {
             x == null -> y
             y == null -> x
@@ -396,8 +411,8 @@ fun List<SensorValue<Any?>?>.max(): Double? {
         }
     } else null
 }
-fun List<SensorValue<Any?>?>.min(): Double? {
-    return if (this.size() > 0) this.map { if (it?.value != null) it?.value.toString().toDouble() else null } .reduce { x, y ->
+fun List<SensorValue?>.min(): Double? {
+    return if (this.size() > 0) this.map { if (it?.v != null) it?.v.toString().toDouble() else null } .reduce { x, y ->
         when {
             x == null -> y
             y == null -> x
@@ -407,3 +422,4 @@ fun List<SensorValue<Any?>?>.min(): Double? {
     } else null
 }
 
+*/

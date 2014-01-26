@@ -24,12 +24,12 @@ import kontrol.api.sensor.SensorValue
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class MockDoubleSensor(val intRange: IntRange) : Sensor<Double>{
+public class MockDoubleSensor(val intRange: IntRange) : Sensor{
     override fun name(): String {
         return "mock"
     }
-    override fun value(machine: Machine): SensorValue<Double> {
-        return SensorValue(Math.random() * (intRange.end - intRange.start) + intRange.start);
+    override fun value(machine: Machine): SensorValue {
+        return SensorValue(name(), Math.random() * (intRange.end - intRange.start) + intRange.start);
     }
     override fun start() {
 

@@ -24,18 +24,23 @@ import kontrol.api.MachineState
 import kontrol.api.sensor.SensorValue
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentHashMap
+import kontrol.api.ComparableTemporalStore
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class MockMachine(val ip: String) : Machine{
+    override fun groupName(): String {
+        return "mock"
+    }
+
     override var disableAction: ((Machine) -> Unit)? = null
     override var enableAction: ((Machine) -> Unit)? = null
-    override var data: ConcurrentMap<String, SensorValue<Any?>> = ConcurrentHashMap();
+    override var data: ConcurrentMap<String, ComparableTemporalStore<SensorValue>> = ConcurrentHashMap();
 
     override var monitor: Monitor<MachineState, Machine> = MockMachineMonitor();
-    override val stateMachine: StateMachine<MachineState, Machine> = DefaultStateMachine<MachineState, Machine>(this);
+    override val fsm: StateMachine<MachineState> = DefaultStateMachine<MachineState>(this);
     override var enabled: Boolean = true;
 
     override fun ip(): String {

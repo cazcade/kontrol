@@ -32,7 +32,7 @@ import org.apache.velocity.runtime.RuntimeConstants
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
 import kontrol.api.UpStreamKonfigurator
 import kontrol.api.MachineState
-import kontrol.common.on
+import kontrol.ext.string.ssh.onHost
 
 
 public class HaproxyKonfigurator(val templateName: String) : DownStreamKonfigurator, UpStreamKonfigurator {
@@ -69,7 +69,7 @@ public class HaproxyKonfigurator(val templateName: String) : DownStreamKonfigura
                 println("Configuring HA Proxy on ${it.name()}")
                 val context = VelocityContext()
                 context["downstreamMachine"] = downStreamMachine;
-                context["downstreamWorkingMachines"] = downstreamGroup.machines().filter { it.state() == MachineState.OK };
+                context["downstreamWorkingMachines"] = downstreamGroup.workingMachines();
                 context["downstreamGroup"] = downstreamGroup
                 context["thisGroup"] = thisGroup
                 context["thisMachine"] = it
@@ -79,7 +79,7 @@ public class HaproxyKonfigurator(val templateName: String) : DownStreamKonfigura
                 val file = File.createTempFile("haproxy", ".cfg")
                 file.writeText(writer.getBuffer().toString())
                 file.scp(host = it.hostname(), path = "/etc/haproxy/haproxy.cfg")
-                "service haproxy restart".on(it.hostname())
+                "service haproxy restart".onHost(it.hostname())
                 println("Configured HA Proxy on ${it.name()}")
             } catch (e: Exception) {
                 println("${e.getMessage()} on ${it.name()}")

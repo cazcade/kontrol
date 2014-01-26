@@ -21,7 +21,6 @@
 import kontrol.api.UpStreamKonfigurator
 import kontrol.api.Machine
 import kontrol.api.MachineGroup
-import kontrol.api.MachineGroupState
 import kotlin.cfclient.CloudFlareClient
 import kontrol.cfclient.DomainRecord
 
@@ -34,7 +33,7 @@ public class CloudFlareKonfigurator(val emailAddress: String, val apiKey: String
             configureCloudFlare(newMachine)
         } else {
             println("No 'other' machine.")
-            machineGroup.stateMachine.attemptTransition(MachineGroupState.GROUP_BROKEN)
+            //            machineGroup.stateMachine.attemptTransition(MachineGroupState.GROUP_BROKEN)
         }
     }
 

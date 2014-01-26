@@ -22,13 +22,13 @@ import kontrol.api.MachineState
 import kontrol.api.Monitor
 import kontrol.api.StateMachine
 import kontrol.common.DefaultStateMachine
-import java.util.Timer
-import kotlin.concurrent.*;
 import kontrol.api.sensors.SensorArray
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentHashMap
 import kontrol.api.sensor.SensorValue
 import kontrol.api.MonitorRule
+import kontrol.api.Controller
+import kontrol.api.ComparableTemporalStore
 
 /**
  * @todo document.
@@ -36,17 +36,17 @@ import kontrol.api.MonitorRule
  */
 public final class DigitalOceanMachine(var droplet: Droplet,
                                        val clientFactory: DigitalOceanClientFactory,
-
-                                       val sensorArray: SensorArray<Any?>) : Machine {
+                                       val sensorArray: SensorArray, val controller: Controller, val groupName: String) : Machine {
+    override fun groupName(): String {
+        return groupName
+    }
     override var disableAction: ((Machine) -> Unit)? = null
     override var enableAction: ((Machine) -> Unit)? = null
-    override final var data: ConcurrentMap<String, SensorValue<Any?>> = ConcurrentHashMap();
-    override final var monitor: Monitor<MachineState, Machine> = DigitalOceanMachineMonitor(clientFactory);
-    override final val stateMachine: StateMachine<MachineState, Machine> = DefaultStateMachine<MachineState, Machine>(this);
+    override final var data: ConcurrentMap<String, ComparableTemporalStore<SensorValue>> = ConcurrentHashMap();
+    override final val fsm: StateMachine<MachineState> = DefaultStateMachine<MachineState>(this);
+    override final var monitor: Monitor<MachineState, Machine> = DigitalOceanMachineMonitor(clientFactory, this, fsm, controller);
     override var enabled: Boolean = true;
 
-
-    val timer = Timer("DO-" + id(), true);
 
     override fun id(): String {
         return droplet.id.toString();
@@ -59,22 +59,11 @@ public final class DigitalOceanMachine(var droplet: Droplet,
 
     override fun startMonitoring(rules: Set<MonitorRule<MachineState, Machine>>) {
         super<Machine>.startMonitoring(rules);
-        timer.schedule((5000 * Math.random()).toLong(), 20000) {
-            //            println("Updating ${droplet.getId()}")
-            val doa = clientFactory.instance();
-            droplet = doa.getDropletInfo(droplet.id?:-1) ?: droplet;
-            if (state() in listOf(MachineState.BROKEN, MachineState.OK, MachineState.STARTING, MachineState.STALE)) {
-                data.putAll(sensorArray.values(this@DigitalOceanMachine))
-            } else {
-                data.clear()
-            }
-        }
 
     }
 
 
     override fun stopMonitoring() {
-        timer.cancel();
         super<Machine>.stopMonitoring()
     }
 

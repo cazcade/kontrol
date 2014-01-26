@@ -20,9 +20,11 @@ package kontrol.api
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public trait Monitorable<E : Enum<E>, T : Monitorable<E, T>> {
-    val stateMachine: StateMachine<E, T>
+public trait Monitorable<E : Enum<E>> {
+    fun state(): E?
+    fun transition(state: E)
     var enabled: Boolean
     fun name(): String
+    fun groupName(): String
 
 }

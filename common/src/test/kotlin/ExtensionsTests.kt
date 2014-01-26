@@ -24,8 +24,8 @@ import org.junit.Before as before
 import org.junit.After as after
 import java.io.File
 import kontrol.common.scp
-import kontrol.common.on
 import kotlin.test.assertEquals
+import kontrol.ext.string.ssh.onHost
 
 public class ExtensionsTests {
 
@@ -34,12 +34,12 @@ public class ExtensionsTests {
         val testValue = "Testing 1 2 3"
         file.writeText(testValue)
         file.scp(host = "teamcity.cazcade.com", path = "/tmp/test.scp.extension.txt.receipt", user = "root")
-        assertEquals(testValue, "cat /tmp/test.scp.extension.txt.receipt".on("teamcity.cazcade.com"))
+        assertEquals(testValue, "cat /tmp/test.scp.extension.txt.receipt".onHost("teamcity.cazcade.com"))
 
     }
 
     after before fun clean() {
         File("/tmp/test.scp.extension.txt.receipt").delete()
-        "rm /tmp/test.scp.extension.txt.receipt".on("teamcity.cazcade.com")
+        "rm /tmp/test.scp.extension.txt.receipt".onHost("teamcity.cazcade.com")
     }
 }

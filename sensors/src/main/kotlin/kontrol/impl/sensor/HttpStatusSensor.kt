@@ -27,15 +27,15 @@ import kontrol.HttpUtil
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class HttpStatusSensor(val path: String, val port: Int = 80) : Sensor<Int> {
+public class HttpStatusSensor(val path: String, val port: Int = 80) : Sensor {
 
     override fun name(): String {
         return "http-status"
     }
 
-    override fun value(machine: Machine): SensorValue<Int> {
+    override fun value(machine: Machine): SensorValue {
         try {
-            return SensorValue(when {
+            return SensorValue(name(), when {
                 machine.hostname().isNotEmpty() -> {
 
                     val URI = URL("http", machine.hostname(), port, path).toURI()
@@ -50,7 +50,7 @@ public class HttpStatusSensor(val path: String, val port: Int = 80) : Sensor<Int
             });
         } catch (e: Exception) {
             println("HttpStatusSensor: ${e.javaClass} for ${machine.name()}")
-            return SensorValue(999);
+            return SensorValue(name(), 999);
         }
 
     }

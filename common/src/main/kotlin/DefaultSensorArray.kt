@@ -29,7 +29,7 @@ import kontrol.api.sensor.SensorValue
  * @todo document.
  */
 
-public class DefaultSensorArray<T>(val sensors: List<Sensor<T>>) : SensorArray<T> {
+public class DefaultSensorArray(val sensors: List<Sensor>) : SensorArray{
 
     //    override fun eachDouble(machines: List<Machine>, key: String, f: (List<Double?>) -> Double?): Double? {
     //        return f(machines.map {
@@ -40,8 +40,8 @@ public class DefaultSensorArray<T>(val sensors: List<Sensor<T>>) : SensorArray<T
     //    }
 
 
-    override fun values(machine: Machine): Map<String, SensorValue<T>> {
-        var result = HashMap<String, SensorValue<T>>();
+    override fun values(machine: Machine): Map<String, SensorValue> {
+        var result = HashMap<String, SensorValue>();
         sensors.forEach { result.put(it.name(), it.value(machine)) };
         return result;
     }

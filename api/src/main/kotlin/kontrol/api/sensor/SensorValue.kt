@@ -17,45 +17,89 @@
 package kontrol.api.sensor
 
 import java.io.Serializable
+import javax.persistence.Entity as entity
+import javax.persistence.Id as id
+import javax.persistence.GeneratedValue as generated
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public data class SensorValue<T>(public val value: T?) : Serializable {
+
+enum class Type {
+    INTEGER
+    FLOAT
+    BOOLEAN
+    STRING
+    NULL
+}
+
+public entity data class SensorValue(public var k: String? = null, value: Any? = null, public id  var id: String? = null, public var t: Type? = when(value) {
+    null -> Type.NULL
+    is Float, is Double -> Type.FLOAT
+    is Long, is Int -> Type.INTEGER
+    is Boolean -> Type.BOOLEAN
+    else -> Type.STRING
+}) : Serializable, Comparable<SensorValue> {
+
+
+    override fun compareTo(other: SensorValue): Int {
+        if (t in listOf(Type.FLOAT, Type.INTEGER) && other.t in listOf(Type.FLOAT, Type.INTEGER)) {
+            return this.D()!!.compareTo(other.D()!!)
+        } else {
+            return  (v?:"").compareTo(other.v?:"")
+        }
+
+    }
+
+    public var v: String? = value.toString()
+
 
     override fun toString(): String? {
-        return if (value == null) null else value.toString();
+        return if (v == null) null else v.toString();
     }
 
     fun D(): Double? {
-        val v = value;
-        return when (v) {
-            null -> null
-            is Int -> v.toDouble()
-            is Double -> v as Double
-            else -> v.toString().toDouble()
+        val v = v;
+        return when(t) {
+            Type. NULL -> null
+            Type.INTEGER -> v?.toDouble()
+            else -> v!!.toDouble()
         }
     }
 
 
     fun I(): Int? {
-        val v = value;
-        return when (v) {
-            null -> null
-            is Int -> v
-            is Double -> v.toInt()
+        val v = v;
+        return when(t) {
+            Type. NULL -> null
+            Type.INTEGER -> v?.toInt()
             else -> (v.toString().toDouble()).toInt()
         }
     }
 
+
+    fun L(): Long? {
+        val v = v;
+        return when(t) {
+            Type. NULL -> null
+            Type.INTEGER -> v?.toLong()
+            else -> (v.toString().toDouble()).toLong()
+        }
+    }
+
+
     fun I(multiplier: Double): Int? {
-        val v = value;
+        val v = v;
         return when (v) {
             null -> null
-            is Int -> v * multiplier.toInt()
-            is Double -> (v * multiplier).toInt()
+            "null" -> null
             else -> (v.toString().toDouble() * multiplier).toInt()
         }
+    }
+
+    fun withNewId(newId: String): SensorValue {
+        return SensorValue(k, v, newId, t)
+
     }
 }

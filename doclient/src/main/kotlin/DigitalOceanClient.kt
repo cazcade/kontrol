@@ -112,8 +112,8 @@ public  class DigitalOceanClient(val clientId: String, val apiKey: String) : Dig
      */
     private var apiHost: String = "api.digitalocean.com"
 
-    public override fun getAvailableDroplets(): List<Droplet> = get(AVAILABLE_DROPLETS, TYPE_DROPLET_LIST) as List<Droplet>
-    public override fun createDroplet(droplet: Droplet, sshKeyIds: String?, backupsEnabled:Boolean, privateNetworking:Boolean): Droplet =
+    public override fun droplets(): List<Droplet> = get(AVAILABLE_DROPLETS, TYPE_DROPLET_LIST) as List<Droplet>
+    public override fun createDroplet(droplet: Droplet, sshKeyIds: String?, backupsEnabled: Boolean, privateNetworking: Boolean): Droplet =
             getWithParam(CREATE_DROPLET, javaClass<Droplet>(),
                     hashMapOf(
                             P_NAME to droplet.name,
@@ -144,7 +144,7 @@ public  class DigitalOceanClient(val clientId: String, val apiKey: String) : Dig
     override fun disableDropletBackups(id: Int): Response = call(DISABLE_AUTOMATIC_BACKUPS, id)
     override fun renameDroplet(id: Int, name: String): Response = callWithParam(RENAME_DROPLET, hashMapOf(P_NAME to  name), id)
     override fun deleteDroplet(id: Int): Response = call(DELETE_DROPLET, id)
-    override fun getAvailableRegions():List<Region> = get(AVAILABLE_REGIONS, TYPE_REGION_LIST) as List<Region>
+    override fun getAvailableRegions(): List<Region> = get(AVAILABLE_REGIONS, TYPE_REGION_LIST) as List<Region>
     override fun getAvailableImages(): List<DropletImage> = get(AVAILABLE_IMAGES, TYPE_IMAGE_LIST) as List<DropletImage>
     override fun getImageInfo(imageId: Int): DropletImage = get(GET_IMAGE_INFO, javaClass<DropletImage>(), imageId) as DropletImage
     override fun deleteImage(imageId: Int): Response = call(DELETE_IMAGE, imageId)

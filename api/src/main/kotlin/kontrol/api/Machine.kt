@@ -25,11 +25,15 @@ import java.io.Serializable
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  * @todo document.
  */
-public trait Machine : Monitorable<MachineState, Machine>, Serializable {
+public trait Machine : Monitorable<MachineState>, Serializable {
 
     var disableAction: ((Machine) -> Unit)?;
     var enableAction: ((Machine) -> Unit)?;
-    var data: ConcurrentMap<String, SensorValue<Any?>>;
+    var data: ConcurrentMap<String, ComparableTemporalStore<SensorValue>>;
+
+    fun latestDataValues(): Map<String, SensorValue?> {
+        return data.mapValues { it.value.lastEntry() }
+    }
 
     fun ip(): String?
 
@@ -65,23 +69,30 @@ public trait Machine : Monitorable<MachineState, Machine>, Serializable {
         return ip() ?: "";
     }
 
-    fun get(s: String): SensorValue<Any?>? {
-        return data[s];
+    fun get(s: String): SensorValue? {
+        return data[s]?.lastEntry();
     }
 
+    fun get(s: String, window: Long): List<Double?> {
+        return (data[s]!! within (0..window)).map { it?.D() };
+    }
 
-    fun state(): MachineState? {
-        return stateMachine.state();
+    override fun transition(state: MachineState) {
+        fsm.transition(state)
+    }
+
+    override fun state(): MachineState? {
+        return fsm.state();
     }
 
     var monitor: Monitor<MachineState, Machine>;
 
     fun startMonitoring(rules: Set<MonitorRule<MachineState, Machine>>) {
         println("Started monitoring ${ip()}");
-        if (stateMachine.rules == null) {
+        if (fsm.rules == null) {
             throw  IllegalArgumentException("Cannot monitor ${name()} without state machine rules.")
         }
-        monitor.start(this, stateMachine, rules);
+        monitor.start(this, fsm, rules);
     }
 
     fun stopMonitoring() {
@@ -89,7 +100,7 @@ public trait Machine : Monitorable<MachineState, Machine>, Serializable {
         monitor.stop();
     }
 
-    override val stateMachine: StateMachine<MachineState, Machine>;
+    val fsm: StateMachine<MachineState>;
 
     override fun toString(): String {
         return "${name()}@${ip()} (${id()}) [${state()}]  - ${data}";

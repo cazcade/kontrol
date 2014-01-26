@@ -16,6 +16,9 @@
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.4" level="project" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="api" />
+    <orderEntry type="library" name="Maven: org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: com.netflix.rxjava:rxjava-kotlin:0.16.1" level="project" />
+    <orderEntry type="library" name="Maven: com.netflix.rxjava:rxjava-core:0.16.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:0.6.1910" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-runtime:0.6.1910" level="project" />

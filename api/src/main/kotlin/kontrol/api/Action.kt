@@ -24,5 +24,4 @@ public enum class Action {
     REIMAGE_MACHINE
     FAILOVER
     FAILBACK
-    POSTMORTEM
 }

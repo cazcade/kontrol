@@ -29,10 +29,13 @@ import kontrol.api.MonitorRule
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class MockSequencedGroupMonitor(val states: List<MachineGroupState?>) : Monitor<MachineGroupState, MachineGroup> {
+    override fun target(): MachineGroup? {
+        return null
+    }
 
     val timer: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-    override fun start(target: MachineGroup, stateMachine: StateMachine<MachineGroupState, MachineGroup>, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
+    override fun start(target: MachineGroup, stateMachine: StateMachine<MachineGroupState>, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
         println("Sequenced Transition")
         for (count in 0..states.size - 1) {
             stateMachine.transition(states[count])

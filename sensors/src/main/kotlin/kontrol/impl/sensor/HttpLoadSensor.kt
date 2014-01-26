@@ -32,13 +32,13 @@ public class HttpLoadSensor(val path: String) : LoadSensor {
         return "http-load"
     }
 
-    override fun value(machine: Machine): SensorValue<Double?> {
+    override fun value(machine: Machine): SensorValue {
         try {
-            return SensorValue(when {
+            return SensorValue(name(), when {
                 machine.hostname().isNotEmpty() -> {
 
                     val URI = URL("http", machine.hostname(), 80, path).toURI()
-                    val load = HttpUtil.getUrlAsString(URI, 60000)?.toDouble()
+                    val load = HttpUtil.getUrlAsString(URI, 3000)?.toDouble()
                     //                    println("$URI responded with $load")
                     load;
 
@@ -49,7 +49,7 @@ public class HttpLoadSensor(val path: String) : LoadSensor {
             });
         } catch (e: Exception) {
             println("HttpLoadSensor: ${e.javaClass} for ${machine.name()}")
-            return SensorValue(null);
+            return SensorValue(name(), null);
         }
 
     }

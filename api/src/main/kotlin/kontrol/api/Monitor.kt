@@ -20,8 +20,25 @@ package kontrol.api
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public trait Monitor<E : Enum<E>, T : Monitorable<E, T>> {
+public trait Monitor<E : Enum<E>, T : Monitorable<E>> {
 
-    fun start(target: T, stateMachine: StateMachine<E, T>, rules: Set<MonitorRule<E, T>>);
+    fun start(target: T, stateMachine: StateMachine<E>, rules: Set<MonitorRule<E, T>>);
+
+    /**
+     * Called periodically after evaluating the monitor rules
+     */
+    fun heartbeat() {
+
+    }
+
+    /**
+     * Called periodically to update the targets details.  Must be thread safe.
+     */
+    fun update() {
+
+    }
+
     fun stop();
+
+    fun target(): T?
 }

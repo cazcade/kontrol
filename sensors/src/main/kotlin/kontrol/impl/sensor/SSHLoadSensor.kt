@@ -41,7 +41,7 @@ public class SSHLoadSensor : LoadSensor{
     }
 
 
-    override fun value(machine: Machine): SensorValue<Double?> {
+    override fun value(machine: Machine): SensorValue {
         try {
             val ssh: SSHClient = SSHClient();
             ssh.addHostKeyVerifier { a, b, c -> true };
@@ -53,7 +53,7 @@ public class SSHLoadSensor : LoadSensor{
                     val cmd: Command? = session?.exec("cat /proc/loadavg | cut -d' ' -f1 | tr -d ' '");
                     val load = IOUtils.readFully(cmd?.getInputStream()).toString().toDouble()
                     cmd?.join(5, TimeUnit.SECONDS);
-                    return SensorValue(load);
+                    return SensorValue(name(), load);
                 } finally {
                     session?.close();
                 }
@@ -62,7 +62,7 @@ public class SSHLoadSensor : LoadSensor{
             }
         } catch (e: Exception) {
             println("SSHLoadSensor: ${e.javaClass} for ${machine.name()}")
-            return  SensorValue(null);
+            return  SensorValue(name(), null);
         }
     }
 }

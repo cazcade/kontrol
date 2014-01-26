@@ -70,7 +70,7 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun getAvailableDroplets(): List<Droplet>
+    fun droplets(): List<Droplet>
 
     /**
      * <p>
@@ -105,7 +105,7 @@ public trait DigitalOcean {
      *
      * @since v1.0
      */
-    fun createDroplet(droplet: Droplet, sshKeyIds: String?=null, backupsEnabled:Boolean=false, privateNetworking:Boolean=false): Droplet
+    fun createDroplet(droplet: Droplet, sshKeyIds: String? = null, backupsEnabled: Boolean = false, privateNetworking: Boolean = false): Droplet
     /**
      * Method returns full information for a specific droplet ID that is passed
      * in the URL.

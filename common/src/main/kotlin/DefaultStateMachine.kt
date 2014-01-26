@@ -19,20 +19,25 @@ package kontrol.common
 
 import kontrol.api.StateMachine
 import kontrol.api.StateMachineRules
-import kontrol.api.Monitorable
+import kontrol.common.DefaultStateMachineRules.Rule
+import kontrol.api.TemporalCollection
 
 /**
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  * @todo document.
  */
-public open class DefaultStateMachine<E : Enum<E>, T : Monitorable<E, T>>(val target: T) : StateMachine<E, T> {
-    override fun attemptTransition(newState: E?): StateMachine<E, T> {
+public open class DefaultStateMachine<E : Enum<E>>(val target: Any) : StateMachine<E> {
+    override val history: TemporalCollection<E> = BoundedTemporalCollection(100)
+
+
+    override fun attemptTransition(newState: E?): StateMachine<E> {
         return transitionInternal(newState, false);
     }
     override fun state(): E? {
         return currentState;
     }
-    override public var rules: StateMachineRules<E, T>? = null
+
+    override public var rules: StateMachineRules<E>? = null
         set(newVal) {
             if (newVal == null) {
                 throw  IllegalArgumentException("Cannot set new rules value to null");
@@ -43,25 +48,25 @@ public open class DefaultStateMachine<E : Enum<E>, T : Monitorable<E, T>>(val ta
         }
     var currentState: E? = null;
 
-    override fun force(newState: E?): StateMachine<E, T> {
+    override fun force(newState: E?): StateMachine<E> {
         throw UnsupportedOperationException()
     }
 
-    override fun transition(newState: E?): StateMachine<E, T> {
+    override fun transition(newState: E?): StateMachine<E> {
         return transitionInternal(newState, true);
     }
 
-    fun transitionInternal(newState: E?, error: Boolean): StateMachine<E, T> {
+    fun transitionInternal(newState: E?, error: Boolean): StateMachine<E> {
         if (rules == null) {
             throw  IllegalStateException("Cannot transition with null rule set")
         }
         synchronized(this) {
             var previousState = currentState;
             currentState = newState;
-            val ruleList = (rules as DefaultStateMachineRules?)?.rules() ;
+            val ruleList: List<Rule<out Any?>> = (rules as DefaultStateMachineRules).rules() ;
             var okay = false ;
             //                println((rules as DefaultStateMachineRules?)?.rules?.size)
-            ruleList?.forEach {
+            ruleList.forEach {
                 if (it.newState == newState) {
                     if (it.currentState == previousState) {
                         okay = true;
@@ -70,7 +75,7 @@ public open class DefaultStateMachine<E : Enum<E>, T : Monitorable<E, T>>(val ta
                         val action = it.action
                         if (action != null) {
                             try {
-                                action(target);
+                                action!!(target);
                             } catch (e: Exception) {
                                 e.printStackTrace();
                             }
@@ -85,6 +90,7 @@ public open class DefaultStateMachine<E : Enum<E>, T : Monitorable<E, T>>(val ta
                     throw IllegalStateException("Could not transition to ${newState} from ${currentState}");
                 }
             } else {
+                history.addNullable(newState);
                 if (previousState != newState) {
                     //                    println("${previousState} -> ${currentState} for ${target.name()}");
                 }

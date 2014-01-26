@@ -1,0 +1,8 @@
+<div id="footer">
+    <div class="container">
+        <p class="text-muted">Kontrol (C) 2014 Cazcade Limited - Released under Apache 2.0 License</p>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+

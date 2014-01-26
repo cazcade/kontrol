@@ -13,6 +13,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="digitalocean" />
     <orderEntry type="module" module-name="api" />
+    <orderEntry type="library" name="Maven: org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: com.netflix.rxjava:rxjava-kotlin:0.16.1" level="project" />
+    <orderEntry type="library" name="Maven: com.netflix.rxjava:rxjava-core:0.16.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:0.6.1910" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-runtime:0.6.1910" level="project" />
@@ -31,6 +34,7 @@
     <orderEntry type="library" name="Maven: com.hazelcast:hazelcast:3.1.3" level="project" />
     <orderEntry type="module" module-name="doclient" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.2.4" level="project" />
+    <orderEntry type="module" module-name="server" />
     <orderEntry type="module" module-name="sensors" />
     <orderEntry type="module" module-name="konfigurators" />
     <orderEntry type="module" module-name="cfclient" />
@@ -38,6 +42,20 @@
     <orderEntry type="module" module-name="webserver" />
     <orderEntry type="module" module-name="postmortem" />
     <orderEntry type="module" module-name="hazelcast" />
+    <orderEntry type="module" module-name="hibernate" />
+    <orderEntry type="library" name="Maven: org.hibernate:hibernate-core:4.3.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.jboss.logging:jboss-logging:3.1.3.GA" level="project" />
+    <orderEntry type="library" name="Maven: org.jboss.logging:jboss-logging-annotations:1.2.0.Beta1" level="project" />
+    <orderEntry type="library" name="Maven: org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec:1.0.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: dom4j:dom4j:1.6.1" level="project" />
+    <orderEntry type="library" name="Maven: xml-apis:xml-apis:1.0.b2" level="project" />
+    <orderEntry type="library" name="Maven: org.hibernate.common:hibernate-commons-annotations:4.0.4.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.javassist:javassist:3.18.1-GA" level="project" />
+    <orderEntry type="library" name="Maven: antlr:antlr:2.7.7" level="project" />
+    <orderEntry type="library" name="Maven: org.jboss:jandex:1.1.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: javassist:javassist:3.12.1.GA" level="project" />
+    <orderEntry type="library" name="Maven: com.h2database:h2:1.3.173" level="project" />
+    <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.28" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.11" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>

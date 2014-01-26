@@ -1,0 +1,61 @@
+#* @vtlvariable name="events" type="java.util.List<kontrol.api.EventLogEntry>" *#
+<!DOCTYPE html>
+#* @vtlvariable name="postmortems" type="java.util.List<kontrol.api.PostmortemResult>" *#
+    #set($Integer = 0)
+<html>
+<head>
+    <title>Server Status Page</title>
+    #parse("head.vm")
+</head>
+<body>
+
+    #parse("style.vm")
+
+<div id="wrap">
+    <!-- Fixed navbar -->
+    #parse("navbar.vm")
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Event Log</h1>
+        </div>
+        <table class="table">
+
+
+            #foreach($event in $events)
+                #if($event.state == "FAILBACK")
+                <tr class="success">
+                #elseif($event.state== "RESTART_MACHINE")
+                <tr class="warning">
+                #elseif($event.state== "CONTRACT")
+                <tr class="success">
+                #elseif($event.state== "EXPAND")
+                <tr class="success">
+                #elseif($event.state== "UPGRADE")
+                <tr class="warning">
+                #elseif($event.state== "EMERGENCY_FIX")
+                <tr class="danger">
+                #elseif($event.state== "REBUILD")
+                <tr class="danger">
+                #elseif($event.state== "REIMAGE_MACHINE")
+                <tr class="danger">
+                #elseif($event.state == "DESTROY_MACHINE")
+                <tr class="danger">
+                #elseif($event.state== "FAILOVER")
+                #else
+                <tr>
+                #end
+                <td class="col-md-2">$!event.created</td>
+                <td class="col-md-2">$!event.state</td>
+                <td class="col-md-3">$!event.targetName</td>
+                <td class="col-md-1">$!event.contextualState</td>
+                <td class="col-md-4">$!event.message</td>
+            </tr>
+            #end
+        </table>
+    </div>
+</div>
+
+    #parse("footer.vm")
+</body>
+</html>

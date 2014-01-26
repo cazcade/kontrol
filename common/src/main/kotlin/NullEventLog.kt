@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package kontrol.api
-
-import java.io.Serializable
-
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public trait Store<K : Comparable<K>, T : Serializable> {
+package kontrol.common
 
-    fun set(key: K, value: T)
-    fun get(key: K, value: T)
-    fun remove(key: K)
-    fun contains(key: K)
-    fun minus(key: K) {
-        remove(key)
+import kontrol.api.EventLog
+import kontrol.api.LogContextualState
+import kontrol.api.EventLogEntry
+
+public class NullEventLog : EventLog {
+    override fun  log(targetName: String, state: Any?, contextState: LogContextualState, message: String) {
     }
+    override fun last(n: Int): List<EventLogEntry> = listOf()
 
 }

@@ -22,27 +22,32 @@ package kontrol.postmortem
 
 import kontrol.api.Postmortem
 import kontrol.api.Machine
-import kontrol.common.on
+import kontrol.ext.string.ssh.onHost
 import kontrol.api.PostmortemResult
 import java.util.HashMap
+import kontrol.api.PostmortemPart
 
-public class CentosPostmortem(val logMax: Int = 10000) : Postmortem{
+public class CentosPostmortem(val logMax: Int = 1000) : Postmortem{
 
     override fun perform(machine: Machine): PostmortemResult {
-        return PostmortemResult("centos", machine, hashMapOf(
-                "syslog" to LogPart("cat /var/log/messages | tail -${logMax}" on machine.ip()),
-                "ps" to TextPart("ps aux" on machine.ip()),
-                "who" to TextPart("who" on machine.ip()),
-                "w" to TextPart("w" on machine.ip()),
-                "uptime" to TextPart("uptime" on machine.ip()),
-                "uname" to TextPart("uanme -a" on machine.ip()),
-                "ifconfig" to TextPart("ifconfig -a" on machine.ip()),
-                "mem" to TextPart("cat /proc/meminfo" on machine.ip()),
-                "cpu" to TextPart("cat /proc/cpuinfo" on machine.ip()),
-                "ulimit" to TextPart("ulimit -a" on machine.ip()),
-                "du" to TextPart("du -h /*" on machine.ip()),
-                "df" to TextPart("df -h" on machine.ip())
-        ), HashMap(machine.data));
+        println("Performing Centos Postmortem for ${machine.name()}")
+        return PostmortemResult("centos", machine, arrayListOf<PostmortemPart>(
+                LogPart("syslog", "cat /var/log/messages | tail -${logMax}" onHost machine.ip()),
+                TextPart("ps", "ps aux" onHost machine.ip()),
+                TextPart("who", "who" onHost machine.ip()),
+                TextPart("w", "w" onHost machine.ip()),
+                TextPart("uptime", "uptime" onHost machine.ip()),
+                TextPart("uname", "uname -a" onHost machine.ip()),
+                TextPart("ifconfig", "ifconfig -a" onHost machine.ip()),
+                TextPart("mem", "cat /proc/meminfo" onHost machine.ip()),
+                TextPart("cpu", "cat /proc/cpuinfo" onHost machine.ip()),
+                TextPart("ulimit", "ulimit -a" onHost machine.ip()),
+                TextPart("du", "du -sh /*" onHost machine.ip()),
+                TextPart("df", "df -h" onHost machine.ip()),
+                TextPart("services", "service --status-all" onHost machine.ip()),
+                TextPart("netstat", "netstat -tulpn" onHost machine.ip())
+
+        ), HashMap(machine.latestDataValues()));
 
     }
 
