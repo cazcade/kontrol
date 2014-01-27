@@ -64,7 +64,7 @@ public class VelocityWebServer(port: Int = 8080, hostname: String? = null, val p
                 return Response(Status.OK, text = writer.getBuffer().toString())
             }
         } catch (rnfe: ResourceNotFoundException) {
-            return Response(Status.NOT_FOUND)
+            return Response(Status.NOT_FOUND, text = rnfe.getMessage())
         } catch (e: Exception) {
             return Response(Status.INTERNAL_ERROR, text = "$e ${e.getMessage()}")
         }
