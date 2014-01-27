@@ -7,7 +7,7 @@
 <html>
 <head>
     <title>Costings</title>
-    #parse("./head.vm")
+    #parse("head.vm")
 </head>
 <body>
 

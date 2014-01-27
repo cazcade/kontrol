@@ -94,6 +94,7 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
 }
 
 public fun MachineGroup.applyDefaultRules() {
+    this memberIs DEAD ifStateIn listOf(STARTING) after 600 seconds "starting-now-dead"
     this memberIs DEAD ifStateIn listOf(STOPPED) after 300 seconds "stopped-now-dead"
     val HOUR: Long = 60 * 60 * 1000
     this memberIs DEAD ifStateIn listOf(DEAD, BROKEN) andTest { it.fsm.history.countInWindow(BROKEN, HOUR) > 3 } after 300 seconds "broken-now-dead"
