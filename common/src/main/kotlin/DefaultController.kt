@@ -98,7 +98,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 groupExec.execute(false, it.target()?.groupName()) { it.update() }
             }
             println("*** Machine Group Update ${Date()} ***")
-        }, 0, 10, TimeUnit.MINUTES)
+        }, 0, 5, TimeUnit.MINUTES)
 
         executor?.scheduleWithFixedDelay({
             val monitors = HashMap(machineMonitors)

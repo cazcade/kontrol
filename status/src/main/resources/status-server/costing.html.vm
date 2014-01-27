@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+#* @vtlvariable name="topology" type="kontrol.api.Topology" *#
+
+
+    #set($Integer = 0)
+
+<html>
+<head>
+    <title>Costings</title>
+    #parse("./head.vm")
+</head>
+<body>
+
+    #include("style.vm")
+
+<div id="wrap">
+    <!-- Fixed navbar -->
+    #include("navbar.vm")
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Status</h1>
+        </div>
+        #foreach($group in $topology.members.values())
+            <div class="row">
+
+                <div>
+                    <h2>$group.name()
+                        <small>$ ${group.costPerHourInDollars()}/hr $ ${group.costPerMonthInDollars()}/mth</small>
+                    </h2>
+                    <table class="table">
+
+                        #foreach($machine in $group.machines())
+                            <tr>
+                                <td class="col-md-3">$!machine.name()</td>
+                                <td class="col-md-1">$ ${machine.costPerHourInDollars()}</td>
+                                <td class="col-md-1">$ ${machine.costPerMonthInDollars()}</td>
+                            </tr>
+                        #end
+                    </table>
+                </div>
+            </div>
+        #end
+
+    </div>
+</div>
+
+    #include("footer.vm")
+</body>
+</html>

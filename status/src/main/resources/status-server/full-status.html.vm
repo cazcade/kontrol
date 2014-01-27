@@ -56,10 +56,10 @@
                             #else
                             <tr>
                             #end
-                            <td class="col-md-3">$machine.name()</td>
-                            <td class="col-md-1">$machine.state()</td>
-                            <td class="col-md-2">$machine.hostname()</td>
-                            <td class="col-md-1">$machine.ip()</td>
+                            <td class="col-md-3">$!machine.name()</td>
+                            <td class="col-md-1">$!machine.state()</td>
+                            <td class="col-md-2">$!machine.hostname()</td>
+                            <td class="col-md-1">$!machine.ip()</td>
                             <td class="col-md-5">
                                 <div class="details">
                                     <!--$machine.data-->
@@ -81,14 +81,14 @@
                                     #if($machine['http-response-time'])
                                         <div class="row">
                                             <div class="col-md-3">Response</div>
-                                            #set($respVal= $machine['http-response-time'].value / 100)
+                                            #set($respVal= $machine['http-response-time'].L() / 50)
                                             <div class="col-md-9">
                                                 <div class="progress">
                                                     <div class="progress-bar progress-bar" role="progressbar"
                                                          aria-valuenow="$machine['http-response-time']"
-                                                         aria-valuemin="0" aria-valuemax="10000"
+                                                         aria-valuemin="0" aria-valuemax="5000"
                                                          style="max-width:100%;width:${respVal}%">
-                                                        <span class="sr-only">Response $machine['http-response-time'] </span>
+                                                        <span class="sr-only">Response $machine['http-response-time'].L() </span>
                                                     </div>
                                                 </div>
                                             </div>

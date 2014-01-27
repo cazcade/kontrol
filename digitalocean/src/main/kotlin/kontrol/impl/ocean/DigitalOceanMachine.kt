@@ -37,6 +37,24 @@ import kontrol.api.ComparableTemporalStore
 public final class DigitalOceanMachine(var droplet: Droplet,
                                        val clientFactory: DigitalOceanClientFactory,
                                        val sensorArray: SensorArray, val controller: Controller, val groupName: String) : Machine {
+
+    var pricingMap = hashMapOf(
+            66 to 0.007,
+            63 to 0.015,
+            62 to 0.03,
+            64 to 0.06,
+            65 to 0.119,
+            61 to 0.238,
+            60 to 0.476,
+            70 to 0.705,
+            69 to 0.941,
+            68 to 1.411
+    )
+
+    override fun costPerHourInDollars(): Double {
+        return pricingMap[droplet.size_id]?:throw IllegalArgumentException();
+    }
+
     override fun groupName(): String {
         return groupName
     }

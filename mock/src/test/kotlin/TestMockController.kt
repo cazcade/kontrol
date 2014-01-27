@@ -94,6 +94,7 @@ public class TestMockController {
         val members = HashMap<String, MachineGroup>();
         var previous: List<MachineGroup> = ArrayList()
         val controller = DefaultController(NullBus(), NullEventLog());
+        controller.start();
         map.entrySet().forEach {
             val gs: List<MachineGroupState?> = groupStates.get(it.key) ?: listOf();
             val mockMachineGroup = MockMachineGroup(it.key, it.value, MockSequencedGroupMonitor(gs), previous, MockKonfigurator(), MockKonfigurator(), controller)
@@ -107,6 +108,7 @@ public class TestMockController {
         infra.start();
         Thread.sleep(4000)
         infra.stop();
+        controller.stop();
         return infra;
     }
 
@@ -138,8 +140,8 @@ public class TestMockController {
         val map = buildSimpleFullToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
-        assertEquals(0, mockController.topology().get("worker").machines().size);
-        assertEquals(6, (mockController.topology().get("gateway") .downStreamKonfigurator as MockKonfigurator).downStreamConfigureCalls)
+        assertEquals(2, mockController.topology().get("worker").machines().size);
+        assertEquals(0, (mockController.topology().get("gateway") .downStreamKonfigurator as MockKonfigurator).downStreamConfigureCalls)
     }
 
     test fun test4(): Unit {

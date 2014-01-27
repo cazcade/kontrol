@@ -32,7 +32,10 @@ import kontrol.postmortem.CentosPostmortem
 import kontrol.postmortem.JettyPostmortem
 import kontrol.server.Server
 import kontrol.api.Controller
-import kontrol.common.group.ext.selectStateUsingSensorValues
+import kontrol.common.group.ext.addSensorRules
+import kontrol.common.group.ext.allowDefaultTransitions
+import kontrol.common.group.ext.applyDefaultRules
+import kontrol.common.group.ext.applyDefaultPolicies
 
 /**
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
@@ -43,31 +46,17 @@ public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
 
         group memberIs OK ifStateIn listOf(BROKEN, STARTING) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 30 seconds "http-ok"
-        group memberIs DEAD ifStateIn listOf(STOPPED) after 300 seconds "stopped-now-dead"
-        group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 100 seconds "mega-overload"
-        val HOUR: Long = 60 * 60 * 1000
-        group memberIs DEAD ifStateIn listOf(BROKEN) andTest { it.fsm.history.countInWindow(BROKEN, HOUR) > 3 } after 300 seconds "broken-now-dead"
-        group memberIs FAILED ifStateIn listOf(BROKEN, DEAD) andTest { it.fsm.history.countInWindow(DEAD, 4 * HOUR) > 3 } after 1 seconds "dead-now-failed"
+        group memberIs BROKEN ifStateIn listOf(OK, STALE) andTest { it["load"]?.D()?:0.0 > 30 } after 240 seconds "mega-overload"
+        group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-status"]?.I()?:999 >= 400 } after 300 seconds "http-broken"
+        group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-response-time"]?.I()?:9000 > 3000 } after 240 seconds "response-too-long"
 
         when(group.name()) {
             "lb", "gateway" -> {
-
-                group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest {
-                it["http-status"]?.I()?:999 >= 400
-                } after 300 seconds "http-broken"
-
-                group.selectStateUsingSensorValues("http-response-time" to -1.0..1000.0, "load" to 1.0..5.0)
+                group.addSensorRules("http-response-time" to -1.0..2000.0, "load" to 1.0..5.0)
             }
-
             "worker" -> {
-
-                group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest {
-                it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 30.0
-                } after 240 seconds "http-broken"
-
-                group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-response-time"]?.I()?:9000 > 2000 } after 60 seconds "response-too-long"
-                group.selectStateUsingSensorValues("http-response-time" to -1.0..1000.0, "http-load" to 4.0..8.0)
-
+                //change this when deployed
+                group.addSensorRules("http-response-time" to -1.0..5000.0, "http-load" to 4.0..8.0)
             }
         }
     }
@@ -108,10 +97,14 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
 fun main(args: Array<String>): Unit {
 
 
-    val server = Server { controller ->
+    val server = Server { controller, bus, postmortems ->
         val cient = DigitalOceanClientFactory(System.getProperty("do.cid")?:"", System.getProperty("do.apikey")?:"")
-        val groups = buildGroups(cient, controller, false)
-        val cloud = DigitalOceanCloud(cient, groups)
+        val cloud = DigitalOceanCloud(cient, buildGroups(cient, controller, false))
+        cloud.topology().each { group ->
+            group.allowDefaultTransitions();
+            group.applyDefaultPolicies(controller, postmortems)
+            group.applyDefaultRules();
+        }
         snapitoSensorActions(cloud);
     }
 

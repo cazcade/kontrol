@@ -30,7 +30,7 @@ import kontrol.hibernate.HibernatePostmortemStore
 
 public class TestHibernate {
     test fun testStore(): Unit {
-        val store = HibernatePostmortemStore()
+        val store = HibernatePostmortemStore("jdbc:h2:file:store;DB_CLOSE_DELAY=-1")
         var list = arrayListOf<PostmortemPart>(LogPart("test-part", "hello world"))
         val pmr = PostmortemResult("test", null, list)
         store.add(pmr);

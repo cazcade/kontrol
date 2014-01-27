@@ -39,6 +39,9 @@ import kontrol.api.Controller
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator?, override val upStreamKonfigurator: UpStreamKonfigurator?, override val controller: Controller) : MachineGroup{
+    override fun costPerHourInDollars(): Double {
+        return 0.0;
+    }
 
     override fun groupName(): String {
         return name;

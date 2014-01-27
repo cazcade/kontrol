@@ -57,10 +57,11 @@ public open class HibernateStore<K : Comparable<K>, V : Serializable>(val url: S
         configuration.addAnnotatedClass(clazz)
         classes.forEach { configuration = configuration.addAnnotatedClass(it)!! }
 
-        sessionFactory = configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
+        sessionFactory = configuration.setProperty("hibernate.dialect",
+                when {url.startsWith("jdbc:h2") -> "org.hibernate.dialect.H2Dialect" else -> "org.hibernate.dialect.MySQLDialect"})
         ?.setProperty("hibernate.connection.url", url)
-        ?.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
-        ?.setProperty("hibernate.connection.username", "root")
+        //        ?.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
+        //        ?.setProperty("hibernate.connection.username", "root")
         ?.setProperty("hibernate.current_session_context_class", "thread")
         ?.setProperty("hibernate.show_sql", "true")
         ?.setProperty("hibernate.hbm2ddl.auto", "update")

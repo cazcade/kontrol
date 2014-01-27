@@ -51,9 +51,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
                                       override val postmortems: List<Postmortem>,
                                       override val downStreamKonfigurator: DownStreamKonfigurator? = null,
                                       override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
-    override fun groupName(): String {
-        return name;
-    }
+
 
     override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
     override var enabled: Boolean = true
@@ -73,9 +71,9 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
 
     }
 
-    override fun name(): String {
-        return name;
-    }
+    override fun costPerHourInDollars(): Double = machines.map { it.getValue().costPerHourInDollars() }.sum()
+    override fun groupName(): String = name;
+    override fun name(): String = name;
 
     override fun machines(): List<Machine> {
         val arrayList: ArrayList<DigitalOceanMachine> = ArrayList();

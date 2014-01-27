@@ -158,6 +158,10 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
         downStreamKonfigurator?.configureDownStream(this)
     }
 
+    fun costPerHourInDollars(): Double
+
+    fun costPerMonthInDollars(): Double = costPerHourInDollars() * 24 * 30
+
     fun configure(): MachineGroup {
         println("**** Configure ${name()}");
         upStreamKonfigurator?.configureUpStream(this)

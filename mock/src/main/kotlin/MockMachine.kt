@@ -31,6 +31,9 @@ import kontrol.api.ComparableTemporalStore
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class MockMachine(val ip: String) : Machine{
+    override fun costPerHourInDollars(): Double {
+        return 0.0;
+    }
     override fun groupName(): String {
         return "mock"
     }

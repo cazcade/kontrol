@@ -85,6 +85,10 @@ public trait Machine : Monitorable<MachineState>, Serializable {
         return fsm.state();
     }
 
+    fun costPerHourInDollars(): Double
+    fun costPerMonthInDollars(): Double = costPerHourInDollars() * 24 * 30
+
+
     var monitor: Monitor<MachineState, Machine>;
 
     fun startMonitoring(rules: Set<MonitorRule<MachineState, Machine>>) {

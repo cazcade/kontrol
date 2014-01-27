@@ -31,7 +31,7 @@ import kontrol.api.PostmortemStore
  */
 
 
-public fun MachineGroup.allowDefaultTranstitions() {
+public fun MachineGroup.allowDefaultTransitions() {
 
     this allowMachine (STARTING to OK);
     this allowMachine (STARTING to BROKEN);
@@ -42,7 +42,12 @@ public fun MachineGroup.allowDefaultTranstitions() {
     this allowMachine (OK to STALE);
     this allowMachine (STOPPING to STOPPED);
     this allowMachine (STOPPING to STARTING);
+    this allowMachine (STOPPING to OK);
     this allowMachine (STOPPED to DEAD);
+    this allowMachine (STOPPED to STARTING);
+    this allowMachine (STOPPED to OK);
+    this allowMachine (STOPPED to BROKEN);
+    this allowMachine (BROKEN to STARTING);
     this allowMachine (BROKEN to OK);
     this allowMachine (BROKEN to DEAD);
     this allowMachine (BROKEN to FAILED);
@@ -85,13 +90,21 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
     controller will { this.failAction(it) { this.expand(); postmortemStore.addAll(this.postmortem(it));this.destroy(it) };java.lang.String() } takeAction DESTROY_MACHINE inGroup this;
     controller use { this.expand();java.lang.String() } to EXPAND  IF { this.activeSize() < this.max }  group this;
     controller use { this.contract();java.lang.String() } to CONTRACT IF { this.workingSize() > this.min } group this;
-    controller use { it.machines().forEach { postmortemStore.addAll(this.postmortem(it));    this.reImage(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
+    controller use { it.machines().forEach { postmortemStore.addAll(this.postmortem(it)); this.reImage(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
+}
+
+public fun MachineGroup.applyDefaultRules() {
+    this memberIs DEAD ifStateIn listOf(STOPPED) after 300 seconds "stopped-now-dead"
+    val HOUR: Long = 60 * 60 * 1000
+    this memberIs DEAD ifStateIn listOf(DEAD, BROKEN) andTest { it.fsm.history.countInWindow(BROKEN, HOUR) > 3 } after 300 seconds "broken-now-dead"
+    this memberIs FAILED ifStateIn listOf(BROKEN, DEAD) andTest { it.fsm.history.countInWindow(DEAD, 4 * HOUR) > 3 } after 1 seconds "dead-now-failed"
+
 }
 
 
-fun MachineGroup.selectStateUsingSensorValues(vararg ranges: Pair<String, Range<Double>>) {
+fun MachineGroup.addSensorRules(vararg ranges: Pair<String, Range<Double>>) {
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.activeSize() == 0 } after 30 seconds "no-working-machines-in-group"
+    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.activeSize() == 0 } after 180 seconds "no-working-machines-in-group"
 
     this becomes BUSY ifStateIn  listOf(QUIET, BUSY, NORMAL, null) andTest { it.activeSize() < it.min } after 180 seconds "not-enough-working-machines-in-group"
 
@@ -100,18 +113,17 @@ fun MachineGroup.selectStateUsingSensorValues(vararg ranges: Pair<String, Range<
     }  after 180 seconds "overload"
 
     this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
-    this.activeSize() > this.max
+        this.activeSize() > this.max
     }  after 1 seconds "too-many-machines"
 
 
     this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
-        ranges.any { this[it.first]?:it.second.start < it.second.start }
-    }  after 240 seconds "underload"
+        !ranges.any { this[it.first]?:it.second.start > it.second.end } && ranges.any { this[it.first]?:it.second.start < it.second.start }
+    }  after 300 seconds "underload"
 
     this becomes NORMAL ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, null) andTest {
-    ranges.all { this[it.first]?:it.second.start in it.second }
+        ranges.all { this[it.first]?:it.second.start in it.second }
         && this.activeSize() in this.min..this.max
-
     }  after 30 seconds "group-ok"
 
 }

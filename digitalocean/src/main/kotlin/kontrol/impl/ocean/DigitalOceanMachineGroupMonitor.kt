@@ -54,16 +54,14 @@ public class DigitalOceanMachineGroupMonitor(val group: DigitalOceanMachineGroup
 
             }
 
-            synchronized(group.machines) {
-                for (entry in machines) {
-                    if (!group.machines.containsKey(entry.key)) {
-                        entry.value.fsm.rules = group.defaultMachineRules;
-                        entry.value.startMonitoring(group.machineMonitorRules);
-                        group.machines.put(entry.key, entry.value);
-                    }
+            for (entry in machines) {
+                if (!group.machines.containsKey(entry.key)) {
+                    entry.value.fsm.rules = group.defaultMachineRules;
+                    entry.value.startMonitoring(group.machineMonitorRules);
+                    group.machines.putIfAbsent(entry.key, entry.value);
                 }
-                group.machines.keySet().filterNot { machines.containsKey(it) }.forEach { group.machines.remove(it) }
             }
+            group.machines.keySet().filterNot { machines.containsKey(it) }.forEach { group.machines.remove(it) }
 
 
         } catch (e: Throwable) {

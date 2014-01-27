@@ -29,7 +29,7 @@ import org.hibernate.FetchMode
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class HibernatePostmortemStore(url: String = "jdbc:h2:file:store;DB_CLOSE_DELAY=-1") : PostmortemStore, HibernateStore<Int, PostmortemResult>(url, javaClass<PostmortemResult>(), listOf<Class<*>>(
+public class HibernatePostmortemStore(url: String) : PostmortemStore, HibernateStore<Int, PostmortemResult>(url, javaClass<PostmortemResult>(), listOf<Class<*>>(
         javaClass<LogPart>(),
         javaClass<TextPart>(),
         javaClass<PostmortemPart>(),

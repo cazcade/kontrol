@@ -39,6 +39,9 @@ public class StatusServer(infra: Infrastructure, bus: Bus, postmortem: Postmorte
                     context["events"] = eventLog.last(100)
                     "log.html.vm"
                 }
+                "costing" -> {
+                    "costing.html.vm"
+                }
                 "postmortems" -> {
                     context["postmortems"] = postmortem.last(50)
                     "postmortems.html.vm"
