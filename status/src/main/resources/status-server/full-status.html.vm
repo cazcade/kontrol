@@ -7,7 +7,7 @@
 <html>
 <head>
     <title>Server Status Page</title>
-    #parse("./head.vm")
+    #parse("head.vm")
 </head>
 <body>
 
