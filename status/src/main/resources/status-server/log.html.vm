@@ -70,8 +70,18 @@
                 #else
                 <tr>
                 #end
-                <td class="col-md-2">$!event.created</td>
-                <td class="col-md-2">$!event.state</td>
+                <td class="col-md-2">
+                    #if($event.contextualState == "START")
+                        <span class="glyphicon glyphicon-play"></span>
+                    #elseif($event.contextualState == "END")
+                        <span class="glyphicon glyphicon-stop"></span>
+                    #elseif($event.contextualState == "TRIGGER")
+                        <span class="glyphicon glyphicon-certificate"></span>
+                    #end
+
+                    $!event.state</td>
+                <td class="col-md-2">
+                    $!event.created</td>
                 <td class="col-md-3">$!event.targetName</td>
                 <td class="col-md-1">$!event.contextualState</td>
                 <td class="col-md-4">$!event.message</td>
