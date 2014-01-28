@@ -25,34 +25,29 @@ import kontrol.digitalocean.DigitalOceanConfig
 import kontrol.sensor.HttpLoadSensor
 import kontrol.common.DefaultSensorArray
 import kontrol.api.Infrastructure
-import kontrol.api.MachineState.*
 import kontrol.konfigurators.HaproxyKonfigurator
 import kontrol.sensor.HttpResponseTimeSensor
 import kontrol.postmortem.CentosPostmortem
 import kontrol.postmortem.JettyPostmortem
 import kontrol.server.Server
 import kontrol.api.Controller
-import kontrol.common.group.ext.addSensorRules
+import kontrol.common.group.ext.addGroupSensorRules
 import kontrol.common.group.ext.allowDefaultTransitions
 import kontrol.common.group.ext.applyDefaultRules
 import kontrol.common.group.ext.applyDefaultPolicies
+import kontrol.common.group.ext.addMachineSensorRules
 
 
 public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
-
-        group memberIs OK ifStateIn listOf(BROKEN, REBUILDING, null) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 30 seconds "http-ok"
-        group memberIs BROKEN ifStateIn listOf(OK, REBUILDING, STALE) andTest { it["load"]?.D()?:0.0 > 30 } after 240 seconds "mega-overload"
-        group memberIs BROKEN ifStateIn listOf(OK, REBUILDING, STALE, null) andTest { it["http-status"]?.I()?:0 >= 400 } after 240 seconds "http-broken"
-        group memberIs BROKEN ifStateIn listOf(OK, REBUILDING, STALE, null) andTest { it["http-response-time"]?.I()?:9000 > 3000 } after 240 seconds "response-too-long"
-
+        group.addMachineSensorRules("http-status" to 399.0, "load" to 30.0, "http-response-time" to 3000.0)
         when(group.name()) {
             "lb", "gateway" -> {
-                group.addSensorRules("http-response-time" to -1.0..2000.0, "load" to 1.0..5.0)
+                group.addGroupSensorRules("http-response-time" to -1.0..2000.0, "load" to 1.0..5.0)
             }
             "worker" -> {
                 //change this when deployed
-                group.addSensorRules("http-response-time" to -1.0..2000.0, "http-load" to 4.0..8.0)
+                group.addGroupSensorRules("http-response-time" to -1.0..2000.0, "http-load" to 4.0..8.0)
             }
         }
     }

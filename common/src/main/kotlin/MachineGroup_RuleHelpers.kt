@@ -112,8 +112,15 @@ public fun MachineGroup.applyDefaultRules() {
 
 }
 
+public fun MachineGroup.addMachineSensorRules(vararg rules: Pair<String, Double>) {
 
-fun MachineGroup.addSensorRules(vararg ranges: Pair<String, Range<Double>>) {
+    this memberIs OK ifStateIn listOf(BROKEN, REBUILDING, null) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after 30 seconds "machine-ok"
+
+    this memberIs BROKEN ifStateIn listOf(OK, BROKEN, REBUILDING, STALE) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after 240 seconds "machine-broken"
+}
+
+
+fun MachineGroup.addGroupSensorRules(vararg ranges: Pair<String, Range<Double>>) {
 
     this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.workingSize() == 0 || it.activeSize() == 0 } after 60 seconds "no-working-machines-in-group"
 
