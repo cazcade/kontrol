@@ -103,8 +103,9 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
 }
 
 public fun MachineGroup.applyDefaultRules() {
+    this memberIs BROKEN ifStateIn listOf(null) after 600 seconds "unknown-now-broken"
     this memberIs BROKEN ifStateIn listOf(STARTING, STOPPING) after 600 seconds "bad-now-broken"
-    this memberIs DEAD ifStateIn listOf(STARTING, BROKEN, STOPPING, STOPPED) after 600 seconds "bad-now-dead"
+    this memberIs DEAD ifStateIn listOf(BROKEN, STOPPING) after 600 seconds "bad-now-dead"
     this memberIs DEAD ifStateIn listOf(STOPPED) after 300 seconds "stopped-now-dead"
     val HOUR: Long = 60 * 60 * 1000
     this memberIs DEAD ifStateIn listOf(DEAD, BROKEN) andTest { it.fsm.history.countInWindow(listOf(BROKEN, STARTING), HOUR) > 3 } after 1 seconds "flap-now-dead"
@@ -131,8 +132,8 @@ fun MachineGroup.addGroupSensorRules(vararg ranges: Pair<String, Range<Double>>)
     }  after 180 seconds "overload"
 
     this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
-        this.workingSize() > this.max && this.activeSize() > this.max
-    }  after 1 seconds "too-many-machines"
+        this.activeSize() > this.max
+    }  after 60 seconds "too-many-machines"
 
 
     this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
