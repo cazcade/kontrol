@@ -90,8 +90,8 @@ public open class DefaultStateMachine<E : Enum<E>>(val target: Any) : StateMachi
                     throw IllegalStateException("Could not transition to ${newState} from ${currentState}");
                 }
             } else {
-                history.addNullable(newState);
                 if (previousState != newState) {
+                    history.addNullable(newState);
                     //                    println("${previousState} -> ${currentState} for ${target.name()}");
                 }
 

@@ -45,10 +45,10 @@ import kontrol.common.group.ext.applyDefaultPolicies
 public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
 
-        group memberIs OK ifStateIn listOf(BROKEN, STARTING) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 30 seconds "http-ok"
+        group memberIs OK ifStateIn listOf(BROKEN, null) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 30 seconds "http-ok"
         group memberIs BROKEN ifStateIn listOf(OK, STALE) andTest { it["load"]?.D()?:0.0 > 30 } after 240 seconds "mega-overload"
-        group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-status"]?.I()?:999 >= 400 } after 300 seconds "http-broken"
-        group memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-response-time"]?.I()?:9000 > 3000 } after 240 seconds "response-too-long"
+        group memberIs BROKEN ifStateIn listOf(OK, STALE, null) andTest { it["http-status"]?.I()?:0 >= 400 } after 1 seconds "http-broken"
+        group memberIs BROKEN ifStateIn listOf(OK, STALE, null) andTest { it["http-response-time"]?.I()?:9000 > 3000 } after 240 seconds "response-too-long"
 
         when(group.name()) {
             "lb", "gateway" -> {
@@ -56,7 +56,7 @@ public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
             }
             "worker" -> {
                 //change this when deployed
-                group.addSensorRules("http-response-time" to -1.0..2000.0, "http-load" to 2.0..8.0)
+                group.addSensorRules("http-response-time" to -1.0..2000.0, "http-load" to 4.0..8.0)
             }
         }
     }
@@ -76,6 +76,7 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
     val workerConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 65)
 
     val keys = "Neil Laptop,Eric New"
+
 
     val loadBalancerGroup = DigitalOceanMachineGroup(client, controller, "lb", loadBalancerSensorArray, lbConfig, keys, 2, 2, listOf(), listOf(CentosPostmortem()), downStreamKonfigurator = HaproxyKonfigurator("/haproxy.cfg.vm"), upStreamKonfigurator = cloudFlareKonfigurator
     )

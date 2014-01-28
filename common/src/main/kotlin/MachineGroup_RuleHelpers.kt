@@ -53,10 +53,17 @@ public fun MachineGroup.allowDefaultTransitions() {
     this allowMachine (BROKEN to OK);
     this allowMachine (BROKEN to DEAD);
     this allowMachine (BROKEN to FAILED);
+    this allowMachine (BROKEN to REBUILDING);
+    this allowMachine (STARTING to REBUILDING);
+    this allowMachine (STOPPED to REBUILDING);
+    this allowMachine (STOPPING to REBUILDING);
+    this allowMachine (OK to REBUILDING);
+    this allowMachine (DEAD to REBUILDING);
+    this allowMachine (FAILED to REBUILDING);
+    this allowMachine (STALE to REBUILDING);
     this allowMachine (REBUILDING to STARTING);
     this allowMachine (REBUILDING to OK);
     this allowMachine (REBUILDING to BROKEN);
-    this allowMachine (DEAD to REBUILDING);
     this allowMachine (DEAD to FAILED);
     this allowMachine (DEAD to OK);
     this allowMachine (OK to FAILED);
@@ -90,9 +97,9 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
     controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.reImage(it) } ;java.lang.String() } takeAction REIMAGE_MACHINE inGroup this;
     controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.restart(it) };java.lang.String() } takeAction RESTART_MACHINE inGroup this;
     controller will { this.failAction(it) { this.expand(); postmortemStore.addAll(this.postmortem(it));this.destroy(it) };java.lang.String() } takeAction DESTROY_MACHINE inGroup this;
-    controller use { this.expand();java.lang.String() } to EXPAND  IF { this.activeSize() < this.max }  group this;
-    controller use { this.contract();java.lang.String() } to CONTRACT IF { this.workingSize() > this.min } group this;
-    controller use { it.machines().forEach { postmortemStore.addAll(this.postmortem(it)); this.reImage(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
+    controller use { this.expand(); this.configure();java.lang.String() } to EXPAND  IF { this.activeSize() < this.max }  group this;
+    controller use { this.contract(); this.configure();java.lang.String() } to CONTRACT IF { this.workingSize() > this.min } group this;
+    controller use { this.configure();it.machines().forEach { postmortemStore.addAll(this.postmortem(it)); this.reImage(it);this.failback(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
 }
 
 public fun MachineGroup.applyDefaultRules() {
@@ -108,7 +115,7 @@ public fun MachineGroup.applyDefaultRules() {
 
 fun MachineGroup.addSensorRules(vararg ranges: Pair<String, Range<Double>>) {
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.activeSize() == 0 } after 180 seconds "no-working-machines-in-group"
+    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.workingSize() == 0 } after 60 seconds "no-working-machines-in-group"
 
     this becomes BUSY ifStateIn  listOf(QUIET, BUSY, NORMAL, null) andTest { it.activeSize() < it.min } after 180 seconds "not-enough-working-machines-in-group"
 
@@ -117,7 +124,7 @@ fun MachineGroup.addSensorRules(vararg ranges: Pair<String, Range<Double>>) {
     }  after 180 seconds "overload"
 
     this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
-        this.activeSize() > this.max
+        this.workingSize() > this.max && this.activeSize() > this.max
     }  after 1 seconds "too-many-machines"
 
 
