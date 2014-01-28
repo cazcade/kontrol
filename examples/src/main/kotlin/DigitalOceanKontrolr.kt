@@ -37,18 +37,14 @@ import kontrol.common.group.ext.allowDefaultTransitions
 import kontrol.common.group.ext.applyDefaultRules
 import kontrol.common.group.ext.applyDefaultPolicies
 
-/**
- * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
- */
-
 
 public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
 
-        group memberIs OK ifStateIn listOf(BROKEN, null) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 30 seconds "http-ok"
-        group memberIs BROKEN ifStateIn listOf(OK, STALE) andTest { it["load"]?.D()?:0.0 > 30 } after 240 seconds "mega-overload"
-        group memberIs BROKEN ifStateIn listOf(OK, STALE, null) andTest { it["http-status"]?.I()?:0 >= 400 } after 1 seconds "http-broken"
-        group memberIs BROKEN ifStateIn listOf(OK, STALE, null) andTest { it["http-response-time"]?.I()?:9000 > 3000 } after 240 seconds "response-too-long"
+        group memberIs OK ifStateIn listOf(BROKEN, REBUILDING, null) andTest { it["http-status"]?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30 } after 30 seconds "http-ok"
+        group memberIs BROKEN ifStateIn listOf(OK, REBUILDING, STALE) andTest { it["load"]?.D()?:0.0 > 30 } after 240 seconds "mega-overload"
+        group memberIs BROKEN ifStateIn listOf(OK, REBUILDING, STALE, null) andTest { it["http-status"]?.I()?:0 >= 400 } after 240 seconds "http-broken"
+        group memberIs BROKEN ifStateIn listOf(OK, REBUILDING, STALE, null) andTest { it["http-response-time"]?.I()?:9000 > 3000 } after 240 seconds "response-too-long"
 
         when(group.name()) {
             "lb", "gateway" -> {

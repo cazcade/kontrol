@@ -98,7 +98,7 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
     controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.restart(it) };java.lang.String() } takeAction RESTART_MACHINE inGroup this;
     controller will { this.failAction(it) { this.expand(); postmortemStore.addAll(this.postmortem(it));this.destroy(it) };java.lang.String() } takeAction DESTROY_MACHINE inGroup this;
     controller use { this.expand(); this.configure();java.lang.String() } to EXPAND  IF { this.activeSize() < this.max }  group this;
-    controller use { this.contract(); this.configure();java.lang.String() } to CONTRACT IF { this.workingSize() > this.min } group this;
+    controller use { this.contract(); this.configure();java.lang.String() } to CONTRACT IF { this.activeSize() > this.min } group this;
     controller use { this.configure();it.machines().forEach { postmortemStore.addAll(this.postmortem(it)); this.reImage(it);this.failback(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
 }
 
@@ -115,7 +115,7 @@ public fun MachineGroup.applyDefaultRules() {
 
 fun MachineGroup.addSensorRules(vararg ranges: Pair<String, Range<Double>>) {
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.workingSize() == 0 } after 60 seconds "no-working-machines-in-group"
+    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.workingSize() == 0 || it.activeSize() == 0 } after 60 seconds "no-working-machines-in-group"
 
     this becomes BUSY ifStateIn  listOf(QUIET, BUSY, NORMAL, null) andTest { it.activeSize() < it.min } after 180 seconds "not-enough-working-machines-in-group"
 
