@@ -50,8 +50,8 @@ public class Server(var infraFactory: (Controller, Bus, PostmortemStore) -> Infr
     }
 
 
-    fun start() {
-        controller.start(120)
+    fun start(gracePeriod: Int = 240) {
+        controller.start(gracePeriod)
         infra.start()
         statusServer.start()
     }
