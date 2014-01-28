@@ -41,7 +41,7 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
         }
         if (eval(target)) {
             if (previousStates.size() == 0 || target.state() in previousStates) {
-                val count = (confirmations.get(target)?:0).inc() ;
+                val count = (confirmations.get(target.id())?:0).inc() ;
                 if (count >= confirms ) {
                     confirmations.put(target.id(), 0);
                     eventLog.log(target.name(), state, LogContextualState.TRIGGER, "Rule '$name' triggered $state on ${target.name()} after $confirms confirms")
