@@ -29,6 +29,8 @@ import kontrol.ext.collections.median
 
 public open class BoundedTemporalCollection<T>(var limit: Int = 1000) : TemporalCollection<T>, MutableCollection<T>  {
 
+    override fun countInWindow(list: List<T?>, window: Long, key: String): Int = inWindow(key, window).filter { it in list }.size();
+
     override fun withinSecs(range: Range<Int>, k: String): List<T?> {
         return within(LongRange(range.start * 1000L, range.end * 1000L), k)
     }

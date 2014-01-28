@@ -77,7 +77,6 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
 
     val keys = "Neil Laptop,Eric New"
 
-
     val loadBalancerGroup = DigitalOceanMachineGroup(client, controller, "lb", loadBalancerSensorArray, lbConfig, keys, 2, 2, listOf(), listOf(CentosPostmortem()), downStreamKonfigurator = HaproxyKonfigurator("/haproxy.cfg.vm"), upStreamKonfigurator = cloudFlareKonfigurator
     )
 
