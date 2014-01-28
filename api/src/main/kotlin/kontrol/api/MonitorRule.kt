@@ -73,7 +73,7 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
 
     fun equals(other: Any?): Boolean {
         return if (other is MonitorRule<*, *>) {
-            state.toString() == other.toString();
+            toString() == other.toString();
         } else {
             false
         }
