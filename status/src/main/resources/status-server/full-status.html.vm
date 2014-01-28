@@ -28,6 +28,7 @@
                     <h2>$group.name()
                         <small>($!group.stateMachine.state())</small>
                         <small>${group.activeSize()}/${group.machines().size()} Active</small>
+                        <small>${group.workingSize()}/${group.machines().size()} Working</small>
                     </h2>
                     <table class="table">
 

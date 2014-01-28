@@ -48,7 +48,7 @@ public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFa
     override fun update() {
         val doa = clientFactory.instance();
         target.droplet = doa.getDropletInfo(target.droplet.id?:-1) ?: target.droplet;
-        if (target.state() !in listOf(MachineState.REBUILDING, MachineState.STOPPING, MachineState.STARTING)) {
+        if (target.state() !in listOf(MachineState.REBUILDING, MachineState.STOPPING, MachineState.STOPPED, MachineState.STARTING)) {
             target.sensorArray.values(target).entrySet().forEach {
                 if (!target.data.containsKey(it.key)) {
                     target.data.putIfAbsent(it.key, BoundedComparableTemporalCollection())
