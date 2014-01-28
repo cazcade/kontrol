@@ -46,6 +46,8 @@ import kontrol.api.LogContextualState
 public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeoutInMinutes: Long = 30) : Controller{
 
     override val frequency: Int = 15
+    var gracePeriod: Int = 0
+    var started: Long = 0
 
     val  groupMonitors: ConcurrentHashMap<Monitor<MachineGroupState, MachineGroup>, Pair<MachineGroup, Set<MonitorRule<MachineGroupState, MachineGroup>>>> = ConcurrentHashMap()
     val  machineMonitors: ConcurrentHashMap<Monitor<MachineState, Machine>, Pair<Machine, Set<MonitorRule<MachineState, Machine>>>> = ConcurrentHashMap()
@@ -66,7 +68,9 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     override fun removeMachineMonitor(monitor: Monitor<MachineState, Machine>) {
         machineMonitors.remove(monitor)
     }
-    override fun start() {
+    override fun start(gracePeriod: Int) {
+        this.gracePeriod = gracePeriod
+        this.started = System.currentTimeMillis()
         executor = Executors.newSingleThreadScheduledExecutor()
         groupExec.start();
         executor?.scheduleWithFixedDelay({
@@ -126,6 +130,11 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     }
 
     override fun execute(group: MachineGroup, machine: Machine, pre: () -> Boolean, vararg actionArgs: Action): Controller {
+        if (gracePeriod * 60 + started > System.currentTimeMillis()) {
+            println("Actions ignored during grace period.")
+            return this
+        }
+
         //        println(actions);
         actionArgs.forEach { actionArg ->
             val action = actions[key(machine, actionArg)];
@@ -154,7 +163,10 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
 
 
     override fun execute(group: MachineGroup, pre: () -> Boolean, vararg actionArgs: GroupAction): Controller {
-        //        println(groupActions);
+        if (gracePeriod * 60 + started > System.currentTimeMillis()) {
+            println("Actions ignored during grace period.")
+            return this
+        }
         actionArgs.forEach { actionArg ->
             val key = key(group, actionArg)
             println(key)
@@ -173,6 +185,11 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     }
 
     override fun execute(group: MachineGroup, pre: () -> Boolean, vararg actionArgs: Action): Controller {
+        if (gracePeriod * 60 + started > System.currentTimeMillis()) {
+            println("Actions ignored during grace period.")
+            return this
+        }
+
         println(actions);
         actionArgs.forEach { actionArg ->
             val key = key(group, actionArg)

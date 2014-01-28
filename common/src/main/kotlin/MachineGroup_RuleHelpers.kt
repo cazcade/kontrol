@@ -114,9 +114,9 @@ public fun MachineGroup.applyDefaultRules() {
 
 public fun MachineGroup.addMachineSensorRules(vararg rules: Pair<String, Double>) {
 
-    this memberIs OK ifStateIn listOf(BROKEN, REBUILDING, null) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after 30 seconds "machine-ok"
+    this memberIs OK ifStateIn listOf(BROKEN, REBUILDING, STARTING, null) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after 30 seconds "machine-ok"
 
-    this memberIs BROKEN ifStateIn listOf(OK, BROKEN, REBUILDING, STALE) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after 240 seconds "machine-broken"
+    this memberIs BROKEN ifStateIn listOf(OK, BROKEN, REBUILDING, STARTING, STOPPING, STOPPED, STALE, null) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after 240 seconds "machine-broken"
 }
 
 

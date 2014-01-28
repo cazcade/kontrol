@@ -40,7 +40,7 @@ public trait Controller {
     fun register(group: MachineGroup, action: GroupAction, pre: () -> Boolean = { true }, machineGroupAction: (MachineGroup) -> Serializable): Controller
 
 
-    fun start()
+    fun start(gracePeriod: Int)
     fun stop()
 
     fun addGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>,

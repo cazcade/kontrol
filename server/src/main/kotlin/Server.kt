@@ -51,7 +51,7 @@ public class Server(var infraFactory: (Controller, Bus, PostmortemStore) -> Infr
 
 
     fun start() {
-        controller.start()
+        controller.start(120)
         infra.start()
         statusServer.start()
     }
