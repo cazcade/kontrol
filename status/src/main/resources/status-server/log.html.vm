@@ -22,10 +22,27 @@
         <table class="table">
 
 
+
             #foreach($event in $events)
                 #if($event.state == "FAILBACK")
                 <tr class="success">
                 #elseif($event.state== "RESTART_MACHINE")
+                <tr class="warning">
+                #elseif($event.state== "OK")
+                <tr class="success">
+                #elseif($event.state== "BUSY")
+                <tr class="success">
+                #elseif($event.state== "QUIET")
+                <tr class="success">
+                #elseif($event.state== "NORMAL")
+                <tr class="success">
+                #elseif($event.state== "STARTING")
+                <tr class="warning">
+                #elseif($event.state== "STOPPED")
+                <tr class="warning">
+                #elseif($event.state== "STOPPING")
+                <tr class="warning">
+                #elseif($event.state== "STALE")
                 <tr class="warning">
                 #elseif($event.state== "CONTRACT")
                 <tr class="success">
@@ -34,6 +51,14 @@
                 #elseif($event.state== "UPGRADE")
                 <tr class="warning">
                 #elseif($event.state== "EMERGENCY_FIX")
+                <tr class="danger">
+                #elseif($event.state== "REBUILDING")
+                <tr class="danger">
+                #elseif($event.state== "DEAD")
+                <tr class="danger">
+                #elseif($event.state== "GROUP_BROKEN")
+                <tr class="danger">
+                #elseif($event.state== "FAILED")
                 <tr class="danger">
                 #elseif($event.state== "REBUILD")
                 <tr class="danger">
