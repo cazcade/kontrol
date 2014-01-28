@@ -25,6 +25,7 @@ public trait Monitorable<E : Enum<E>> {
     fun transition(state: E)
     var enabled: Boolean
     fun name(): String
+    fun id(): String
     fun groupName(): String
 
 }

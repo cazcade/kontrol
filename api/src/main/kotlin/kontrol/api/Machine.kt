@@ -65,7 +65,7 @@ public trait Machine : Monitorable<MachineState>, Serializable {
     /**
      * Override this.
      */
-    fun id(): String {
+    override fun id(): String {
         return ip() ?: "";
     }
 

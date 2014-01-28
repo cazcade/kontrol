@@ -44,6 +44,8 @@
                 <tr class="warning">
                 #elseif($event.state== "STALE")
                 <tr class="warning">
+                #elseif($event.state== "BROKEN")
+                <tr class="warning">
                 #elseif($event.state== "CONTRACT")
                 <tr class="success">
                 #elseif($event.state== "EXPAND")

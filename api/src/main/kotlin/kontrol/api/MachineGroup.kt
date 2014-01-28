@@ -44,6 +44,8 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     val max: Int
 
 
+    override fun id(): String = name()
+
     override fun state(): MachineGroupState? {
         return stateMachine.state()
     }

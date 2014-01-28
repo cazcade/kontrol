@@ -130,7 +130,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     }
 
     override fun execute(group: MachineGroup, machine: Machine, pre: () -> Boolean, vararg actionArgs: Action): Controller {
-        if (gracePeriod * 60 + started > System.currentTimeMillis()) {
+        if (gracePeriod * 1000 + started > System.currentTimeMillis()) {
             println("Actions ignored during grace period.")
             return this
         }
@@ -185,7 +185,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     }
 
     override fun execute(group: MachineGroup, pre: () -> Boolean, vararg actionArgs: Action): Controller {
-        if (gracePeriod * 60 + started > System.currentTimeMillis()) {
+        if (gracePeriod * 1000 + started > System.currentTimeMillis()) {
             println("Actions ignored during grace period.")
             return this
         }

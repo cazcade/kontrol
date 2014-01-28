@@ -32,7 +32,7 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
         return toString().compareTo(other.toString())
     }
 
-    val confirmations: ConcurrentMap<T, Int> = ConcurrentHashMap();
+    val confirmations: ConcurrentMap<String, Int> = ConcurrentHashMap();
 
     fun evaluate(target: T, eventLog: EventLog) {
         if (!target.enabled) {
@@ -43,12 +43,12 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
             if (previousStates.size() == 0 || target.state() in previousStates) {
                 val count = (confirmations.get(target)?:0).inc() ;
                 if (count >= confirms ) {
-                    confirmations.put(target, 0);
+                    confirmations.put(target.id(), 0);
                     eventLog.log(target.name(), state, LogContextualState.TRIGGER, "Rule '$name' triggered $state on ${target.name()} after $confirms confirms")
                     target.transition(state)
                     println("Rule '$name' triggered $state after $confirms confirms")
                 } else {
-                    confirmations.put(target, count);
+                    confirmations.put(target.id(), count);
                 }
             } else {
                 if (target.state() != state) {
@@ -57,7 +57,7 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
             }
 
         } else {
-            confirmations.put(target, 0);
+            confirmations.put(target.id(), 0);
         }
 
     }
@@ -66,8 +66,9 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
     fun toString(): String {
         val stringBuilder = StringBuilder()
         previousStates.appendString(stringBuilder)
-        return "$name=$stringBuilder->$state";
+        return "$name=${stringBuilder}->$state";
     }
+
     fun hashCode(): Int {
         return toString().hashCode();
     }
