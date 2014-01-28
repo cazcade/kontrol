@@ -14,6 +14,7 @@
                 <li><a href="/full-status.html">Status</a></li>
                 <li><a href="/postmortems.do">Postmortems</a></li>
                 <li><a href="/log.do">Log</a></li>
+                <li><a href="/costing.do">Costing</a></li>
                 <li><a href="https://github.com/cazcade/kontrol">About</a></li>
                 <li><a href="mailto:support@cazcade.com">Contact</a></li>
                 <li class="dropdown">

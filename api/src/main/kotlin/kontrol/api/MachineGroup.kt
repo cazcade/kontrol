@@ -55,7 +55,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     fun machines(): List<Machine>
 
     fun workingSize(): Int = workingMachines().size();
-    fun activeSize(): Int = enabledMachines().filter { !(it.state() in listOf(null, MachineState.FAILED, MachineState.DEAD, MachineState.BROKEN)) }.size();
+    fun activeSize(): Int = enabledMachines().filter { !(it.state() in listOf(MachineState.FAILED, MachineState.REBUILDING, MachineState.DEAD, MachineState.BROKEN)) }.size();
     fun enabledMachines(): List<Machine> = machines().filter { it.enabled }
     fun workingMachines(): List<Machine> = enabledMachines().filter { it.state() in listOf(MachineState.OK, null) }
 
