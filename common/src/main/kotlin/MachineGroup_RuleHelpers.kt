@@ -103,13 +103,11 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
 }
 
 public fun MachineGroup.applyDefaultRules() {
-    this memberIs BROKEN ifStateIn listOf(null) after 600 seconds "unknown-now-broken"
-    this memberIs BROKEN ifStateIn listOf(STARTING, STOPPING) after 600 seconds "bad-now-broken"
-    this memberIs DEAD ifStateIn listOf(BROKEN, STOPPING) after 600 seconds "bad-now-dead"
-    this memberIs DEAD ifStateIn listOf(STOPPED) after 300 seconds "stopped-now-dead"
+    this memberIs BROKEN ifStateIn listOf(null, STARTING, STOPPING, STOPPED) after 300 seconds "bad-now-broken"
+    this memberIs DEAD ifStateIn listOf(BROKEN) after 600 seconds "escalate-broken-to-dead"
     val HOUR: Long = 60 * 60 * 1000
-    this memberIs DEAD ifStateIn listOf(DEAD, BROKEN) andTest { it.fsm.history.countInWindow(listOf(BROKEN, STARTING), HOUR) > 3 } after 1 seconds "flap-now-dead"
-    this memberIs FAILED ifStateIn listOf(BROKEN, DEAD) andTest { it.fsm.history.countInWindow(listOf(DEAD, BROKEN, STARTING), 4 * HOUR) > 4 } after 1 seconds "flap-now-failed"
+    this memberIs DEAD ifStateIn listOf(BROKEN) andTest { it.fsm.history.countInWindow(listOf(BROKEN, REBUILDING, STARTING), HOUR) > 3 } after 1 seconds "flap-now-escalate-to-dead"
+    this memberIs FAILED ifStateIn listOf(DEAD) andTest { it.fsm.history.countInWindow(listOf(DEAD, REBUILDING), 4 * HOUR) > 4 } after 1 seconds "flap-now-escalate-to-failed"
 
 }
 
