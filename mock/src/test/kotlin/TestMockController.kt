@@ -94,7 +94,7 @@ public class TestMockController {
         val members = HashMap<String, MachineGroup>();
         var previous: List<MachineGroup> = ArrayList()
         val controller = DefaultController(NullBus(), NullEventLog());
-        controller.start();
+        controller.start(0);
         map.entrySet().forEach {
             val gs: List<MachineGroupState?> = groupStates.get(it.key) ?: listOf();
             val mockMachineGroup = MockMachineGroup(it.key, it.value, MockSequencedGroupMonitor(gs), previous, MockKonfigurator(), MockKonfigurator(), controller)
