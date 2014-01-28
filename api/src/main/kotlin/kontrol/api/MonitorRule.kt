@@ -47,7 +47,7 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
                 if (previousStates.size() == 0 || target.state() in previousStates) {
                     eventLog.log(target.name(), state, LogContextualState.TRIGGER, "Rule '$name' triggered $state on ${target.name()} after $confirms confirms")
                     target.transition(state)
-                    println("Rule '$name' triggered $state on ${target.name()} after $confirms confirms")
+                    println("Rule '$name' triggered $state after $confirms confirms")
                 } else {
                     if (target.state() != state) {
                         //                                println("$name could not trigger $state on ${target} from state was ${target.stateMachine.state()} and allowed previous states are ${previousStates}")
