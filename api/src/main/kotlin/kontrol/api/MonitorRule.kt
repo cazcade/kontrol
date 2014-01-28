@@ -34,7 +34,7 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
 
     val confirmations: ConcurrentMap<T, Int> = ConcurrentHashMap();
 
-    fun evaluate(target: T) {
+    fun evaluate(target: T, eventLog: EventLog) {
         if (!target.enabled) {
             println("${target.name()} was disabled")
             return
@@ -45,6 +45,7 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
             if (count >= confirms ) {
                 confirmations.put(target, 0);
                 if (previousStates.size() == 0 || target.state() in previousStates) {
+                    eventLog.log(target.name(), state, LogContextualState.TRIGGER, "Rule '$name' triggered $state on ${target.name()} after $confirms confirms")
                     target.transition(state)
                     println("Rule '$name' triggered $state on ${target.name()} after $confirms confirms")
                 } else {

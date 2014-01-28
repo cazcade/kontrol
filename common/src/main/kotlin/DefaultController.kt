@@ -78,7 +78,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 val details = groupMonitors.get(it);
                 groupExec.execute(false, details?.first?.name()) {
                     if (details != null) {
-                        details.second.forEach { it.evaluate(details.first) }
+                        details.second.forEach { it.evaluate(details.first, eventLog) }
                     }
                     it.heartbeat()
                 }
@@ -89,7 +89,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 val details = machineMonitors.get(it);
                 groupExec.execute(false, details?.first?.name()) {
                     if (details != null) {
-                        details.second.forEach { it.evaluate(details.first) }
+                        details.second.forEach { it.evaluate(details.first, eventLog) }
                     }
                     it.heartbeat()
                 }

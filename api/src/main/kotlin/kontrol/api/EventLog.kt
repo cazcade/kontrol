@@ -35,6 +35,7 @@ public enum class LogContextualState {
     DURING
     START
     END
+    TRIGGER
 }
 
 
