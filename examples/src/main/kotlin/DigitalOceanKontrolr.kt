@@ -56,7 +56,7 @@ public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
             }
             "worker" -> {
                 //change this when deployed
-                group.addSensorRules("http-response-time" to -1.0..5000.0, "http-load" to 4.0..8.0)
+                group.addSensorRules("http-response-time" to -1.0..2000.0, "http-load" to 4.0..8.0)
             }
         }
     }
