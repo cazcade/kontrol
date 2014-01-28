@@ -36,6 +36,7 @@ public fun MachineGroup.allowDefaultTransitions() {
     this allowMachine (STARTING to OK);
     this allowMachine (STARTING to BROKEN);
     this allowMachine (STARTING to STOPPED);
+    this allowMachine (STARTING to DEAD);
     this allowMachine (OK to STOPPING);
     this allowMachine (OK to STOPPED);
     this allowMachine (OK to BROKEN);
