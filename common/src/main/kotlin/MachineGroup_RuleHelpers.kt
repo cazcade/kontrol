@@ -78,12 +78,12 @@ public fun MachineGroup.allowDefaultTransitions() {
 
 public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemStore: PostmortemStore) {
 
-    this whenMachine BROKEN recheck THEN tell controller takeActions listOf(RESTART_MACHINE);
+    this whenMachine BROKEN recheck THEN tell controller takeAction RESTART_MACHINE;
     this whenMachine DEAD recheck THEN tell controller takeAction REIMAGE_MACHINE ;
     this whenMachine STALE recheck THEN tell controller takeAction REIMAGE_MACHINE;
     this whenMachine FAILED recheck THEN tell controller takeAction DESTROY_MACHINE;
     this whenGroup BUSY recheck THEN use controller takeAction EXPAND;
-    this whenGroup QUIET recheck THEN use controller  takeAction CONTRACT;
+    this whenGroup QUIET recheck THEN use controller takeAction CONTRACT;
     this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EXPAND, EMERGENCY_FIX);
 
     controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.reImage(it) } ;java.lang.String() } takeAction REIMAGE_MACHINE inGroup this;
