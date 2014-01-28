@@ -40,18 +40,19 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
             return
         }
         if (eval(target)) {
-            val count = (confirmations.get(target)?:0).inc() ;
-            confirmations.put(target, count);
-            if (count >= confirms ) {
-                confirmations.put(target, 0);
-                if (previousStates.size() == 0 || target.state() in previousStates) {
+            if (previousStates.size() == 0 || target.state() in previousStates) {
+                val count = (confirmations.get(target)?:0).inc() ;
+                if (count >= confirms ) {
+                    confirmations.put(target, 0);
                     eventLog.log(target.name(), state, LogContextualState.TRIGGER, "Rule '$name' triggered $state on ${target.name()} after $confirms confirms")
                     target.transition(state)
                     println("Rule '$name' triggered $state after $confirms confirms")
                 } else {
-                    if (target.state() != state) {
-                        //                                println("$name could not trigger $state on ${target} from state was ${target.stateMachine.state()} and allowed previous states are ${previousStates}")
-                    }
+                    confirmations.put(target, count);
+                }
+            } else {
+                if (target.state() != state) {
+                    //                                println("$name could not trigger $state on ${target} from state was ${target.stateMachine.state()} and allowed previous states are ${previousStates}")
                 }
             }
 
