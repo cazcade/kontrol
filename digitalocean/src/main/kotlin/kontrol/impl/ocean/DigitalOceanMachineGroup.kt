@@ -89,8 +89,11 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         try {
 
             println("Destroying m/c")
-            val machine = machines.values().filter { it.droplet.status?.toLowerCase() == "active" }.sortBy { it.id() }. first()
-            val id = machine.droplet.id!!
+            var machs = machines.values().filter { it.state() !in listOf(MachineState.OK, null) }
+            if (machs.size() == 0) {
+                machs = machines.values().filter { it.droplet.status?.toLowerCase() == "active" }.sortBy { it.id() };
+            }
+            val id = machs.first().droplet.id!!
             digitalOcean.deleteDroplet(id)
             while (digitalOcean.getDropletInfo(id).status?.toLowerCase() == "active") {
                 println("Awaiting Machine ${id} OFF")
@@ -162,14 +165,14 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
     fun waitForRestart(id: Int) {
         var count1: Int = 0;
         val instance = apiFactory.instance()
-        while (instance.getDropletInfo(id).status == "active" && count1++ < 30) {
+        while (instance.getDropletInfo(id).status == "active" && count1++ < 60) {
             println("Waiting for machine ${id} to stop being active")
-            Thread.sleep(1000);
+            Thread.sleep(5000);
         }
         var count2: Int = 0;
         while (instance.getDropletInfo(id).status != "active" && count2++ < 60) {
             println("Waiting for machine ${id} to become active")
-            Thread.sleep(1000);
+            Thread.sleep(5000);
         }
         Thread.sleep(60000);
 

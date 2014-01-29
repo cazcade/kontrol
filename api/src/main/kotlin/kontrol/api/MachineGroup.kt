@@ -225,6 +225,8 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
         for (machine in machines()) {
             string += "$machine\n";
         }
+        string += "Rules:"
+        machineMonitorRules.forEach { string += "$it\n" }
         return string;
     }
 

@@ -43,19 +43,27 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
     public void execute(final boolean retry, final Object key, final FountainExecutable executable) throws InterruptedException {
         begin();
         try {
-            final int executorId = Math.abs(key.hashCode() % buckets);
-            final ThreadPoolExecutor threadPoolExecutor = executors.get(executorId);
-            executeInternal(retry, executable, threadPoolExecutor);
+            executeInternal(retry, false, executable, executors.get(Math.abs(key.hashCode() % buckets)));
         } finally {
             end();
         }
     }
 
-    private void executeInternal(final boolean retry, final FountainExecutable executable, final ThreadPoolExecutor threadPoolExecutor) throws InterruptedException {
+    @Override
+    public void submit(final boolean retry, final Object key, final FountainExecutable executable) throws InterruptedException {
+        begin();
+        try {
+            executeInternal(retry, true, executable, executors.get(Math.abs(key.hashCode() % buckets)));
+        } finally {
+            end();
+        }
+    }
+
+    private void executeInternal(final boolean retry, boolean submit, final FountainExecutable executable, final ThreadPoolExecutor threadPoolExecutor) throws InterruptedException {
         boolean cont = true;
         while (cont) {
             try {
-                threadPoolExecutor.execute(new Runnable() {
+                Runnable command = new Runnable() {
                     public void run() {
                         try {
                             boolean fail = true;
@@ -95,7 +103,12 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
                             count.decrementAndGet();
                         }
                     }
-                });
+                };
+                if (submit) {
+                    threadPoolExecutor.submit(command);
+                } else {
+                    threadPoolExecutor.execute(command);
+                }
                 cont = false;
                 count.incrementAndGet();
             } catch (RejectedExecutionException e) {
@@ -116,7 +129,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
                 }
             }
             assert executor != null;
-            executeInternal(retry, executable, executor);
+            executeInternal(retry, false, executable, executor);
         } finally {
             end();
         }
@@ -124,7 +137,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
 
     public void execute(final FountainExecutable executable) throws InterruptedException {
         final ThreadPoolExecutor threadPoolExecutor = executors.get((int) (buckets * Math.random()));
-        executeInternal(false, executable, threadPoolExecutor);
+        executeInternal(false, false, executable, threadPoolExecutor);
     }
 
     @Override

@@ -37,6 +37,8 @@ public interface FountainExecutorService extends ServiceStateMachine {
      */
     void execute(boolean retry, Object hashObject, FountainExecutable executable) throws InterruptedException;
 
+    void submit(boolean retry, Object key, FountainExecutable executable) throws InterruptedException;
+
     /**
      * No retry, random hash.
      *

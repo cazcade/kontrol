@@ -28,7 +28,7 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
                                                            val confirms: Int,
                                                            val name: String,
                                                            val previousStates: Set<E?>) : Comparable<MonitorRule<E, T>>{
-    override fun compareTo(other: MonitorRule<E, T>): Int {
+    override public fun compareTo(other: MonitorRule<E, T>): Int {
         return toString().compareTo(other.toString())
     }
 
@@ -63,17 +63,17 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
     }
 
 
-    fun toString(): String {
+    public fun toString(): String {
         val stringBuilder = StringBuilder()
         previousStates.appendString(stringBuilder)
         return "$name=${stringBuilder}->$state";
     }
 
-    fun hashCode(): Int {
+    public fun hashCode(): Int {
         return toString().hashCode();
     }
 
-    fun equals(other: Any?): Boolean {
+    public fun equals(other: Any?): Boolean {
         return if (other is MonitorRule<*, *>) {
             toString() == other.toString();
         } else {

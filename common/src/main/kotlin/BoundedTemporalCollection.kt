@@ -111,15 +111,48 @@ public open class BoundedTemporalCollection<T>(var limit: Int = 1000) : Temporal
     override fun inWindow(key: String, window: Long): List<T?> {
         return list.filter { it.time > System.currentTimeMillis() - window && it.k == key }.map { it.v }.filterNotNull()
     }
+
     override fun addWithKey(v: T?, k: String) {
         list.add(TemporalValue(k, v))
         if (list.size() > limit) {
             list.remove(list.first)
         }
     }
-    override fun percentageInWindow(targetValue: T?, window: Long, key: String): Double {
-        val windowList = inWindow(key, window)
-        return (windowList.filter { it == targetValue }.size() * 100.0) / windowList.size().toDouble()
+    override fun percentageInWindow(targetValue: T?, window: Range<Long>, key: String): Double {
+        val windowList = within(window, key)
+        if (windowList.size() == 0) {
+            return 0.0
+        } else {
+            return (windowList.filter { it == targetValue }.size() * 100.0) / windowList.size().toDouble()
+        }
+    }
+
+    override fun percentageInWindow(targetValues: List<T?>, window: Range<Long>, key: String): Double {
+        val windowList = within(window, key)
+        if (windowList.size() == 0 ) {
+            return 0.0
+        } else {
+            return (windowList.filter { it in targetValues }.size() * 100.0) / windowList.size().toDouble()
+        }
+    }
+
+
+    override fun valueForDuration(targetValue: T?, window: Long, key: String): Boolean {
+        var values = list.filter { it.k == key && it.v == targetValue }.filterNotNull()
+        if (values.size() == 0 || values.first().time > System.currentTimeMillis() - window) {
+            return false
+        } else {
+            return values.filter { it.time > System.currentTimeMillis() - window }.map { it.v }.filterNotNull().all { it == targetValue };
+        }
+    }
+
+    override fun valueForDuration(targetValues: List<T?>, window: Long, key: String): Boolean {
+        var values = list.filter { it.k == key && it.v in targetValues }.filterNotNull()
+        if (values.size() == 0 || values.first().time > System.currentTimeMillis() - window) {
+            return false
+        } else {
+            return values.filter { it.time > System.currentTimeMillis() - window }.map { it.v }.filterNotNull().all { it in targetValues };
+        }
     }
 
     override fun avgForWindow(window: Long, key: String): Double? {

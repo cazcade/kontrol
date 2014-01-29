@@ -24,7 +24,10 @@ public trait TemporalCollection<E> {
 
     fun inWindow(key: String = "<default>", window: Long): List<E?>
     fun lastEntry(k: String = "<default>"): E?
-    fun percentageInWindow(targetValue: E?, window: Long, key: String = "<default>"): Double
+    fun valueForDuration(targetValue: E?, window: Long, key: String = "<default>"): Boolean
+    fun valueForDuration(targetValues: List<E?>, window: Long, key: String = "<default>"): Boolean
+    fun percentageInWindow(targetValue: E?, window: Range<Long>, key: String = "<default>"): Double
+    fun percentageInWindow(targetValues: List<E?>, window: Range<Long>, key: String = "<default>"): Double
     fun countInWindow(targetValue: E?, window: Long, key: String = "<default>"): Int
     fun countInWindow(list: List<E?>, window: Long, key: String = "<default>"): Int
     fun avgForWindow(window: Long, key: String = "<default>"): Double?

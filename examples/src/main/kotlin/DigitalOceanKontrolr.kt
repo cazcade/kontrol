@@ -95,6 +95,7 @@ fun main(args: Array<String>): Unit {
             group.allowDefaultTransitions();
             group.applyDefaultPolicies(controller, postmortems)
             group.applyDefaultRules();
+            println(group.toString())
         }
         snapitoSensorActions(cloud);
     }

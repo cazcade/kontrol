@@ -99,21 +99,21 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
     controller will { this.failAction(it) { this.expand(); postmortemStore.addAll(this.postmortem(it));this.destroy(it) };java.lang.String() } takeAction DESTROY_MACHINE inGroup this;
     controller use { this.expand(); this.configure();java.lang.String() } to EXPAND  IF { this.activeSize() < this.max }  group this;
     controller use { this.contract(); this.configure();java.lang.String() } to CONTRACT IF { this.activeSize() > this.min } group this;
-    controller use { this.configure();it.machines().forEach { postmortemStore.addAll(this.postmortem(it)); this.reImage(it);this.failback(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
+    controller use { this.configure();it.machines().sortBy { it.state().toString() }.forEach { postmortemStore.addAll(this.postmortem(it)); this.reImage(it);this.failback(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
 }
 
 public fun MachineGroup.applyDefaultRules() {
-    this memberIs BROKEN ifStateIn listOf(null, STARTING, STOPPING, STOPPED) after 300 seconds "bad-now-broken"
-    this memberIs DEAD ifStateIn listOf(BROKEN) after 600 seconds "escalate-broken-to-dead"
-    val HOUR: Long = 60 * 60 * 1000
-    this memberIs DEAD ifStateIn listOf(BROKEN) andTest { it.fsm.history.countInWindow(listOf(BROKEN, REBUILDING, STARTING), HOUR) > 4 } after 60 seconds "flap-now-escalate-to-dead"
-    this memberIs FAILED ifStateIn listOf(DEAD) andTest { it.fsm.history.countInWindow(listOf(DEAD, REBUILDING), 4 * HOUR) > 4 } after 60 seconds "flap-now-escalate-to-failed"
+    this memberIs BROKEN ifStateIn listOf(BROKEN, null, STARTING, STOPPING, STOPPED) after 120 seconds "bad-now-broken"
+    this memberIs DEAD ifStateIn listOf(DEAD, BROKEN) after 180 seconds "escalate-broken-to-dead"
+    val escalateDuration: Long = 30 * 60 * 1000
+    this memberIs DEAD ifStateIn listOf(DEAD, BROKEN) andTest { it.fsm.history.percentageInWindow(listOf(BROKEN, REBUILDING, STARTING), escalateDuration / 2..escalateDuration) > 60.0 } after 60 seconds "flap-now-escalate-to-dead"
+    this memberIs FAILED ifStateIn listOf(FAILED, DEAD) andTest { it.fsm.history.percentageInWindow(listOf(DEAD, REBUILDING), escalateDuration / 2..escalateDuration) > 60.0 } after 60 seconds "flap-now-escalate-to-failed"
 
 }
 
 public fun MachineGroup.addMachineSensorRules(vararg rules: Pair<String, Double>) {
 
-    this memberIs OK ifStateIn listOf(BROKEN, REBUILDING, STARTING, null) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after 30 seconds "machine-ok"
+    this memberIs OK ifStateIn listOf(DEAD, BROKEN, REBUILDING, STARTING, null) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after 30 seconds "machine-ok"
 
     this memberIs BROKEN ifStateIn listOf(OK, BROKEN, REBUILDING, STARTING, STOPPING, STOPPED, STALE, null) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after 240 seconds "machine-broken"
 }
@@ -121,17 +121,15 @@ public fun MachineGroup.addMachineSensorRules(vararg rules: Pair<String, Double>
 
 fun MachineGroup.addGroupSensorRules(vararg ranges: Pair<String, Range<Double>>) {
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.workingSize() == 0 || it.activeSize() == 0 } after 60 seconds "no-working-machines-in-group"
+    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { it.workingSize() == 0 || it.activeSize() == 0 } after 60 seconds "group-size-dangerously-low"
 
-    this becomes BUSY ifStateIn  listOf(QUIET, BUSY, NORMAL, null) andTest { it.activeSize() < it.min } after 180 seconds "not-enough-working-machines-in-group"
+    this becomes BUSY ifStateIn  listOf(QUIET, BUSY, NORMAL, null) andTest { it.workingSize() < it.min } after 180 seconds "not-enough-working-machines-in-group"
 
     this becomes BUSY ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
         ranges.any { this[it.first]?:it.second.end > it.second.end }
     }  after 180 seconds "overload"
 
-    this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
-        this.activeSize() > this.max
-    }  after 60 seconds "too-many-machines"
+    this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest { this.workingSize() > this.max }  after 60 seconds "too-many-machines"
 
 
     this becomes QUIET ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
@@ -140,7 +138,7 @@ fun MachineGroup.addGroupSensorRules(vararg ranges: Pair<String, Range<Double>>)
 
     this becomes NORMAL ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, null) andTest {
         ranges.all { this[it.first]?:it.second.start in it.second }
-        && this.activeSize() in this.min..this.max
+        && this.workingSize() in this.min..this.max
     }  after 30 seconds "group-ok"
 
 }

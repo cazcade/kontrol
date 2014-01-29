@@ -25,6 +25,7 @@ import org.junit.Test as test
 import org.junit.Before as before
 import org.junit.After as after
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 public class TemporalStoreTests {
 
@@ -36,6 +37,11 @@ public class TemporalStoreTests {
         val avg2Sec = store.avgForWindow(2100)?.toInt()
         val avg60Sec = store.avgForWindow(60 * 1000)?.toInt()
         val median60Sec = store.medianForWindow(60 * 1000)
+        assertEquals(0.0, store.percentageInWindow(1, 100L..1100L))
+        val piw1 = store.percentageInWindow(10, 0L..1100L)
+        val piw2 = store.percentageInWindow(10, 0L..2100L)
+        assertTrue(piw1 > 90)
+        assertTrue(piw2 in 49.0..51.0)
         assertEquals(10, avg1Sec)
         assertEquals(9, avg2Sec)
         assertEquals(5, avg60Sec)
@@ -44,6 +50,8 @@ public class TemporalStoreTests {
         println(avg2Sec)
         println(avg60Sec)
         println(median60Sec)
+        println(piw1)
+        println(piw2)
 
     }
 
