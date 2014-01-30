@@ -53,6 +53,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
     public void submit(final boolean retry, final Object key, final FountainExecutable executable) throws InterruptedException {
         begin();
         try {
+            System.out.println("Executing with key " + key);
             executeInternal(retry, true, executable, executors.get(Math.abs(key.hashCode() % buckets)));
         } finally {
             end();
@@ -121,12 +122,13 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
     public void execute(final boolean retry, final FountainExecutable executable) throws InterruptedException {
         begin();
         try {
-            final int minimum = Integer.MAX_VALUE;
+            int minimum = Integer.MAX_VALUE;
             ThreadPoolExecutor executor = null;
             for (final ThreadPoolExecutor threadPoolExecutor : executors) {
                 final int i = threadPoolExecutor.getQueue().size();
                 if (i < minimum) {
                     executor = threadPoolExecutor;
+                    minimum = i;
                 }
             }
             assert executor != null;
