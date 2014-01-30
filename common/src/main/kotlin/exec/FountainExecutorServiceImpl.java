@@ -78,7 +78,9 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
                                         Thread.sleep(100);
                                         continue;
                                     }
+                                    System.out.println("Executing ...");
                                     executable.run();
+                                    System.out.println("Executed ...");
                                     fail = false;
                                 } catch (InterruptedException ie) {
                                     Thread.interrupted();
