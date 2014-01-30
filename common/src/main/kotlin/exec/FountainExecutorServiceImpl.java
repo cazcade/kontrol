@@ -112,6 +112,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
                 cont = false;
                 count.incrementAndGet();
             } catch (RejectedExecutionException e) {
+                e.printStackTrace();
                 Thread.sleep(requeueDelay);
             }
         }
