@@ -53,7 +53,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
     public void submit(final boolean retry, final Object key, final FountainExecutable executable) throws InterruptedException {
         begin();
         try {
-            System.out.println("Executing with key " + key);
+            System.out.println("Submitted with key " + key);
             executeInternal(retry, true, executable, executors.get(Math.abs(key.hashCode() % buckets)));
         } finally {
             end();
@@ -107,6 +107,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
                         }
                     }
                 };
+                System.out.println("Queue size is " + threadPoolExecutor.getQueue().size());
                 if (submit) {
                     threadPoolExecutor.submit(command);
                 } else {
@@ -115,7 +116,6 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
                 cont = false;
                 count.incrementAndGet();
             } catch (RejectedExecutionException e) {
-                e.printStackTrace();
                 Thread.sleep(requeueDelay);
             }
         }

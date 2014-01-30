@@ -19,7 +19,6 @@ package kontrol.server
 import kontrol.common.DefaultController
 import kontrol.api.Infrastructure
 import kontrol.status.StatusServer
-import kontrol.hazelcast.HazelcastBus
 import kontrol.hibernate.HibernatePostmortemStore
 import kontrol.api.Controller
 import kontrol.api.Bus
@@ -40,7 +39,7 @@ public class Server(var infraFactory: (Controller, Bus, PostmortemStore) -> Infr
     {
         val dbUrl = "jdbc:mysql://localhost:3306/kontrol?user=root"
         val eventLog = HibernateEventLog(dbUrl)
-        bus = HazelcastBus()
+        bus = NullBus()
         controller = DefaultController(bus, eventLog)
         postmortems = HibernatePostmortemStore(dbUrl)
         postmortems.last(1)
@@ -50,7 +49,7 @@ public class Server(var infraFactory: (Controller, Bus, PostmortemStore) -> Infr
     }
 
 
-    fun start(gracePeriod: Int = 600) {
+    fun start(gracePeriod: Int = 120) {
         controller.start(gracePeriod)
         infra.start()
         statusServer.start()

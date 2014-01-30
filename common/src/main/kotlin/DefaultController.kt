@@ -54,7 +54,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     val actions = HashMap<String, Pair<() -> Boolean, (Machine) -> Serializable>>();
     val groupActions = HashMap<String, Pair<() -> Boolean, (MachineGroup) -> Serializable>>();
     var executor: ScheduledExecutorService? = null
-    var groupExec: FountainExecutorService = FountainExecutorServiceImpl(0, 16, 10000, 0, 1);
+    var groupExec: FountainExecutorService = FountainExecutorServiceImpl(0, 32, 10, 100, 1);
 
     override fun addGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>, target: MachineGroup, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
         groupMonitors.put(monitor, target to rules)
@@ -99,14 +99,14 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
 
         executor?.scheduleWithFixedDelay({
             groupMonitors.keySet().forEach {
-                groupExec.submit(false, it.target()?.id()) { it.update() }
+                groupExec.submit(false, it.target()?.id() + ".monitor") { it.update() }
             }
             println("*** Machine Group Update ${Date()} ***")
         }, 0, 5, TimeUnit.MINUTES)
 
         executor?.scheduleWithFixedDelay({
             val monitors = HashMap(machineMonitors)
-            monitors.keySet().forEach { groupExec.execute(false, it.target()?.id()) { it.update() } }
+            monitors.keySet().forEach { groupExec.submit(false, it.target()?.id() + ".monitor") { it.update() } }
             println("*** Machine Update ${Date()} ***")
         }, 2, 30, TimeUnit.SECONDS)
     }
@@ -139,7 +139,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
         actionArgs.forEach { actionArg ->
             val action = actions[key(machine, actionArg)];
             if (action != null && action.first()) {
-                println("Performing action for $action on ${machine.ip()}")
+                println("Performing action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 groupExec.submit(false, machine.id()) {
                     eventLog.log(machine.name(), actionArg, LogContextualState.START)
@@ -149,7 +149,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             };
             val action2 = actions[key(group, actionArg)];
             if (action2 != null && action2.first()) {
-                println("Performing action for $action2 on ${machine.ip()}")
+                println("Performing action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 groupExec.submit(false, machine.id()) {
                     eventLog.log(machine.name(), actionArg, LogContextualState.START)
@@ -172,7 +172,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             println(key)
             val action = groupActions[key];
             if (action != null && action.first()) {
-                println("Performing action for $action on ${actionArg.name()}")
+                println("Performing action for $actionArg on ${actionArg.name()}")
                 bus.dispatch("machine.group.pre", actionArg to group.name());
                 groupExec.submit(false, group.id()) {
                     eventLog.log(group.name(), actionArg, LogContextualState.START)
@@ -198,10 +198,10 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             if (action != null && action.first()) {
                 println("Action is not null")
                 group.machines().forEach {
-                    println("Performing action for $action on ${it.ip()}")
+                    println("Performing action for $actionArg on ${it.ip()}")
                     bus.dispatch("machine.group.pre", actionArg to group.name());
-                    groupExec.submit(false, it.name()) {
-                        eventLog.log(group.name(), actionArg, LogContextualState.START)
+                    groupExec.submit(false, it.id()) {
+                    eventLog.log(group.name(), actionArg, LogContextualState.START)
                         bus.dispatch("machine.group.post", actionArg to  action.second(it));
                         eventLog.log(group.name(), actionArg, LogContextualState.END)
                     }
