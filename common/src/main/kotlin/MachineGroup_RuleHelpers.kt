@@ -43,6 +43,7 @@ public fun MachineGroup.allowDefaultTransitions() {
     this allowMachine (OK to BROKEN);
     this allowMachine (OK to STALE);
     this allowMachine (STOPPING to STOPPED);
+    this allowMachine (STOPPING to BROKEN);
     this allowMachine (STOPPING to STARTING);
     this allowMachine (STOPPING to OK);
     this allowMachine (STOPPED to DEAD);
@@ -97,17 +98,17 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
     controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.reImage(it) } ;java.lang.String() } takeAction REIMAGE_MACHINE inGroup this;
     controller will { this.failAction(it) { postmortemStore.addAll(this.postmortem(it));this.restart(it) };java.lang.String() } takeAction RESTART_MACHINE inGroup this;
     controller will { this.failAction(it) { this.expand(); postmortemStore.addAll(this.postmortem(it));this.destroy(it) };java.lang.String() } takeAction DESTROY_MACHINE inGroup this;
-    controller use { this.expand(); this.configure();java.lang.String() } to EXPAND  IF { this.activeSize() < this.max }  group this;
-    controller use { this.contract(); this.configure();java.lang.String() } to CONTRACT IF { this.activeSize() > this.min } group this;
+    controller use { this.expand(); this.configure();java.lang.String() } to EXPAND  IF { this.workingSize() < this.max }  group this;
+    controller use { this.contract(); this.configure();java.lang.String() } to CONTRACT IF { this.workingSize() > this.min } group this;
     controller use { this.configure();it.machines().sortBy { it.state().toString() }.forEach { postmortemStore.addAll(this.postmortem(it)); this.reImage(it);this.failback(it) }; this.configure();java.lang.String() } to EMERGENCY_FIX group this;
 }
 
 public fun MachineGroup.applyDefaultRules() {
     this memberIs BROKEN ifStateIn listOf(BROKEN, null, STARTING, STOPPING, STOPPED) after 120 seconds "bad-now-broken"
-    this memberIs DEAD ifStateIn listOf(DEAD, BROKEN) after 180 seconds "escalate-broken-to-dead"
+    this memberIs DEAD ifStateIn listOf(DEAD, BROKEN, REBUILDING) after 180 seconds "escalate-broken-to-dead"
     val escalateDuration: Long = 30 * 60 * 1000
-    this memberIs DEAD ifStateIn listOf(DEAD, BROKEN) andTest { it.fsm.history.percentageInWindow(listOf(BROKEN, REBUILDING, STARTING), escalateDuration / 2..escalateDuration) > 60.0 } after 60 seconds "flap-now-escalate-to-dead"
-    this memberIs FAILED ifStateIn listOf(FAILED, DEAD) andTest { it.fsm.history.percentageInWindow(listOf(DEAD, REBUILDING), escalateDuration / 2..escalateDuration) > 60.0 } after 60 seconds "flap-now-escalate-to-failed"
+    this memberIs DEAD ifStateIn listOf(DEAD, BROKEN) andTest { it.fsm.history.percentageInWindow(listOf(BROKEN, REBUILDING, STARTING), (escalateDuration / 2)..escalateDuration) > 60.0 } after 60 seconds "flap-now-escalate-to-dead"
+    this memberIs FAILED ifStateIn listOf(FAILED, DEAD) andTest { it.fsm.history.percentageInWindow(listOf(DEAD, REBUILDING), (escalateDuration / 2)..escalateDuration) > 60.0 } after 60 seconds "flap-now-escalate-to-failed"
 
 }
 
