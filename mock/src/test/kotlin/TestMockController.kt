@@ -113,8 +113,8 @@ public class TestMockController {
     }
 
     test fun test1(): Unit {
-        val machine1States = listOf(STARTING, OK)
-        val machine2States = listOf(STARTING, OK)
+        val machine1States = listOf(RESTARTING, OK)
+        val machine2States = listOf(RESTARTING, OK)
         val map = buildSimpleWorkerToplogy(machine1States, machine2States);
 
         val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL, MachineGroupState.QUIET, MachineGroupState.BUSY, MachineGroupState.NORMAL, MachineGroupState.GROUP_BROKEN)));
@@ -125,8 +125,8 @@ public class TestMockController {
 
 
     test fun test2(): Unit {
-        val machine1States = listOf(STARTING, OK)
-        val machine2States = listOf(STARTING, OK)
+        val machine1States = listOf(RESTARTING, OK)
+        val machine2States = listOf(RESTARTING, OK)
         val map = buildSimpleWorkerToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
@@ -135,8 +135,8 @@ public class TestMockController {
     }
 
     test fun test3(): Unit {
-        val machine1States = listOf(STARTING, OK, BROKEN, DEAD)
-        val machine2States = listOf(STARTING, OK, BROKEN, DEAD)
+        val machine1States = listOf(RESTARTING, OK, BROKEN, DEAD)
+        val machine2States = listOf(RESTARTING, OK, BROKEN, DEAD)
         val map = buildSimpleFullToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("worker", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
@@ -145,8 +145,8 @@ public class TestMockController {
     }
 
     test fun test4(): Unit {
-        val machine1States = listOf(STARTING, OK, BROKEN, STOPPING, STARTING, OK)
-        val machine2States = listOf(STARTING, OK, BROKEN)
+        val machine1States = listOf(RESTARTING, OK, BROKEN, STOPPING, RESTARTING, OK)
+        val machine2States = listOf(RESTARTING, OK, BROKEN)
         val map = buildSimpleLBToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("lb", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)
@@ -154,8 +154,8 @@ public class TestMockController {
     }
 
     test fun test5(): Unit {
-        val machine1States = listOf(STARTING, OK, BROKEN)
-        val machine2States = listOf(STARTING, OK, BROKEN)
+        val machine1States = listOf(RESTARTING, OK, BROKEN)
+        val machine2States = listOf(RESTARTING, OK, BROKEN)
         val map = buildSimpleLBToplogy(machine1States, machine2States);
         val groupStates = mapOf(Pair("lb", listOf(MachineGroupState.NORMAL)));
         val mockController = runTestForScenario(map, groupStates)

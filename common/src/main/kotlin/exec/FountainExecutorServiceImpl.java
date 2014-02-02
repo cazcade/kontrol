@@ -53,7 +53,6 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
     public void submit(final boolean retry, final Object key, final FountainExecutable executable) throws InterruptedException {
         begin();
         try {
-            System.out.println("Submitted with key " + key);
             executeInternal(retry, true, executable, executors.get(Math.abs(key.hashCode() % buckets)));
         } finally {
             end();
@@ -78,9 +77,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
                                         Thread.sleep(100);
                                         continue;
                                     }
-                                    System.out.println("Executing ...");
                                     executable.run();
-                                    System.out.println("Executed ...");
                                     fail = false;
                                 } catch (InterruptedException ie) {
                                     Thread.interrupted();

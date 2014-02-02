@@ -135,9 +135,13 @@ public class HttpUtil {
     }
 
     public static int getStatus(URI url, Locale locale, int timeout) throws IOException {
-        HttpGet request = new HttpGet(url);
-        request.addHeader("Accept-Language", locale.toLanguageTag());
-        return getCookielessHttpClient(timeout).execute(request).getStatusLine().getStatusCode();
+        try {
+            HttpGet request = new HttpGet(url);
+            request.addHeader("Accept-Language", locale.toLanguageTag());
+            return getCookielessHttpClient(timeout).execute(request).getStatusLine().getStatusCode();
+        } catch (Exception e) {
+            return 999;
+        }
     }
 
     public static String getUrlAsString(URL url, int timeout, Locale locale) throws IOException {

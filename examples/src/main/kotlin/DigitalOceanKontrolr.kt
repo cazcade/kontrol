@@ -36,11 +36,15 @@ import kontrol.common.group.ext.allowDefaultTransitions
 import kontrol.common.group.ext.applyDefaultRules
 import kontrol.common.group.ext.applyDefaultPolicies
 import kontrol.common.group.ext.addMachineSensorRules
+import kontrol.api.MachineGroupState.*
+import kontrol.HttpUtil
+import java.util.Locale
+import java.net.URI
 
 
 public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
-        group.addMachineSensorRules("http-status" to 399.0, "load" to 30.0, "http-response-time" to 3000.0)
+        group.addMachineSensorRules("http-status" to 399.0, "load" to 30.0, "http-response-time" to 60000.0)
         when(group.name()) {
             "lb", "gateway" -> {
                 group.addGroupSensorRules("http-response-time" to -1.0..2000.0, "load" to 1.0..5.0)
@@ -69,12 +73,12 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
     val keys = "Neil Laptop,Eric New"
 
 
-    val loadBalancerGroup = DigitalOceanMachineGroup(client, controller, "lb", loadBalancerSensorArray, lbConfig, keys, 2, 2, listOf(), listOf(CentosPostmortem()), downStreamKonfigurator = HaproxyKonfigurator("/haproxy.cfg.vm"), upStreamKonfigurator = cloudFlareKonfigurator
+    val loadBalancerGroup = DigitalOceanMachineGroup(client, controller, "lb", loadBalancerSensorArray, lbConfig, keys, 2, 2, 6, listOf(), listOf(CentosPostmortem()), downStreamKonfigurator = HaproxyKonfigurator("/haproxy.cfg.vm"), upStreamKonfigurator = cloudFlareKonfigurator
     )
 
-    val gatewayGroup = DigitalOceanMachineGroup(client, controller, "gateway", gatewaySensorArray, gatewayConfig, keys, 2, 2, listOf(loadBalancerGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty")))
+    val gatewayGroup = DigitalOceanMachineGroup(client, controller, "gateway", gatewaySensorArray, gatewayConfig, keys, 2, 2, 6, listOf(loadBalancerGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty")))
 
-    val workerGroup = DigitalOceanMachineGroup(client, controller, "worker", workerSensorArray, workerConfig, keys, 3, 8, listOf(gatewayGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty")), upStreamKonfigurator = WorkerKonfigurator())
+    val workerGroup = DigitalOceanMachineGroup(client, controller, "worker", workerSensorArray, workerConfig, keys, 3, 20, 25, listOf(gatewayGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty")), upStreamKonfigurator = WorkerKonfigurator())
 
 
     return hashMapOf(
@@ -97,6 +101,12 @@ fun main(args: Array<String>): Unit {
             group.applyDefaultRules();
             println(group.toString())
         }
+
+        cloud["lb"] becomes GROUP_BROKEN ifStateIn listOf(GROUP_BROKEN, QUIET, BUSY, NORMAL, null) andTest {
+            cloud["gateway"].state() != GROUP_BROKEN && cloud["worker"].state() != GROUP_BROKEN &&
+            HttpUtil.getStatus(URI("http://api.snapito.com/web/abc123/lc/sky.com?timestamp=true"), Locale.getDefault(), 60000) >= 400
+        } after 300 seconds "api-broken"
+
         snapitoSensorActions(cloud);
     }
 

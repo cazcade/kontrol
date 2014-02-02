@@ -47,6 +47,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
                                       val sshKeys: String,
                                       public override val min: Int,
                                       public override val max: Int,
+                                      public override val hardMax: Int,
                                       override val upstreamGroups: List<MachineGroup>,
                                       override val postmortems: List<Postmortem>,
                                       override val downStreamKonfigurator: DownStreamKonfigurator? = null,
@@ -93,7 +94,10 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
             if (machs.size() == 0) {
                 machs = machines.values().filter { it.droplet.status?.toLowerCase() == "active" }.sortBy { it.id() };
             }
-            val id = machs.first().droplet.id!!
+            val machine = machs.first()
+            machine.disable()
+            failover(machine)
+            val id = machine.droplet.id!!
             digitalOcean.deleteDroplet(id)
             while (digitalOcean.getDropletInfo(id).status?.toLowerCase() == "active") {
                 println("Awaiting Machine ${id} OFF")
@@ -155,9 +159,15 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
 
 
     override fun destroy(machine: Machine): MachineGroup {
-        println("Destroying $machine")
-        val digitalOcean = apiFactory.instance();
-        digitalOcean.deleteDroplet(machine.id().toInt());
+        val id = machine.id().toInt()
+        try {
+            println("Destroying $machine")
+            val digitalOcean = apiFactory.instance();
+            digitalOcean.deleteDroplet(id);
+        } catch (e: Exception) {
+            println("Failed to destroy ${id} due to ${e.getMessage()}")
+        }
+
         return this;
     }
 
@@ -210,10 +220,15 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
 
     override fun restart(machine: Machine): MachineGroup {
         val id = machine.id().toInt()
-        println("Rebooting $machine")
-        "reboot".onHost(machine.ip())
-        waitForRestart(id)
-        println("Rebuilt ${id}")
+        try {
+            println("Rebooting $machine")
+            "reboot".onHost(machine.ip())
+            waitForRestart(id)
+            println("Rebuilt ${id}")
+        } catch (e: Exception) {
+            println("Failed to restart ${id} due to ${e.getMessage()}")
+            machine.fsm.attemptTransition(MachineState.DEAD)
+        }
 
         return this;
     }

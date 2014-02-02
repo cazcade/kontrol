@@ -33,15 +33,15 @@ import kontrol.api.MachineGroup.Recheck.*;
 
 public fun defaultTranstitions(group: MachineGroup) {
 
-    group allowMachine (STARTING to OK);
-    group allowMachine (STARTING to BROKEN);
-    group allowMachine (STARTING to STOPPED);
+    group allowMachine (RESTARTING to OK);
+    group allowMachine (RESTARTING to BROKEN);
+    group allowMachine (RESTARTING to STOPPED);
     group allowMachine (OK to STOPPING);
     group allowMachine (OK to STOPPED);
     group allowMachine (OK to BROKEN);
     group allowMachine (OK to STALE);
     group allowMachine (STOPPING to STOPPED);
-    group allowMachine (STOPPING to STARTING);
+    group allowMachine (STOPPING to RESTARTING);
     group allowMachine (BROKEN to STOPPING);
     group allowMachine (BROKEN to STOPPED);
     group allowMachine (BROKEN to OK);
@@ -67,7 +67,7 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
     infra.topology().each {
         val group = it;
 
-        group memberIs OK ifStateIn listOf(BROKEN, STARTING) andTest {
+        group memberIs OK ifStateIn listOf(BROKEN, RESTARTING) andTest {
             it.data["http-status"]?.lastEntry()?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30
         } after 5 seconds "http-ok"
 
@@ -76,9 +76,9 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
         when(it.name()) {
             "lb" -> {
                 val balancers = it;
-                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-status"]?.I()?:222 >= 400 } after 2 seconds "http-broken"
+                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest { it["http-status"]?.I()?:222 >= 400 } after 2 seconds "http-broken"
 
-                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 2 seconds "mega-overload"
+                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 2 seconds "mega-overload"
                 group becomes BUSY ifStateIn listOf(QUIET, NORMAL, null) andTest { it.get("load")?:0.0 > 3.0 }  after 2 seconds "overload"
                 group becomes QUIET ifStateIn listOf(BUSY, NORMAL, null) andTest { it.get("load")?:1.0 < 1.0 }  after 5 seconds "underload"
                 group becomes NORMAL ifStateIn listOf(QUIET, BUSY, null) andTest { it.get("load")?:1.0 in 1.0..3.0 }  after 5 seconds "group-ok"
@@ -86,11 +86,11 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
             "gateway" -> {
 
                 val gateways = it;
-                gateways memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest {
+                gateways memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest {
                     it["http-status"]?.I()?:222 >= 400
                 } after 3 seconds "http-broken"
 
-                gateways memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest {
+                gateways memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest {
                     it["load"]?.D()?:0.0 > 30
                 } after 3 seconds "mega-overload"
 
@@ -102,9 +102,9 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
             }
             "worker" -> {
                 val workers = it;
-                workers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 2.0 } after 30 seconds "http-broken"
+                workers memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest { it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 2.0 } after 30 seconds "http-broken"
 
-                workers memberIs BROKEN ifStateIn listOf(OK, STALE, STARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 5 seconds "mega-overload"
+                workers memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 5 seconds "mega-overload"
 
                 group becomes BUSY ifStateIn listOf(BUSY, QUIET, NORMAL, null) andTest { it.get("http-load")?:1.0 > 5.0 || group.activeSize() < group.min }  after 20 seconds "overload"
 

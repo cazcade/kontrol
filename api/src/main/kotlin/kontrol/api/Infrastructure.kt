@@ -26,6 +26,8 @@ package kontrol.api
  */
 public trait Infrastructure {
 
+    fun get(group: String) = topology().get(group)
+
     fun topology(): Topology
 
     fun stop() {

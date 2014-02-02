@@ -54,7 +54,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     val actions = HashMap<String, Pair<() -> Boolean, (Machine) -> Serializable>>();
     val groupActions = HashMap<String, Pair<() -> Boolean, (MachineGroup) -> Serializable>>();
     var executor: ScheduledExecutorService? = null
-    var groupExec: FountainExecutorService = FountainExecutorServiceImpl(0, 32, 10, 100, 1);
+    var groupExec: FountainExecutorService = FountainExecutorServiceImpl(0, 32, 100, 2000, 1);
 
     override fun addGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>, target: MachineGroup, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
         groupMonitors.put(monitor, target to rules)
@@ -152,7 +152,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 println("Performing action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 groupExec.submit(false, machine.id()) {
-                    eventLog.log(machine.name(), actionArg, LogContextualState.START)
+                    //record result into event log
+                eventLog.log(machine.name(), actionArg, LogContextualState.START)
                     bus.dispatch("machine.action.post", actionArg to  action2.second(machine));
                     eventLog.log(machine.name(), actionArg, LogContextualState.END)
                 }
@@ -201,7 +202,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                     println("Performing action for $actionArg on ${it.ip()}")
                     bus.dispatch("machine.group.pre", actionArg to group.name());
                     groupExec.submit(false, it.id()) {
-                    eventLog.log(group.name(), actionArg, LogContextualState.START)
+                        eventLog.log(group.name(), actionArg, LogContextualState.START)
                         bus.dispatch("machine.group.post", actionArg to  action.second(it));
                         eventLog.log(group.name(), actionArg, LogContextualState.END)
                     }

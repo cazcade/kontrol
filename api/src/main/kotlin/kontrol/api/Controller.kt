@@ -76,7 +76,7 @@ public trait Controller {
         fun inGroup(group: MachineGroup) {
             if (machineAction != null) {
                 actionRegistry.register(group, machineAction!!, ifClause, {
-                    if (!ifClause()) {
+                    if (ifClause()) {
                         action(it)
                     } else {
                         java.lang.String()

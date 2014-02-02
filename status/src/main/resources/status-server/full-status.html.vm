@@ -37,23 +37,23 @@
                             #if($machine.state().toString() == "OK")
                             <tr class="success">
                             #elseif($machine.state().toString() == "BROKEN")
-                            <tr class="warning">
-                            #elseif($machine.state().toString() == "DEAD")
-                            <tr class="warning">
-                            #elseif($machine.state().toString() == "REBUILDING")
                             <tr class="danger">
+                            #elseif($machine.state().toString() == "DEAD")
+                            <tr class="danger">
+                            #elseif($machine.state().toString() == "REBUILDING")
+                            <tr class="warning">
                             #elseif($machine.state().toString() == "FAILED")
                             <tr class="danger">
                             #elseif($machine.state().toString() == "STOPPING")
                             <tr class="warning">
                             #elseif($machine.state().toString() == "STOPPED")
                             <tr class="warning">
-                            #elseif($machine.state().toString() == "STARTING")
+                            #elseif($machine.state().toString() == "RESTARTING")
                             <tr class="warning">
                             #elseif($machine.state().toString() == "UNKNOWN")
                             <tr class="warning">
                             #elseif($machine.state().toString() == "STALE")
-                            <tr>
+                            <tr class="info">
                             #else
                             <tr>
                             #end

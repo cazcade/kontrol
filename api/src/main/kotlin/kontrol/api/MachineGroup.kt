@@ -42,6 +42,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     val downStreamGroups: List<MachineGroup>
     val min: Int
     val max: Int
+    val hardMax: Int
 
 
     override fun id(): String = name()
@@ -57,9 +58,9 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     fun machines(): List<Machine>
 
     fun workingSize(): Int = workingMachines().size();
-    fun activeSize(): Int = enabledMachines().filter { !(it.state() in listOf(MachineState.FAILED, MachineState.REBUILDING, MachineState.DEAD, MachineState.BROKEN)) }.size();
+    fun activeSize(): Int = enabledMachines().filter { !(it.state() in listOf(MachineState.FAILED, MachineState.REBUILDING, MachineState.RESTARTING, MachineState.DEAD, MachineState.BROKEN)) }.size();
     fun enabledMachines(): List<Machine> = machines().filter { it.enabled }
-    fun workingMachines(): List<Machine> = enabledMachines().filter { it.state() in listOf(MachineState.OK, null) }
+    fun workingMachines(): List<Machine> = enabledMachines().filter { it.state() in listOf(MachineState.OK, MachineState.STALE, null) }
 
     fun get(value: String): Double? {
         val values = machines()  map { it[value] }
@@ -113,25 +114,22 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
 
     fun failAction(machine: Machine, action: (Machine) -> Unit) {
         println("**** Fail Action for  Machine ${machine.ip()}");
-        failover(machine);
+        machine.disable()
         try {
+            failover(machine);
             action(machine);
-            failback(machine)
-        } catch(e: Exception) {
+        } finally {
             machine.enable();
-            throw e
         }
     }
 
     fun failover(machine: Machine): MachineGroup {
         println("**** Failover Machine ${machine.ip()}");
-        machine.disable();
         try {
             downStreamKonfigurator?.onMachineFail(machine, this);
             upStreamKonfigurator?.onMachineFail(machine, this)
             upstreamGroups.forEach { it.downstreamFailover(machine, this) }
         } catch (e: Exception) {
-            machine.enable()
             throw e
         }
         return this;
@@ -183,6 +181,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
         return this;
     }
     fun restart(machine: Machine): MachineGroup {
+        machine.fsm.transition(MachineState.RESTARTING)
         println("**** Re Start Machine ${machine.name()}(${machine.id()})");
         return this;
     }
@@ -252,19 +251,23 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
             return this;
         }
 
-        fun takeAction(vararg action: Action): MachineGroup {
+        fun takeAction(vararg actions: Action): MachineGroup {
             machineGroup.defaultMachineRules.on<Machine>(null, newState, { machine ->
                 if (!recheck || machine.fsm.state() == newState) {
-                    action.forEach { action -> registry?.execute(machineGroup, machine, { true }, action) }
+                    actions.forEach { action -> registry?.execute(machineGroup, machine, { true }, action) }
+                } else {
+                    println("RECHECK FAILED for $actions")
                 }
             });
             return machineGroup;
         }
 
-        fun takeActions(action: List<Action>): MachineGroup {
+        fun takeActions(actions: List<Action>): MachineGroup {
             machineGroup.defaultMachineRules.on<Machine>(null, newState, { machine ->
                 if (!recheck || machine.fsm.state() == newState) {
-                    action.forEach { action -> registry?.execute(machineGroup, machine, { true }, action) }
+                    actions.forEach { action -> registry?.execute(machineGroup, machine, { true }, action) }
+                } else {
+                    println("RECHECK FAILED for $actions")
                 }
             });
             return machineGroup;
@@ -300,6 +303,8 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
             machineGroup.stateMachine.rules?.on<MachineGroup>(null, newState, {
                 if (!recheck || machineGroup.stateMachine.state() == newState) {
                     registry?.execute(machineGroup, { true }, action)
+                } else {
+                    println("RECHECK FAILED for $action")
                 }
             });
             return machineGroup;

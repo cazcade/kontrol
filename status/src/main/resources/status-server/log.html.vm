@@ -36,7 +36,7 @@
                 <tr class="success">
                 #elseif($event.state== "NORMAL")
                 <tr class="success">
-                #elseif($event.state== "STARTING")
+                #elseif($event.state== "RESTARTING")
                 <tr class="warning">
                 #elseif($event.state== "STOPPED")
                 <tr class="warning">
@@ -69,6 +69,9 @@
                 #elseif($event.state == "DESTROY_MACHINE")
                 <tr class="danger">
                 #elseif($event.state== "FAILOVER")
+                <tr class="info">
+                #elseif($event.state== "FAILBACK")
+                <tr class="info">
                 #else
                 <tr>
                 #end

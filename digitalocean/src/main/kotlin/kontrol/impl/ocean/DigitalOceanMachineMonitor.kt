@@ -41,14 +41,14 @@ public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFa
     override fun heartbeat() {
         when (target.droplet.status?.toLowerCase()) {
             "off" -> stateMachine.attemptTransition(MachineState.STOPPED)
-            "new" -> stateMachine.attemptTransition(MachineState.STARTING)
+            "new" -> stateMachine.attemptTransition(MachineState.RESTARTING)
             "archive" -> stateMachine.attemptTransition(MachineState.STOPPING)
         }
     }
     override fun update() {
         val doa = clientFactory.instance();
         target.droplet = doa.getDropletInfo(target.droplet.id?:-1) ?: target.droplet;
-        if (target.state() !in listOf(MachineState.REBUILDING, MachineState.STOPPING, MachineState.STOPPED, MachineState.STARTING)) {
+        if (target.state() !in listOf(MachineState.REBUILDING, MachineState.STOPPING, MachineState.STOPPED, MachineState.RESTARTING)) {
             target.sensorArray.values(target).entrySet().forEach {
                 if (!target.data.containsKey(it.key)) {
                     target.data.putIfAbsent(it.key, BoundedComparableTemporalCollection())

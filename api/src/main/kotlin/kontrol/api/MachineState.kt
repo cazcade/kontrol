@@ -19,7 +19,7 @@ package kontrol.api
 
 public enum class MachineState {
     UNKNOWN
-    STARTING
+    RESTARTING
     OK
     STOPPING
     REBUILDING
