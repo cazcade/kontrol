@@ -38,7 +38,8 @@ import kontrol.api.Controller
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>, override val upstreamGroups: List<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator?, override val upStreamKonfigurator: UpStreamKonfigurator?, override val controller: Controller) : MachineGroup{
+public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>, override val upstreamGroups: MutableList<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator?, override val upStreamKonfigurator: UpStreamKonfigurator?, override val controller: Controller) : MachineGroup{
+    override var disabled: Boolean = false
     override val hardMax: Int = 10000000
     override fun costPerHourInDollars(): Double {
         return 0.0;
@@ -78,13 +79,13 @@ public class MockMachineGroup(val name: String, val machines: MutableList<MockMa
         return machines;
     }
 
-    override fun expand(): MachineGroup {
+    override fun expand(): Machine {
         println("**** Expand $name");
         val mockMachine = MockMachine("10.10.10." + (Math.random() * 256));
         mockMachine.monitor = MockMachineMonitor();
         mockMachine.fsm.rules = defaultMachineRules;
         machines.add(mockMachine);
-        return this;
+        return mockMachine;
     }
 
     override fun contract(): MachineGroup {

@@ -41,6 +41,7 @@ public fun String.onHost(host: String? = "localhost", user: String = "root", ret
                 ssh.startSession()?.use { session ->
                     val result = session.exec(this)?.getInputStream()?.use { ins -> String(ins.readBytes(2048)) }
                     session.join(timeoutInSeconds, TimeUnit.SECONDS)
+                    println("> $result")
                     result
                 }?:throw Exception("Could not start session on $host")
             }

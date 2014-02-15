@@ -39,7 +39,7 @@ public class HttpStatusSensor(val path: String, val port: Int = 80) : Sensor {
                 machine.hostname().isNotEmpty() -> {
 
                     val URI = URL("http", machine.hostname(), port, path).toURI()
-                    val status = HttpUtil.getStatus(URI, Locale.getDefault(), 5000)
+                    val status = HttpUtil.getStatus(URI, Locale.getDefault(), 30 * 60 * 1000)
                     //                    println("$URI responded with $status")
                     status;
 
@@ -50,7 +50,7 @@ public class HttpStatusSensor(val path: String, val port: Int = 80) : Sensor {
             });
         } catch (e: Exception) {
             println("HttpStatusSensor: ${e.javaClass} for ${machine.name()}")
-            return SensorValue(name(), 999);
+            return SensorValue(name(), -1);
         }
 
     }

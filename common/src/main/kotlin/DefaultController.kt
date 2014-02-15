@@ -38,6 +38,7 @@ import exec.FountainExecutorService
 import exec.FountainExecutorServiceImpl
 import kontrol.api.EventLog
 import kontrol.api.LogContextualState
+import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * @todo document.
@@ -45,7 +46,7 @@ import kontrol.api.LogContextualState
  */
 public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeoutInMinutes: Long = 30) : Controller{
 
-    override val frequency: Int = 15
+    override final val frequency: Int = 15
     var gracePeriod: Int = 0
     var started: Long = 0
 
@@ -54,7 +55,11 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     val actions = HashMap<String, Pair<() -> Boolean, (Machine) -> Serializable>>();
     val groupActions = HashMap<String, Pair<() -> Boolean, (MachineGroup) -> Serializable>>();
     var executor: ScheduledExecutorService? = null
-    var groupExec: FountainExecutorService = FountainExecutorServiceImpl(0, 32, 100, 2000, 1);
+    val monitorExec: FountainExecutorService = FountainExecutorServiceImpl("Machine Monitor Queue", 0, 10, 98, 100, 20);
+    val groupMonitorExec: FountainExecutorService = FountainExecutorServiceImpl("Group Monitor Queue", 0, 10, 97, 100, 20);
+    var groupExec: FountainExecutorService = FountainExecutorServiceImpl("Group Exec Queue", 0, 256, 100, 100, 1);
+    var machineExec: FountainExecutorService = FountainExecutorServiceImpl("Machine Exec Queue", 0, 256, 100, 100, 1);
+    val unExecutedActions: MutableSet<String> = CopyOnWriteArraySet()
 
     override fun addGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>, target: MachineGroup, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
         groupMonitors.put(monitor, target to rules)
@@ -73,48 +78,94 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
         this.started = System.currentTimeMillis()
         executor = Executors.newSingleThreadScheduledExecutor()
         groupExec.start();
+        groupMonitorExec.start();
+        monitorExec.start();
+        machineExec.start();
         executor?.scheduleWithFixedDelay({
-            groupMonitors.keySet().forEach {
-                val details = groupMonitors.get(it);
-                groupExec.submit(false, details?.first?.id()) {
-                    if (details != null) {
-                        details.second.forEach { it.evaluate(details.first, eventLog) }
+            //            println("*** Group Heartbeat ${Date()} ***")
+            try {
+
+                groupMonitors.keySet().forEach {
+                    if (it.target()?.enabled?:false) {
+                        val details = groupMonitors.get(it);
+                        groupMonitorExec.submit(false, details?.first?.id()) {
+                            if (details != null) {
+                                details.second.forEach { it.evaluate(details.first, eventLog) }
+                            }
+                            it.heartbeat()
+                        }
+                    } else {
+                        println("Group monitor rules skipped as group ${it.target()?.id()} is disabled");
                     }
-                    it.heartbeat()
+
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }, 0, frequency.toLong(), TimeUnit.SECONDS)
         executor?.scheduleWithFixedDelay({
-            machineMonitors.keySet().forEach {
-                val details = machineMonitors.get(it);
-                groupExec.submit(false, details?.first?.id()) {
-                    if (details != null) {
-                        details.second.forEach { it.evaluate(details.first, eventLog) }
+            try {
+
+                //                println("*** Machine Heartbeat ${Date()} ***")
+                machineMonitors.keySet().forEach {
+                    if (it.target()?.enabled?:false) {
+                        val details = machineMonitors.get(it);
+                        monitorExec.submit(false, it.target()?.id()) {
+                            if (details != null) {
+                                details.second.forEach { it.evaluate(details.first, eventLog) }
+                            }
+                            it.heartbeat()
+                        }
+                    } else {
+                        println("Machine monitor rules skipped as machine ${it.target()?.id()} is disabled");
                     }
-                    it.heartbeat()
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            println("*** Heartbeat ${Date()} ***")
         }, 0, frequency.toLong(), TimeUnit.SECONDS)
 
         executor?.scheduleWithFixedDelay({
-            groupMonitors.keySet().forEach {
-                groupExec.submit(false, it.target()?.id() + ".monitor") { it.update() }
-            }
-            println("*** Machine Group Update ${Date()} ***")
-        }, 0, 5, TimeUnit.MINUTES)
+            try {
+                groupMonitors.keySet().forEach {
+                    groupMonitorExec.execute(false, it.target()?.groupName()) {
+                        it.update() ;
+                        //println("*** Machine Group Update ${Date()} ***")
+                    }
+                }
 
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+        }, 1, 2, TimeUnit.MINUTES)
         executor?.scheduleWithFixedDelay({
-            val monitors = HashMap(machineMonitors)
-            monitors.keySet().forEach { groupExec.submit(false, it.target()?.id() + ".monitor") { it.update() } }
-            println("*** Machine Update ${Date()} ***")
+            try {
+                val monitors = HashMap(machineMonitors)
+                monitors.keySet().forEach {
+                    if (it.target()?.enabled?:false) {
+                        monitorExec.execute(false, it.target()?.id()) {
+                            it.update() ;
+                            //println("*** Machine Update ${Date()} ***")
+                        }
+                    } else {
+                        println("Machine sensor update skipped as machine ${it.target()?.id()} is disabled");
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
         }, 2, 30, TimeUnit.SECONDS)
     }
 
     override fun stop() {
         executor?.shutdown();
         executor = null
+        machineExec.stop();
         groupExec.stop();
+        groupMonitorExec.stop();
+        monitorExec.stop();
     }
 
 
@@ -130,6 +181,11 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     }
 
     override fun execute(group: MachineGroup, machine: Machine, pre: () -> Boolean, vararg actionArgs: Action): Controller {
+        if (group.disabled) {
+            println("Group ${group.name()} was disabled")
+            return this
+
+        }
         if (gracePeriod * 1000 + started > System.currentTimeMillis()) {
             println("Actions ignored during grace period.")
             return this
@@ -137,25 +193,50 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
 
         //        println(actions);
         actionArgs.forEach { actionArg ->
-            val action = actions[key(machine, actionArg)];
-            if (action != null && action.first()) {
+            val key = key(group, actionArg)
+            val executionKey = key + ":" + machine.id();
+            val action = actions[key];
+            if (executionKey in unExecutedActions) {
+                println("Skipping group action for $actionArg on ${machine.id()}")
+            } else
+                if (action != null && action.first() && key !in executionKey) {
+                    println("Performing group action for $actionArg on ${machine.ip()}")
+                    bus.dispatch("machine.action.pre", actionArg to machine.id());
+                    unExecutedActions.add(executionKey);
+                    machineExec.submit(false, machine.id()) {
+                        machine.disable();
+                        try {
+                            unExecutedActions.remove(executionKey);
+                            eventLog.log(machine.name(), actionArg, LogContextualState.START)
+                            bus.dispatch("machine.action.post", actionArg to action.second(machine));
+                            println("Performed action for $actionArg on ${machine.ip()}")
+                        } finally {
+                            machine.enable();
+                            eventLog.log(machine.name(), actionArg, LogContextualState.END)
+                        }
+                    }
+                };
+            val key2 = key(machine, actionArg)
+            val action2 = actions[key2];
+            val executionKey2 = key2;
+            if (executionKey2 in unExecutedActions) {
+                println("Skipping action for $actionArg on ${machine.id()}")
+            } else if (action2 != null && action2.first() ) {
                 println("Performing action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
-                groupExec.submit(false, machine.id()) {
-                    eventLog.log(machine.name(), actionArg, LogContextualState.START)
-                    bus.dispatch("machine.action.post", actionArg to action.second(machine));
-                    eventLog.log(machine.name(), actionArg, LogContextualState.END)
-                }
-            };
-            val action2 = actions[key(group, actionArg)];
-            if (action2 != null && action2.first()) {
-                println("Performing action for $actionArg on ${machine.ip()}")
-                bus.dispatch("machine.action.pre", actionArg to machine.id());
-                groupExec.submit(false, machine.id()) {
-                    //record result into event log
-                eventLog.log(machine.name(), actionArg, LogContextualState.START)
-                    bus.dispatch("machine.action.post", actionArg to  action2.second(machine));
-                    eventLog.log(machine.name(), actionArg, LogContextualState.END)
+                unExecutedActions.add(executionKey2)
+                machineExec.submit(false, machine.id()) {
+                    machine.disable();
+                    try {
+                        unExecutedActions.remove(executionKey2);
+                        //record result into event log
+                        eventLog.log(machine.name(), actionArg, LogContextualState.START)
+                        bus.dispatch("machine.action.post", actionArg to  action2.second(machine));
+                        println("Performed action for $actionArg on ${machine.ip()}")
+                    } finally {
+                        machine.enable();
+                        eventLog.log(machine.name(), actionArg, LogContextualState.END)
+                    }
                 }
             };
         }
@@ -164,21 +245,38 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
 
 
     override fun execute(group: MachineGroup, pre: () -> Boolean, vararg actionArgs: GroupAction): Controller {
+        if (group.disabled) {
+            println("Group ${group.name()} was disabled")
+            return this
+        }
+
         if (gracePeriod * 1000 + started > System.currentTimeMillis()) {
             println("Actions ignored during grace period.")
             return this
         }
         actionArgs.forEach { actionArg ->
             val key = key(group, actionArg)
+
             println(key)
             val action = groupActions[key];
-            if (action != null && action.first()) {
-                println("Performing action for $actionArg on ${actionArg.name()}")
+            if (key in unExecutedActions) {
+                println("Skipping action for $actionArg on ${group.name()}")
+
+            } else if (action != null && action.first()) {
+                println("Performing action for $actionArg on ${group.name()}")
                 bus.dispatch("machine.group.pre", actionArg to group.name());
-                groupExec.submit(false, group.id()) {
-                    eventLog.log(group.name(), actionArg, LogContextualState.START)
-                    bus.dispatch("machine.group.post", actionArg to action.second(group));
-                    eventLog.log(group.name(), actionArg, LogContextualState.END)
+                unExecutedActions.add(key);
+                groupExec.submit(false, group.groupName()) {
+                    group.disabled = true;
+                    try {
+                        unExecutedActions.remove(key)
+                        eventLog.log(group.name(), actionArg, LogContextualState.START)
+                        bus.dispatch("machine.group.post", actionArg to action.second(group));
+                        println("Performed action for $actionArg on ${group.name()}")
+                    } finally {
+                        group.disabled = false;
+                        eventLog.log(group.name(), actionArg, LogContextualState.END)
+                    }
                 }
             };
         }
@@ -186,6 +284,11 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     }
 
     override fun execute(group: MachineGroup, pre: () -> Boolean, vararg actionArgs: Action): Controller {
+        if (group.disabled) {
+            println("Group ${group.name()} was disabled")
+            return this
+        }
+
         if (gracePeriod * 1000 + started > System.currentTimeMillis()) {
             println("Actions ignored during grace period.")
             return this
@@ -199,12 +302,24 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             if (action != null && action.first()) {
                 println("Action is not null")
                 group.machines().forEach {
-                    println("Performing action for $actionArg on ${it.ip()}")
-                    bus.dispatch("machine.group.pre", actionArg to group.name());
-                    groupExec.submit(false, it.id()) {
-                        eventLog.log(group.name(), actionArg, LogContextualState.START)
-                        bus.dispatch("machine.group.post", actionArg to  action.second(it));
-                        eventLog.log(group.name(), actionArg, LogContextualState.END)
+                    val executionKey = key + ":" + it.id();
+                    if (executionKey in unExecutedActions) {
+                        println("Skipping action for $actionArg on ${it.id()}")
+                    } else {
+                        println("Performing action for $actionArg on ${it.id()}")
+                        bus.dispatch("machine.group.pre", actionArg to group.name());
+                        unExecutedActions.add(executionKey);
+                        machineExec.submit(false, it.id()) {
+                            it.disable();
+                            try {
+                                unExecutedActions.remove(executionKey);
+                                eventLog.log(group.name(), actionArg, LogContextualState.START)
+                                bus.dispatch("machine.group.post", actionArg to  action.second(it));
+                            } finally {
+                                it.enable();
+                                eventLog.log(group.name(), actionArg, LogContextualState.END)
+                            }
+                        }
                     }
                 };
             }

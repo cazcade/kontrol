@@ -54,6 +54,9 @@ public class HaproxyKonfigurator(val templateName: String) : DownStreamKonfigura
     override fun configureDownStream(thisGroup: MachineGroup) {
         thisGroup.downStreamGroups.forEach { configureInternal(thisGroup, null, it) }
     }
+    override fun configureDownStream(thisGroup: MachineGroup, machine: Machine) {
+        thisGroup.downStreamGroups.forEach { configureMachineInternal(machine, it, thisGroup); }
+    }
 
     override fun onMachineFail(machine: Machine, machineGroup: MachineGroup) {
         machineGroup.downStreamGroups.forEach { configureInternal(machineGroup, null, it) }
@@ -63,29 +66,32 @@ public class HaproxyKonfigurator(val templateName: String) : DownStreamKonfigura
     }
 
     fun configureInternal(thisGroup: MachineGroup, downStreamMachine: Machine? = null, downstreamGroup: MachineGroup) {
-        val template = ve.getTemplate(templateName)!!
         thisGroup.machines().filter { it.state() != MachineState.STOPPED } forEach {
-            try {
-                println("Configuring HA Proxy on ${it.name()}")
-                val context = VelocityContext()
-                context["downstreamMachine"] = downStreamMachine;
-                context["downstreamWorkingMachines"] = downstreamGroup.workingMachines();
-                context["downstreamGroup"] = downstreamGroup
-                context["thisGroup"] = thisGroup
-                context["thisMachine"] = it
-                val writer = StringWriter();
-                template.merge(context, writer)
+            configureMachineInternal(it, downstreamGroup, thisGroup);
 
-                val file = File.createTempFile("haproxy", ".cfg")
-                file.writeText(writer.getBuffer().toString())
-                file.scp(host = it.hostname(), path = "/etc/haproxy/haproxy.cfg")
-                "service haproxy restart".onHost(it.hostname())
-                println("Configured HA Proxy on ${it.name()}")
-            } catch (e: Exception) {
-                println("${e.getMessage()} on ${it.name()}")
-            }
+        }
+    }
 
+    fun configureMachineInternal(it: Machine, downstreamGroup: MachineGroup, thisGroup: MachineGroup) {
+        val template = ve.getTemplate(templateName)!!
+        try {
+            println("Configuring HA Proxy on ${it.name()}")
+            val context = VelocityContext()
+            context["downstreamWorkingMachines"] = downstreamGroup.workingMachines();
+            context["downstreamMachines"] = downstreamGroup.machines();
+            context["downstreamGroup"] = downstreamGroup
+            context["thisGroup"] = thisGroup
+            context["thisMachine"] = it
+            val writer = StringWriter();
+            template.merge(context, writer)
 
+            val file = File.createTempFile("haproxy", ".cfg")
+            file.writeText(writer.getBuffer().toString())
+            file.scp(host = it.hostname(), path = "/etc/haproxy/haproxy.cfg")
+            "service haproxy restart".onHost(it.hostname())
+            println("Configured HA Proxy on ${it.name()}")
+        } catch (e: Exception) {
+            println("${e.getMessage()} on ${it.name()}")
         }
     }
 

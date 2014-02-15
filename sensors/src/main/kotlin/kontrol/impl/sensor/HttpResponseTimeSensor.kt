@@ -27,7 +27,7 @@ import java.util.Locale
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class HttpResponseTimeSensor(val path: String) : Sensor {
+public class HttpResponseTimeSensor(val path: String, val port: Int = 80) : Sensor {
 
     override fun name(): String {
         return "http-response-time"
@@ -39,7 +39,7 @@ public class HttpResponseTimeSensor(val path: String) : Sensor {
                 machine.hostname().isNotEmpty() -> {
 
                     val start = System.currentTimeMillis();
-                    val URI = URL("http", machine.hostname(), 80, path).toURI()
+                    val URI = URL("http", machine.hostname(), port, path).toURI()
                     HttpUtil.getStatus(URI, Locale.getDefault(), 10 * 1000)
                     System.currentTimeMillis() - start
 

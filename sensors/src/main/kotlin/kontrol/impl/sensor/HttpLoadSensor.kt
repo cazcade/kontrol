@@ -38,9 +38,14 @@ public class HttpLoadSensor(val path: String) : LoadSensor {
                 machine.hostname().isNotEmpty() -> {
 
                     val URI = URL("http", machine.hostname(), 80, path).toURI()
-                    val load = HttpUtil.getUrlAsString(URI, 3000)?.toDouble()
-                    //                    println("$URI responded with $load")
-                    load;
+                    val loadStr = HttpUtil.getUrlAsString(URI, 60000)
+                    if (loadStr == "disabled") {
+                        0.0;
+                    } else {
+                        val load = loadStr?.toDouble()
+                        //                    println("$URI responded with $load")
+                        load;
+                    }
 
                 }
                 else -> {

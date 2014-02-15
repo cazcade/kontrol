@@ -34,12 +34,13 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     val downStreamKonfigurator: DownStreamKonfigurator?
     val stateMachine: StateMachine<MachineGroupState>
     val sensors: SensorArray;
+    var disabled: Boolean;
     val defaultMachineRules: StateMachineRules<MachineState>
     val monitor: Monitor<MachineGroupState, MachineGroup>
     val machineMonitorRules: SortedSet<MonitorRule<MachineState, Machine>>
     val groupMonitorRules: SortedSet<MonitorRule<MachineGroupState, MachineGroup>>
-    val upstreamGroups: List<MachineGroup>
-    val downStreamGroups: List<MachineGroup>
+    val upstreamGroups: MutableList<MachineGroup>
+    val downStreamGroups: MutableList<MachineGroup>
     val min: Int
     val max: Int
     val hardMax: Int
@@ -50,7 +51,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     override fun state(): MachineGroupState? {
         return stateMachine.state()
     }
-    override fun transition(state: MachineGroupState) {
+    override fun transition(state: MachineGroupState?) {
         stateMachine.transition(state)
     }
     override fun name(): String
@@ -58,9 +59,11 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     fun machines(): List<Machine>
 
     fun workingSize(): Int = workingMachines().size();
-    fun activeSize(): Int = enabledMachines().filter { !(it.state() in listOf(MachineState.FAILED, MachineState.REBUILDING, MachineState.RESTARTING, MachineState.DEAD, MachineState.BROKEN)) }.size();
+    fun activeSize(): Int = enabledMachines().filter { !(it.state() in listOf(MachineState.FAILED, MachineState.REPAIR, MachineState.DEAD, MachineState.BROKEN, MachineState.UPGRADE_FAILED)) }.size();
     fun enabledMachines(): List<Machine> = machines().filter { it.enabled }
+    fun brokenMachines(): List<Machine> = machines().filter { it.enabled && it.state() in listOf(MachineState.FAILED, MachineState.DEAD, MachineState.BROKEN, MachineState.UPGRADE_FAILED) }
     fun workingMachines(): List<Machine> = enabledMachines().filter { it.state() in listOf(MachineState.OK, MachineState.STALE, null) }
+    fun workingAndReadyMachines(): List<Machine> = enabledMachines().filter { it.state() in listOf(MachineState.OK, MachineState.STALE) }
 
     fun get(value: String): Double? {
         val values = machines()  map { it[value] }
@@ -84,6 +87,11 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
         return result;
     }
 
+
+    fun clearState(machine: Machine) {
+        machine.transition(null);
+
+    }
     fun postmortem(machine: Machine): List<PostmortemResult> = postmortems.map {
         try {
             it.perform(machine)
@@ -103,7 +111,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     }
 
     fun other(machine: Machine): Machine? {
-        val list = workingMachines().filter { it != machine }
+        val list = workingAndReadyMachines().filter { it != machine }
         return if (list.size() > 0) {
             list.first()
         } else {
@@ -118,21 +126,26 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
         try {
             failover(machine);
             action(machine);
-        } finally {
-            machine.enable();
+        } catch(e: Exception) {
+            e.printStackTrace();
         }
+        machine.enable();
     }
 
     fun failover(machine: Machine): MachineGroup {
-        println("**** Failover Machine ${machine.ip()}");
-        try {
-            downStreamKonfigurator?.onMachineFail(machine, this);
-            upStreamKonfigurator?.onMachineFail(machine, this)
-            upstreamGroups.forEach { it.downstreamFailover(machine, this) }
-        } catch (e: Exception) {
-            throw e
+        if (other(machine) == null) {
+            throw IllegalStateException("No machine to take over cannot failover")
+        } else {
+            println("**** Failover Machine ${machine.ip()}");
+            try {
+                downStreamKonfigurator?.onMachineFail(machine, this);
+                upStreamKonfigurator?.onMachineFail(machine, this)
+                upstreamGroups.forEach { it.downstreamFailover(machine, this) }
+            } catch (e: Exception) {
+                throw e
+            }
+            return this;
         }
-        return this;
     }
 
     fun failback(machine: Machine): MachineGroup {
@@ -165,23 +178,31 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     fun configure(): MachineGroup {
         println("**** Configure ${name()}");
         upStreamKonfigurator?.configureUpStream(this)
+        downStreamKonfigurator?.configureDownStream(this)
         return this;
     }
-    fun expand(): MachineGroup {
+
+    fun configure(machine: Machine): Machine {
+        println("**** Configure ${name()}");
+        upStreamKonfigurator?.configureUpStream(this)
+        downStreamKonfigurator?.configureDownStream(this, machine)
+        return machine;
+    }
+
+
+    fun expand(): Machine {
         println("**** Expand ${name()}");
-        return this;
+        throw UnsupportedOperationException()
     }
     fun contract(): MachineGroup {
         println("**** Contract ${name()}");
         return this;
     }
-    fun reImage(machine: Machine): MachineGroup {
-        machine.fsm.transition(MachineState.REBUILDING)
+    fun rebuild(machine: Machine): MachineGroup {
         println("**** Re Image Machine ${machine.name()}(${machine.id()})");
         return this;
     }
     fun restart(machine: Machine): MachineGroup {
-        machine.fsm.transition(MachineState.RESTARTING)
         println("**** Re Start Machine ${machine.name()}(${machine.id()})");
         return this;
     }
@@ -237,7 +258,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
                               val newState: MachineState?) {
 
 
-        var registry: Controller? = null;
+        var controller: Controller? = null;
         var recheck = false;
 
         fun recheck(b: Recheck): RuleBuilder1 {
@@ -247,14 +268,14 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
 
 
         fun tell(registry: Controller): RuleBuilder1 {
-            this.registry = registry;
+            this.controller = registry;
             return this;
         }
 
         fun takeAction(vararg actions: Action): MachineGroup {
             machineGroup.defaultMachineRules.on<Machine>(null, newState, { machine ->
                 if (!recheck || machine.fsm.state() == newState) {
-                    actions.forEach { action -> registry?.execute(machineGroup, machine, { true }, action) }
+                    actions.forEach { action -> println("**** TAKING ACTION $action ****");controller?.execute(machineGroup, machine, { true }, action) }
                 } else {
                     println("RECHECK FAILED for $actions")
                 }
@@ -265,7 +286,10 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
         fun takeActions(actions: List<Action>): MachineGroup {
             machineGroup.defaultMachineRules.on<Machine>(null, newState, { machine ->
                 if (!recheck || machine.fsm.state() == newState) {
-                    actions.forEach { action -> registry?.execute(machineGroup, machine, { true }, action) }
+                    actions.forEach { action ->
+                        println("**** TAKING ACTION $action ON ${machine.id()} ****");
+                        controller?.execute(machineGroup, machine, { true }, action)
+                    }
                 } else {
                     println("RECHECK FAILED for $actions")
                 }

@@ -14,34 +14,25 @@
  * limitations under the License.
  */
 
-package kontrol.api
+package kontrol.staticmc
+
+import kontrol.api.Infrastructure
+import kontrol.api.Topology
+import kontrol.api.MachineGroup
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public trait DownStreamKonfigurator : Konfigurator{
+public class MixedCloud(val members: Map<String, MachineGroup>) : Infrastructure{
 
-    fun onDownStreamMachineFail(machine: Machine,
-                                machineGroup: MachineGroup,
-                                thisGroup: MachineGroup) {
 
+    override fun topology(): Topology {
+        return  MixedTopology(members);
     }
 
-
-    fun onDownStreamMachineUnfail(machine: Machine,
-                                  machineGroup: MachineGroup,
-                                  thisGroup: MachineGroup) {
-
+    public fun toString(): String {
+        return topology().toString();
     }
 
-
-    fun configureDownStream(thisGroup: MachineGroup) {
-
-    }
-
-
-    fun configureDownStream(thisGroup: MachineGroup, machine: Machine) {
-
-    }
 }

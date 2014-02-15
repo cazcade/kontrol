@@ -24,12 +24,13 @@ import net.schmizz.sshj.connection.channel.direct.Session
 import java.util.concurrent.TimeUnit
 import net.schmizz.sshj.connection.channel.direct.Session.Command
 import kontrol.api.sensor.SensorValue
+import kontrol.api.OS
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class SSHLoadSensor : LoadSensor{
+public class SSHLoadSensor(val user: String = "root", val os: OS = OS.LINUX) : LoadSensor{
     override fun name(): String {
         return "load";
     }
@@ -47,11 +48,21 @@ public class SSHLoadSensor : LoadSensor{
             ssh.addHostKeyVerifier { a, b, c -> true };
             ssh.connect(machine.ip());
             try {
-                ssh.authPublickey("root");
+                ssh.authPublickey(user);
                 val session: Session? = ssh.startSession();
                 try {
-                    val cmd: Command? = session?.exec("cat /proc/loadavg | cut -d' ' -f1 | tr -d ' '");
-                    val load = IOUtils.readFully(cmd?.getInputStream()).toString().toDouble()
+                    val cmd: Command?
+                    cmd = when (os) {
+                        OS.LINUX -> {
+                            session?.exec("cat /proc/loadavg | cut -d' ' -f1 | tr -d ' '")
+                        }
+                        OS.OSX -> {
+                            session?.exec("uptime | cut -d: -f4| tr ',' ' '| cut -d' ' -f2 | tr -d ' '");
+                        }
+                        else -> throw IllegalArgumentException("Unsupported OS $os")
+                    }
+
+                    val load = IOUtils.readFully(cmd?.getInputStream()).toString().trim().toDouble()
                     cmd?.join(5, TimeUnit.SECONDS);
                     return SensorValue(name(), load);
                 } finally {

@@ -43,6 +43,9 @@ public trait Topology {
         return this;
     }
 
+    fun costPerHourInDollars(): Double = members.values().map { it.costPerHourInDollars() }.sum();
+    fun costPerMonthInDollars(): Double = members.values().map { it.costPerMonthInDollars() }.sum();
+
     fun eachMachine(action: (Machine) -> Unit): Topology {
         members().values().forEach { it.machines().forEach { action(it) } };
         return this;

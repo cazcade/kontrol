@@ -39,7 +39,7 @@ import kontrol.ext.string.ssh.onHost
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
+public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFactory,
                                       public override val controller: Controller,
                                       val name: String,
                                       override val sensors: SensorArray,
@@ -48,10 +48,11 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
                                       public override val min: Int,
                                       public override val max: Int,
                                       public override val hardMax: Int,
-                                      override val upstreamGroups: List<MachineGroup>,
+                                      override val upstreamGroups: MutableList<MachineGroup>,
                                       override val postmortems: List<Postmortem>,
                                       override val downStreamKonfigurator: DownStreamKonfigurator? = null,
                                       override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
+    override var disabled: Boolean = false
 
 
     override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
@@ -85,14 +86,14 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
     }
 
     override fun contract(): MachineGroup {
-        val digitalOcean = apiFactory.instance()
+        val digitalOcean = clientFactory.instance()
         println("CONTRACTING GROUP ${name()} REQUESTED")
         try {
 
             println("Destroying m/c")
-            var machs = machines.values().filter { it.state() !in listOf(MachineState.OK, null) }
+            var machs = machines.values().filter { it.enabled && it.state() !in listOf(MachineState.OK, MachineState.STALE, null) }
             if (machs.size() == 0) {
-                machs = machines.values().filter { it.droplet.status?.toLowerCase() == "active" }.sortBy { it.id() };
+                machs = machines.values().filter { it.enabled && it.droplet.status?.toLowerCase() == "active" }.sortBy { it.id() };
             }
             val machine = machs.first()
             machine.disable()
@@ -118,12 +119,12 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
     }
 
 
-    override fun expand(): MachineGroup {
+    override fun expand(): Machine {
         val droplet = Droplet()
         droplet.name = (config.machinePrefix + name)
         droplet.size_id = (config.dropletSizeId)
 
-        val instance = apiFactory.instance()
+        val instance = clientFactory.instance()
         val availableRegions = instance.getAvailableRegions()
         //        droplet.setRegionId(availableRegions?.get((Math.random() * (availableRegions?.size()?.toDouble()?:0.0)).toInt())?.getId());
         droplet.region_id = (config.regionId)
@@ -153,7 +154,10 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         } else {
         }
         configure()
-        return this;
+        val newMachine = DigitalOceanMachine(createdDroplet, clientFactory, sensors, controller, name)
+        machines.put(createdDroplet.id.toString(), newMachine);
+        newMachine.fsm.rules = defaultMachineRules
+        return newMachine;
 
     }
 
@@ -162,7 +166,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
         val id = machine.id().toInt()
         try {
             println("Destroying $machine")
-            val digitalOcean = apiFactory.instance();
+            val digitalOcean = clientFactory.instance();
             digitalOcean.deleteDroplet(id);
         } catch (e: Exception) {
             println("Failed to destroy ${id} due to ${e.getMessage()}")
@@ -174,7 +178,7 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
 
     fun waitForRestart(id: Int) {
         var count1: Int = 0;
-        val instance = apiFactory.instance()
+        val instance = clientFactory.instance()
         while (instance.getDropletInfo(id).status == "active" && count1++ < 60) {
             println("Waiting for machine ${id} to stop being active")
             Thread.sleep(5000);
@@ -188,12 +192,12 @@ public class DigitalOceanMachineGroup(val apiFactory: DigitalOceanClientFactory,
 
     }
 
-    override fun reImage(machine: Machine): MachineGroup {
-        super.reImage(machine)
+    override fun rebuild(machine: Machine): MachineGroup {
+        super.rebuild(machine)
         val id = machine.id().toInt()
         try {
 
-            val instance = apiFactory.instance()
+            val instance = clientFactory.instance()
             val images = instance.getAvailableImages()
             var imageId: Int? = null;
             for (image in images) {

@@ -46,9 +46,9 @@ public class DigitalOceanMachineGroupMonitor(val group: DigitalOceanMachineGroup
         try {
             val machines = HashMap<String, DigitalOceanMachine>();
 
-            for (droplet in group.apiFactory.instance().droplets()) {
+            for (droplet in group.clientFactory.instance().droplets()) {
                 if (droplet.name?.startsWith(group.config.machinePrefix + group.name)!!) {
-                    val digitalOceanMachine = DigitalOceanMachine(droplet, group.apiFactory, sensorArray, controller, group.name)
+                    val digitalOceanMachine = DigitalOceanMachine(droplet, group.clientFactory, sensorArray, controller, group.name)
                     machines.put(droplet.id.toString(), digitalOceanMachine)
                 }
 
@@ -61,7 +61,7 @@ public class DigitalOceanMachineGroupMonitor(val group: DigitalOceanMachineGroup
                     group.machines.putIfAbsent(entry.key, entry.value);
                 }
             }
-            group.machines.keySet().filterNot { machines.containsKey(it) }.forEach { group.machines.remove(it) }
+            group.machines.keySet().filterNot { machines.containsKey(it) }.forEach { group.machines.remove(it)?.stopMonitoring() }
 
 
         } catch (e: Throwable) {

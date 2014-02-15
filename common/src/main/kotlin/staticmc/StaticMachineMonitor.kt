@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package kontrol.digitalocean
+package kontrol.staticmc
 
 import kontrol.api.MachineState
 import kontrol.api.Monitor
@@ -23,12 +23,13 @@ import kontrol.api.Machine
 import kontrol.api.MonitorRule
 import kontrol.api.Controller
 import kontrol.common.BoundedComparableTemporalCollection
+import kontrol.digitalocean.StaticMachine
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFactory, val target: DigitalOceanMachine, val stateMachine: StateMachine<MachineState>, val controller: Controller) : Monitor<MachineState, Machine>{
+public  class StaticMachineMonitor(val target: StaticMachine, val stateMachine: StateMachine<MachineState>, val controller: Controller) : Monitor<MachineState, Machine>{
     override fun target(): Machine {
 
         return target;
@@ -39,13 +40,13 @@ public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFa
 
 
     override fun heartbeat() {
-        when (target.droplet.status?.toLowerCase()) {
-            "archive", "off" -> stateMachine.attemptTransition(MachineState.STOPPED)
-        }
+        //        when (target.droplet.status?.toLowerCase()) {
+        //            "off" -> stateMachine.attemptTransition(MachineState.STOPPED)
+        //            "new" -> stateMachine.attemptTransition(MachineState.RESTARTING)
+        //            "archive" -> stateMachine.attemptTransition(MachineState.STOPPING)
+        //        }
     }
     override fun update() {
-        val doa = clientFactory.instance();
-        target.droplet = doa.getDropletInfo(target.droplet.id?:-1) ?: target.droplet;
         if (target.state() !in listOf(MachineState.REPAIR, MachineState.STOPPED)) {
             target.sensorArray.values(target).entrySet().forEach {
                 if (!target.data.containsKey(it.key)) {

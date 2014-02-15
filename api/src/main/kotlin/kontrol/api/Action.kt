@@ -18,10 +18,12 @@ package kontrol.api
 
 
 public enum class Action {
-    RESTART_MACHINE
+    FIX
     DESTROY_MACHINE
     UPGRADE
-    REIMAGE_MACHINE
+    DOWNGRADE
+    REBUILD
     FAILOVER
     FAILBACK
+    STAGGER
 }

@@ -25,17 +25,17 @@ import kontrol.ext.string.ssh.onHost
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class WorkerKonfigurator : UpStreamKonfigurator {
+public class WorkerKonfigurator(val user: String = "root") : UpStreamKonfigurator {
 
 
     override fun onMachineFail(machine: Machine, machineGroup: MachineGroup) {
-        "touch /tmp/snapito-disable" onHost machine.hostname()
+        "touch /tmp/snapito-disable".onHost(machine.hostname(), user)
         Thread.sleep(30 * 1000)
     }
 
 
     override fun onMachineUnfail(machine: Machine, machineGroup: MachineGroup) {
-        "rm /tmp/snapito-disable" onHost machine.hostname()
+        "rm /tmp/snapito-disable".onHost(machine.hostname(), user)
     }
 
 

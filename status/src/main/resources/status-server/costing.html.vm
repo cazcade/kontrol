@@ -19,7 +19,11 @@
 
     <div class="container">
         <div class="page-header">
-            <h1>Status</h1>
+            <h1>Costings</h1>
+
+            <h2>Total
+                <small>$ ${topology.costPerHourInDollars()}/hr $ ${topology.costPerMonthInDollars()}/mth</small>
+            </h2>
         </div>
         #foreach($group in $topology.members.values())
             <div class="row">

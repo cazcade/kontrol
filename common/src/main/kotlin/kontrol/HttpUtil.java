@@ -24,6 +24,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -138,8 +139,17 @@ public class HttpUtil {
         try {
             HttpGet request = new HttpGet(url);
             request.addHeader("Accept-Language", locale.toLanguageTag());
-            return getCookielessHttpClient(timeout).execute(request).getStatusLine().getStatusCode();
+            HttpResponse response = getCookielessHttpClient(timeout).execute(request);
+            if (response.getStatusLine().getStatusCode() >= 400) {
+                System.err.println(url);
+                System.err.println(response.getStatusLine().getStatusCode() + ":" + IOUtils.toString(response.getEntity().getContent()));
+            }
+            return response.getStatusLine().getStatusCode();
+        } catch (ConnectTimeoutException e) {
+            System.err.println(e.getMessage());
+            return -1;
         } catch (Exception e) {
+            System.err.println(e.getMessage());
             return 999;
         }
     }

@@ -22,7 +22,7 @@ package kontrol.api
  */
 public trait Monitorable<E : Enum<E>> {
     fun state(): E?
-    fun transition(state: E)
+    fun transition(state: E?)
     var enabled: Boolean
     fun name(): String
     fun id(): String

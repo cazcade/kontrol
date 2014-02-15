@@ -21,6 +21,8 @@ import kontrol.api.sensor.SensorValue
 import java.io.Serializable
 
 
+enum class OS {LINUX OSX WINDOWS
+}
 /**
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  * @todo document.
@@ -30,6 +32,7 @@ public trait Machine : Monitorable<MachineState>, Serializable {
     var disableAction: ((Machine) -> Unit)?;
     var enableAction: ((Machine) -> Unit)?;
     var data: ConcurrentMap<String, ComparableTemporalStore<SensorValue>>;
+
 
     fun latestDataValues(): Map<String, SensorValue?> {
         return data.mapValues { it.value.lastEntry() }
@@ -77,7 +80,7 @@ public trait Machine : Monitorable<MachineState>, Serializable {
         return (data[s]!! within (0..window)).map { it?.D() };
     }
 
-    override fun transition(state: MachineState) {
+    override fun transition(state: MachineState?) {
         fsm.transition(state)
     }
 

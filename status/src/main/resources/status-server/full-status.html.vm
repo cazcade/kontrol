@@ -34,13 +34,17 @@
 
                         #foreach($machine in $group.enabledMachines())
 
-                            #if($machine.state().toString() == "OK")
+                            #if(!${machine.state()})
+                            <tr class="">
+                            #elseif($machine.state().toString() == "OK")
                             <tr class="success">
                             #elseif($machine.state().toString() == "BROKEN")
                             <tr class="danger">
                             #elseif($machine.state().toString() == "DEAD")
                             <tr class="danger">
                             #elseif($machine.state().toString() == "REBUILDING")
+                            <tr class="warning">
+                            #elseif($machine.state().toString() == "OVERLOADED")
                             <tr class="warning">
                             #elseif($machine.state().toString() == "FAILED")
                             <tr class="danger">
@@ -53,7 +57,7 @@
                             #elseif($machine.state().toString() == "UNKNOWN")
                             <tr class="warning">
                             #elseif($machine.state().toString() == "STALE")
-                            <tr class="info">
+                            <tr class="success">
                             #else
                             <tr>
                             #end

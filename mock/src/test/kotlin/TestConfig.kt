@@ -33,20 +33,12 @@ import kontrol.api.MachineGroup.Recheck.*;
 
 public fun defaultTranstitions(group: MachineGroup) {
 
-    group allowMachine (RESTARTING to OK);
-    group allowMachine (RESTARTING to BROKEN);
-    group allowMachine (RESTARTING to STOPPED);
-    group allowMachine (OK to STOPPING);
     group allowMachine (OK to STOPPED);
     group allowMachine (OK to BROKEN);
     group allowMachine (OK to STALE);
-    group allowMachine (STOPPING to STOPPED);
-    group allowMachine (STOPPING to RESTARTING);
-    group allowMachine (BROKEN to STOPPING);
     group allowMachine (BROKEN to STOPPED);
     group allowMachine (BROKEN to OK);
     group allowMachine (BROKEN to DEAD);
-    group allowMachine (STALE to  STOPPING);
 
     group allow (QUIET to BUSY);
     group allow (QUIET to NORMAL);
@@ -67,7 +59,7 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
     infra.topology().each {
         val group = it;
 
-        group memberIs OK ifStateIn listOf(BROKEN, RESTARTING) andTest {
+        group memberIs OK ifStateIn listOf(BROKEN) andTest {
             it.data["http-status"]?.lastEntry()?.I()?:999 < 400 && it["load"]?.D()?:0.0 < 30
         } after 5 seconds "http-ok"
 
@@ -76,9 +68,9 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
         when(it.name()) {
             "lb" -> {
                 val balancers = it;
-                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest { it["http-status"]?.I()?:222 >= 400 } after 2 seconds "http-broken"
+                balancers memberIs BROKEN ifStateIn listOf(OK, STALE) andTest { it["http-status"]?.I()?:222 >= 400 } after 2 seconds "http-broken"
 
-                balancers memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 2 seconds "mega-overload"
+                balancers memberIs BROKEN ifStateIn listOf(OK, STALE) andTest { it["load"]?.D()?:0.0 > 30 } after 2 seconds "mega-overload"
                 group becomes BUSY ifStateIn listOf(QUIET, NORMAL, null) andTest { it.get("load")?:0.0 > 3.0 }  after 2 seconds "overload"
                 group becomes QUIET ifStateIn listOf(BUSY, NORMAL, null) andTest { it.get("load")?:1.0 < 1.0 }  after 5 seconds "underload"
                 group becomes NORMAL ifStateIn listOf(QUIET, BUSY, null) andTest { it.get("load")?:1.0 in 1.0..3.0 }  after 5 seconds "group-ok"
@@ -86,11 +78,11 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
             "gateway" -> {
 
                 val gateways = it;
-                gateways memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest {
+                gateways memberIs BROKEN ifStateIn listOf(OK, STALE) andTest {
                     it["http-status"]?.I()?:222 >= 400
                 } after 3 seconds "http-broken"
 
-                gateways memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest {
+                gateways memberIs BROKEN ifStateIn listOf(OK, STALE) andTest {
                     it["load"]?.D()?:0.0 > 30
                 } after 3 seconds "mega-overload"
 
@@ -102,9 +94,9 @@ public fun snapitoSensorActions(infra: Infrastructure, controller: Controller) {
             }
             "worker" -> {
                 val workers = it;
-                workers memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest { it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 2.0 } after 30 seconds "http-broken"
+                workers memberIs BROKEN ifStateIn listOf(OK, STALE) andTest { it["http-status"]?.I()?:999 >= 400 && it["http-load"]?.D()?:2.0 < 2.0 } after 30 seconds "http-broken"
 
-                workers memberIs BROKEN ifStateIn listOf(OK, STALE, RESTARTING) andTest { it["load"]?.D()?:0.0 > 30 } after 5 seconds "mega-overload"
+                workers memberIs BROKEN ifStateIn listOf(OK, STALE) andTest { it["load"]?.D()?:0.0 > 30 } after 5 seconds "mega-overload"
 
                 group becomes BUSY ifStateIn listOf(BUSY, QUIET, NORMAL, null) andTest { it.get("http-load")?:1.0 > 5.0 || group.activeSize() < group.min }  after 20 seconds "overload"
 
@@ -122,22 +114,22 @@ public fun snapitoPolicy(infra: Infrastructure, controller: Controller) {
         when(it.name()) {
             "lb" -> {
                 val balancers = it;
-                balancers whenMachine BROKEN recheck THEN tell controller  takeAction RESTART_MACHINE ;
-                balancers whenMachine DEAD recheck THEN tell controller  takeAction REIMAGE_MACHINE ;
-                balancers whenMachine STALE recheck THEN  tell controller takeAction REIMAGE_MACHINE;
+                balancers whenMachine BROKEN recheck THEN tell controller  takeAction FIX ;
+                balancers whenMachine DEAD recheck THEN tell controller  takeAction REBUILD ;
+                balancers whenMachine STALE recheck THEN  tell controller takeAction REBUILD;
             }
             "gateway" -> {
                 val gateways = it;
-                gateways whenMachine BROKEN recheck THEN tell controller  takeAction RESTART_MACHINE;
-                gateways whenMachine DEAD recheck THEN tell controller  takeAction REIMAGE_MACHINE ;
-                gateways whenMachine STALE recheck THEN tell controller   takeAction REIMAGE_MACHINE;
+                gateways whenMachine BROKEN recheck THEN tell controller  takeAction FIX;
+                gateways whenMachine DEAD recheck THEN tell controller  takeAction REBUILD ;
+                gateways whenMachine STALE recheck THEN tell controller   takeAction REBUILD;
             }
             "worker" -> {
                 val workers = it;
-                workers whenMachine BROKEN recheck THEN tell controller  takeAction RESTART_MACHINE;
+                workers whenMachine BROKEN recheck THEN tell controller  takeAction FIX;
                 workers whenMachine DEAD recheck THEN tell controller  takeAction DESTROY_MACHINE;
                 workers whenGroup BUSY recheck THEN use controller   takeAction EXPAND;
-                workers whenMachine STALE recheck THEN tell controller takeAction  REIMAGE_MACHINE;
+                workers whenMachine STALE recheck THEN tell controller takeAction  REBUILD;
                 workers whenGroup QUIET recheck THEN use controller  takeAction CONTRACT;
             }
         }
@@ -149,19 +141,19 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
         when(it.name()) {
             "lb" -> {
                 val balancers = it;
-                controller will { balancers.failover(it).reImage(it).configure().failback(it);java.lang.String() } takeAction REIMAGE_MACHINE inGroup balancers;
+                controller will { balancers.failover(it).rebuild(it).configure().failback(it);java.lang.String() } takeAction REBUILD inGroup balancers;
                 controller will { balancers.failover(it).destroy(it);java.lang.String() } takeAction DESTROY_MACHINE inGroup balancers;
-                controller will { balancers.failover(it).restart(it).failback(it);java.lang.String() } takeAction RESTART_MACHINE inGroup balancers;
+                controller will { balancers.failover(it).restart(it).failback(it);java.lang.String() } takeAction FIX inGroup balancers;
             }
             "gateway" -> {
                 val gateways = it;
                 controller will {
                     gateways.failover(it);
                     infra.topology().get("lb").configure();
-                    gateways.reImage(it).failback(it);
+                    gateways.rebuild(it).failback(it);
                     infra.topology().get("lb").configure()
                     ;java.lang.String()
-                } takeAction REIMAGE_MACHINE inGroup gateways;
+                } takeAction REBUILD inGroup gateways;
 
                 controller will {
                     gateways.failover(it).destroy(it);
@@ -175,13 +167,13 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                     gateways.restart(it).failback(it);
                     infra.topology().get("lb").configure()
                     ;java.lang.String()
-                } takeAction RESTART_MACHINE inGroup gateways;
+                } takeAction FIX inGroup gateways;
             }
             "worker" -> {
                 val workers = it;
-                controller will { workers.failover(it).reImage(it);java.lang.String() } takeAction REIMAGE_MACHINE inGroup workers;
+                controller will { workers.failover(it).rebuild(it);java.lang.String() } takeAction REBUILD inGroup workers;
                 controller will { workers.failover(it).destroy(it);java.lang.String() } takeAction DESTROY_MACHINE inGroup workers;
-                controller will { workers.failover(it).restart(it).failback(it) ;java.lang.String() } takeAction RESTART_MACHINE inGroup workers;
+                controller will { workers.failover(it).restart(it).failback(it) ;java.lang.String() } takeAction FIX inGroup workers;
                 controller use { workers.expand() ;java.lang.String() } to EXPAND  IF { workers.activeSize() < workers.max }  group workers;
                 controller use { workers.contract();java.lang.String() } to CONTRACT IF { workers.activeSize() > workers.min } group workers;
             }

@@ -62,8 +62,8 @@ public trait Controller {
         var machineAction: Action? = null;
         var ifClause: () -> Boolean = { true };
 
-        fun IF(unless: () -> Boolean): MachineRuleBuilder {
-            this.ifClause = unless;
+        fun IF(ifClause: () -> Boolean): MachineRuleBuilder {
+            this.ifClause = ifClause;
             return this;
         }
 
@@ -75,13 +75,7 @@ public trait Controller {
 
         fun inGroup(group: MachineGroup) {
             if (machineAction != null) {
-                actionRegistry.register(group, machineAction!!, ifClause, {
-                    if (ifClause()) {
-                        action(it)
-                    } else {
-                        java.lang.String()
-                    }
-                });
+                actionRegistry.register(group, machineAction!!, ifClause, { action(it) });
             }
 
         }

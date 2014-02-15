@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class FountainExecutorServiceImpl extends AbstractServiceStateMachine implements FountainExecutorService {
 
+    private final String name;
     private final int maxRetry;
 
     private final int buckets;
@@ -31,8 +32,9 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
 
     private final AtomicLong count = new AtomicLong();
 
-    public FountainExecutorServiceImpl(final int maxRetry, final int buckets, final int queueSize, final int requeueDelay, final int threadsPerBucket) {
+    public FountainExecutorServiceImpl(final String name, final int maxRetry, final int buckets, final int queueSize, final int requeueDelay, final int threadsPerBucket) {
         super();
+        this.name = name;
         this.maxRetry = maxRetry;
         this.buckets = buckets;
         this.queueSize = queueSize;
@@ -43,20 +45,48 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
     public void execute(final boolean retry, final Object key, final FountainExecutable executable) throws InterruptedException {
         begin();
         try {
-            executeInternal(retry, false, executable, executors.get(Math.abs(key.hashCode() % buckets)));
+            executeInternal(retry, false, executable, getThreadPoolExecutor(key));
         } finally {
             end();
         }
+    }
+
+    private ThreadPoolExecutor getThreadPoolExecutor(Object key) {
+        int index = hashToBucket(key);
+        ThreadPoolExecutor threadPoolExecutor = executors.get(index);
+        if (threadPoolExecutor == null) {
+            threadPoolExecutor = createExecutor();
+            executors.set(index, threadPoolExecutor);
+        }
+        return threadPoolExecutor;
     }
 
     @Override
     public void submit(final boolean retry, final Object key, final FountainExecutable executable) throws InterruptedException {
         begin();
         try {
-            executeInternal(retry, true, executable, executors.get(Math.abs(key.hashCode() % buckets)));
+            executeInternal(retry, true, executable, getThreadPoolExecutor(key));
         } finally {
             end();
         }
+    }
+
+    private int hashToBucket(Object key) {
+        byte[] bytes = key.toString().getBytes();
+        long hashedValue = 1;
+        for (byte aByte : bytes) {
+            hashedValue += Math.abs(aByte) * 39;
+        }
+        for (byte aByte : bytes) {
+            hashedValue *= Math.abs(aByte) / 7 + 1;
+        }
+        for (byte aByte : bytes) {
+            hashedValue += Math.abs(aByte) * 13 - hashedValue / 3;
+        }
+//        System.out.println("Hashed value " + hashedValue);
+        int hashInt = (int) (Math.abs(hashedValue) % buckets);
+//        System.out.println("Hash bucket is " + hashInt);
+        return hashInt;
     }
 
     private void executeInternal(final boolean retry, boolean submit, final FountainExecutable executable, final ThreadPoolExecutor threadPoolExecutor) throws InterruptedException {
@@ -104,15 +134,18 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
                         }
                     }
                 };
-                System.out.println("Queue size is " + threadPoolExecutor.getQueue().size());
                 if (submit) {
+                    System.out.println(name + ": Submitted request, queue is " + threadPoolExecutor.getQueue().size() + " long");
+
                     threadPoolExecutor.submit(command);
                 } else {
+                    System.out.println(name + ": Executing request, queue is " + threadPoolExecutor.getQueue().size() + " long");
                     threadPoolExecutor.execute(command);
                 }
                 cont = false;
                 count.incrementAndGet();
             } catch (RejectedExecutionException e) {
+                System.out.println(name + ": Queue size at limit " + threadPoolExecutor.getQueue().size() + " requeing");
                 Thread.sleep(requeueDelay);
             }
         }
@@ -147,9 +180,13 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
         super.start();
         executors = new ArrayList<ThreadPoolExecutor>(buckets);
         for (int i = 0; i < buckets; i++) {
-            executors.add(new ThreadPoolExecutor(threadsPerBucket, threadsPerBucket, 3600, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(queueSize), new ThreadPoolExecutor.AbortPolicy()));
+            executors.add(null);
         }
         unlock();
+    }
+
+    private ThreadPoolExecutor createExecutor() {
+        return new ThreadPoolExecutor(threadsPerBucket, threadsPerBucket, 3600, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(queueSize), new ThreadPoolExecutor.AbortPolicy());
     }
 
     @Override
@@ -158,7 +195,9 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
         super.stop();
         try {
             for (int i = 0; i < buckets; i++) {
-                executors.get(i).shutdownNow();
+                if (executors.get(i) != null) {
+                    executors.get(i).shutdownNow();
+                }
             }
             executors.clear();
             System.out.println("Fountain Executor STOPPED");

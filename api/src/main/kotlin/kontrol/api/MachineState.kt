@@ -19,13 +19,14 @@ package kontrol.api
 
 public enum class MachineState {
     UNKNOWN
-    RESTARTING
     OK
-    STOPPING
-    REBUILDING
+    REPAIR
     STOPPED
     BROKEN
+    OVERLOADED
     DEAD
     FAILED
     STALE
+    UPGRADE_FAILED
+
 }

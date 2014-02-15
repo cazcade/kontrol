@@ -33,7 +33,7 @@ public class CloudFlareKonfigurator(val emailAddress: String, val apiKey: String
             configureCloudFlare(newMachine)
         } else {
             println("No 'other' machine.")
-            //            machineGroup.stateMachine.attemptTransition(MachineGroupState.GROUP_BROKEN)
+
         }
     }
 

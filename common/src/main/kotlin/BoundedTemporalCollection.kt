@@ -167,7 +167,7 @@ public open class BoundedTemporalCollection<T>(var limit: Int = 1000) : Temporal
         return list.map { it.v }
     }
     override fun lastEntry(k: String): T? {
-        return list.filter { it.k == k }.last().v
+        return list.filterNotNull().filter { it.k == k }.last().v
     }
 
 
