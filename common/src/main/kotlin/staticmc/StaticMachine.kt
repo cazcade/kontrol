@@ -29,6 +29,7 @@ import kontrol.api.MonitorRule
 import kontrol.api.Controller
 import kontrol.api.ComparableTemporalStore
 import kontrol.staticmc.StaticMachineMonitor
+import kontrol.api.Monitorable
 
 /**
  * @todo document.
@@ -44,8 +45,8 @@ public final class StaticMachine(val sensorArray: SensorArray, val controller: C
     override fun groupName(): String {
         return groupName
     }
-    override var disableAction: ((Machine) -> Unit)? = null
-    override var enableAction: ((Machine) -> Unit)? = null
+    override var disableAction: ((Monitorable<MachineState>) -> Unit)? = null
+    override var enableAction: ((Monitorable<MachineState>) -> Unit)? = null
     override final var data: ConcurrentMap<String, ComparableTemporalStore<SensorValue>> = ConcurrentHashMap();
     override final val fsm: StateMachine<MachineState> = DefaultStateMachine<MachineState>(this);
     override final var monitor: Monitor<MachineState, Machine> = StaticMachineMonitor(this, fsm, controller);

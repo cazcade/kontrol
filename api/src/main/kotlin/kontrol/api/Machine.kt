@@ -29,8 +29,7 @@ enum class OS {LINUX OSX WINDOWS
  */
 public trait Machine : Monitorable<MachineState>, Serializable {
 
-    var disableAction: ((Machine) -> Unit)?;
-    var enableAction: ((Machine) -> Unit)?;
+
     var data: ConcurrentMap<String, ComparableTemporalStore<SensorValue>>;
 
 
@@ -73,7 +72,11 @@ public trait Machine : Monitorable<MachineState>, Serializable {
     }
 
     fun get(s: String): SensorValue? {
-        return data[s]?.lastEntry();
+        return if (data.size() > 0) {
+            data[s]?.lastEntry()
+        } else {
+            null
+        };
     }
 
     fun get(s: String, window: Long): List<Double?> {
@@ -113,19 +116,7 @@ public trait Machine : Monitorable<MachineState>, Serializable {
         return "${name()}@${ip()} (${id()}) [${state()}]  - ${data}";
     }
 
-    fun disable() {
-        enabled = false;
-        if (disableAction != null) {
-            disableAction!!(this)
-        };
-    }
 
-    fun enable() {
-        enabled = true;
-        if (enableAction != null) {
-            enableAction!!(this)
-        };
-    }
 
 
 }

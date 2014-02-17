@@ -34,7 +34,6 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     val downStreamKonfigurator: DownStreamKonfigurator?
     val stateMachine: StateMachine<MachineGroupState>
     val sensors: SensorArray;
-    var disabled: Boolean;
     val defaultMachineRules: StateMachineRules<MachineState>
     val monitor: Monitor<MachineGroupState, MachineGroup>
     val machineMonitorRules: SortedSet<MonitorRule<MachineState, Machine>>
@@ -122,14 +121,12 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
 
     fun failAction(machine: Machine, action: (Machine) -> Unit) {
         println("**** Fail Action for  Machine ${machine.ip()}");
-        machine.disable()
         try {
             failover(machine);
             action(machine);
         } catch(e: Exception) {
             e.printStackTrace();
         }
-        machine.enable();
     }
 
     fun failover(machine: Machine): MachineGroup {
@@ -202,7 +199,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
         println("**** Re Image Machine ${machine.name()}(${machine.id()})");
         return this;
     }
-    fun restart(machine: Machine): MachineGroup {
+    fun fix(machine: Machine): MachineGroup {
         println("**** Re Start Machine ${machine.name()}(${machine.id()})");
         return this;
     }

@@ -141,8 +141,8 @@ public class HttpUtil {
             request.addHeader("Accept-Language", locale.toLanguageTag());
             HttpResponse response = getCookielessHttpClient(timeout).execute(request);
             if (response.getStatusLine().getStatusCode() >= 400) {
-                System.err.println(url);
-                System.err.println(response.getStatusLine().getStatusCode() + ":" + IOUtils.toString(response.getEntity().getContent()));
+                System.err.println(url + ":" + response.getStatusLine().getStatusCode());
+//                System.err.println(response.getStatusLine().getStatusCode() + ":" + IOUtils.toString(response.getEntity().getContent()));
             }
             return response.getStatusLine().getStatusCode();
         } catch (ConnectTimeoutException e) {

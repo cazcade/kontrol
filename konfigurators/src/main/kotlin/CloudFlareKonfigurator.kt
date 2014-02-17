@@ -51,6 +51,7 @@ public class CloudFlareKonfigurator(val emailAddress: String, val apiKey: String
         val records = client.domainRecords(zone).filter { it.display_name == recordName }
         client.update(zone, DomainRecord(`type` = "A", name = recordName, content = machine.ip(), ttl = "1", rec_id = records[0].rec_id))
         println("Configured cloudflare for ${machine.name()}(${machine.id()}) - record id was ${records[0].rec_id}")
+        Thread.sleep(15 * 60 * 1000)
 
     }
 }

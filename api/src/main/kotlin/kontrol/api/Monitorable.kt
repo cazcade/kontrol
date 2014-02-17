@@ -21,11 +21,33 @@ package kontrol.api
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public trait Monitorable<E : Enum<E>> {
+    var disableAction: ((in Monitorable<E>) -> Unit)?;
+    var enableAction: ((in Monitorable<E>) -> Unit)?;
     fun state(): E?
     fun transition(state: E?)
     var enabled: Boolean
     fun name(): String
     fun id(): String
     fun groupName(): String
+
+    fun disabled(): Boolean {
+        return !enabled
+    }
+    fun enabled(): Boolean {
+        return enabled
+    }
+    fun disable() {
+        enabled = false;
+        if (disableAction != null) {
+            disableAction!!(this)
+        };
+    }
+
+    fun enable() {
+        enabled = true;
+        if (enableAction != null) {
+            enableAction!!(this)
+        };
+    }
 
 }

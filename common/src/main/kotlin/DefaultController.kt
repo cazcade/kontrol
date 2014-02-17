@@ -55,10 +55,10 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     val actions = HashMap<String, Pair<() -> Boolean, (Machine) -> Serializable>>();
     val groupActions = HashMap<String, Pair<() -> Boolean, (MachineGroup) -> Serializable>>();
     var executor: ScheduledExecutorService? = null
-    val monitorExec: FountainExecutorService = FountainExecutorServiceImpl("Machine Monitor Queue", 0, 10, 98, 100, 20);
+    val monitorExec: FountainExecutorService = FountainExecutorServiceImpl("Machine Monitor Queue", 0, 64, 98, 100, 20);
     val groupMonitorExec: FountainExecutorService = FountainExecutorServiceImpl("Group Monitor Queue", 0, 10, 97, 100, 20);
-    var groupExec: FountainExecutorService = FountainExecutorServiceImpl("Group Exec Queue", 0, 256, 100, 100, 1);
-    var machineExec: FountainExecutorService = FountainExecutorServiceImpl("Machine Exec Queue", 0, 256, 100, 100, 1);
+    var groupExec: FountainExecutorService = FountainExecutorServiceImpl("Group Exec Queue", 0, 64, 100, 100, 1);
+    var machineExec: FountainExecutorService = FountainExecutorServiceImpl("Machine Exec Queue", 0, 64, 100, 100, 1);
     val unExecutedActions: MutableSet<String> = CopyOnWriteArraySet()
 
     override fun addGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>, target: MachineGroup, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
@@ -181,11 +181,11 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     }
 
     override fun execute(group: MachineGroup, machine: Machine, pre: () -> Boolean, vararg actionArgs: Action): Controller {
-        if (group.disabled) {
+        while (group.disabled()) {
             println("Group ${group.name()} was disabled")
-            return this
-
+            Thread.sleep(100)
         }
+
         if (gracePeriod * 1000 + started > System.currentTimeMillis()) {
             println("Actions ignored during grace period.")
             return this
@@ -198,24 +198,25 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             val action = actions[key];
             if (executionKey in unExecutedActions) {
                 println("Skipping group action for $actionArg on ${machine.id()}")
-            } else
-                if (action != null && action.first() && key !in executionKey) {
-                    println("Performing group action for $actionArg on ${machine.ip()}")
-                    bus.dispatch("machine.action.pre", actionArg to machine.id());
-                    unExecutedActions.add(executionKey);
-                    machineExec.submit(false, machine.id()) {
-                        machine.disable();
-                        try {
-                            unExecutedActions.remove(executionKey);
-                            eventLog.log(machine.name(), actionArg, LogContextualState.START)
-                            bus.dispatch("machine.action.post", actionArg to action.second(machine));
-                            println("Performed action for $actionArg on ${machine.ip()}")
-                        } finally {
-                            machine.enable();
-                            eventLog.log(machine.name(), actionArg, LogContextualState.END)
-                        }
+            } else if (action != null && action.first()) {
+                println("Performing group action for $actionArg on ${machine.ip()}")
+                bus.dispatch("machine.action.pre", actionArg to machine.id());
+                unExecutedActions.add(executionKey);
+                machineExec.submit(false, machine.groupName()) {
+                    machine.disable();
+                    try {
+                        unExecutedActions.remove(executionKey);
+                        eventLog.log(machine.name(), actionArg, LogContextualState.START)
+                        bus.dispatch("machine.action.post", actionArg to action.second(machine));
+                        println("Performed action for $actionArg on ${machine.ip()}")
+                    } finally {
+                        machine.enable();
+                        eventLog.log(machine.name(), actionArg, LogContextualState.END)
                     }
-                };
+                }
+            } else {
+                println("Action  $actionArg on ${machine.ip()} was not taken")
+            }
             val key2 = key(machine, actionArg)
             val action2 = actions[key2];
             val executionKey2 = key2;
@@ -225,8 +226,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 println("Performing action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 unExecutedActions.add(executionKey2)
-                machineExec.submit(false, machine.id()) {
-                    machine.disable();
+                machineExec.submit(false, machine.groupName()) {
+                machine.disable();
                     try {
                         unExecutedActions.remove(executionKey2);
                         //record result into event log
@@ -238,16 +239,18 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                         eventLog.log(machine.name(), actionArg, LogContextualState.END)
                     }
                 }
-            };
+            } else {
+                println("Action  $actionArg on ${machine.ip()} was not taken")
+            }
         }
         return this;
     }
 
 
     override fun execute(group: MachineGroup, pre: () -> Boolean, vararg actionArgs: GroupAction): Controller {
-        if (group.disabled) {
+        while (group.disabled()) {
             println("Group ${group.name()} was disabled")
-            return this
+            Thread.sleep(100)
         }
 
         if (gracePeriod * 1000 + started > System.currentTimeMillis()) {
@@ -267,27 +270,29 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 bus.dispatch("machine.group.pre", actionArg to group.name());
                 unExecutedActions.add(key);
                 groupExec.submit(false, group.groupName()) {
-                    group.disabled = true;
                     try {
                         unExecutedActions.remove(key)
                         eventLog.log(group.name(), actionArg, LogContextualState.START)
                         bus.dispatch("machine.group.post", actionArg to action.second(group));
                         println("Performed action for $actionArg on ${group.name()}")
                     } finally {
-                        group.disabled = false;
                         eventLog.log(group.name(), actionArg, LogContextualState.END)
                     }
                 }
-            };
+            } else {
+                println("Action  $actionArg on ${group.name()} was not taken")
+
+            }
         }
         return this;
     }
 
     override fun execute(group: MachineGroup, pre: () -> Boolean, vararg actionArgs: Action): Controller {
-        if (group.disabled) {
+        while (group.disabled()) {
             println("Group ${group.name()} was disabled")
-            return this
+            Thread.sleep(100)
         }
+
 
         if (gracePeriod * 1000 + started > System.currentTimeMillis()) {
             println("Actions ignored during grace period.")
@@ -309,8 +314,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                         println("Performing action for $actionArg on ${it.id()}")
                         bus.dispatch("machine.group.pre", actionArg to group.name());
                         unExecutedActions.add(executionKey);
-                        machineExec.submit(false, it.id()) {
-                            it.disable();
+                        machineExec.submit(false, it.groupName()) {
+                        it.disable();
                             try {
                                 unExecutedActions.remove(executionKey);
                                 eventLog.log(group.name(), actionArg, LogContextualState.START)
@@ -322,6 +327,9 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                         }
                     }
                 };
+            } else {
+                println("Action  $actionArg on ${group.name()} memberwas not taken")
+
             }
         }
         return this;

@@ -35,6 +35,7 @@ import kontrol.common.*
 import kontrol.ext.string.ssh.onHost
 import kontrol.digitalocean.StaticMachine
 import kontrol.staticmnc.StaticMachineGroupMonitor
+import kontrol.api.Monitorable
 
 /**
  * @todo document.
@@ -52,7 +53,8 @@ public class StaticMachineGroup(members: List<StaticMachine>,
                                 override val postmortems: MutableList<Postmortem>,
                                 override val downStreamKonfigurator: DownStreamKonfigurator? = null,
                                 override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
-    override var disabled: Boolean = false
+    override var disableAction: ((Monitorable<MachineGroupState>) -> Unit)? = null
+    override var enableAction: ((Monitorable<MachineGroupState>) -> Unit)? = null
     override val min: Int = members.size
     override val max: Int = members.size
     override val hardMax: Int = members.size
@@ -124,7 +126,7 @@ public class StaticMachineGroup(members: List<StaticMachine>,
     }
 
 
-    override fun restart(machine: Machine): MachineGroup {
+    override fun fix(machine: Machine): MachineGroup {
         val id = machine.id();
         try {
             println("Restarting $machine")

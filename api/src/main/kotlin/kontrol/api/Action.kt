@@ -25,5 +25,4 @@ public enum class Action {
     REBUILD
     FAILOVER
     FAILBACK
-    STAGGER
 }

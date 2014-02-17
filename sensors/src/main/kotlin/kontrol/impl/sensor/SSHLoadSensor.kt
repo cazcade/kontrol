@@ -57,7 +57,7 @@ public class SSHLoadSensor(val user: String = "root", val os: OS = OS.LINUX) : L
                             session?.exec("cat /proc/loadavg | cut -d' ' -f1 | tr -d ' '")
                         }
                         OS.OSX -> {
-                            session?.exec("uptime | cut -d: -f4| tr ',' ' '| cut -d' ' -f2 | tr -d ' '");
+                            session?.exec("uptime | cut -d, -f3 | cut -d: -f2 | cut -d' ' -f2 | tr -d ' '");
                         }
                         else -> throw IllegalArgumentException("Unsupported OS $os")
                     }

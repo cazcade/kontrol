@@ -68,7 +68,7 @@
                             <td class="col-md-5">
                                 <div class="details">
                                     <!--$machine.data-->
-                                    #if($machine.load)
+                                    #if($!machine.load)
                                         <div class="row">
                                             <div class="col-md-3">Load</div>
                                             <div class="col-md-9">

@@ -143,7 +143,7 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                 val balancers = it;
                 controller will { balancers.failover(it).rebuild(it).configure().failback(it);java.lang.String() } takeAction REBUILD inGroup balancers;
                 controller will { balancers.failover(it).destroy(it);java.lang.String() } takeAction DESTROY_MACHINE inGroup balancers;
-                controller will { balancers.failover(it).restart(it).failback(it);java.lang.String() } takeAction FIX inGroup balancers;
+                controller will { balancers.failover(it).fix(it).failback(it);java.lang.String() } takeAction FIX inGroup balancers;
             }
             "gateway" -> {
                 val gateways = it;
@@ -164,7 +164,7 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                 controller will {
                     gateways.failover(it);
                     infra.topology().get("lb").configure();
-                    gateways.restart(it).failback(it);
+                    gateways.fix(it).failback(it);
                     infra.topology().get("lb").configure()
                     ;java.lang.String()
                 } takeAction FIX inGroup gateways;
@@ -173,7 +173,7 @@ public fun snapitoStrategy(infra: Infrastructure, controller: Controller) {
                 val workers = it;
                 controller will { workers.failover(it).rebuild(it);java.lang.String() } takeAction REBUILD inGroup workers;
                 controller will { workers.failover(it).destroy(it);java.lang.String() } takeAction DESTROY_MACHINE inGroup workers;
-                controller will { workers.failover(it).restart(it).failback(it) ;java.lang.String() } takeAction FIX inGroup workers;
+                controller will { workers.failover(it).fix(it).failback(it) ;java.lang.String() } takeAction FIX inGroup workers;
                 controller use { workers.expand() ;java.lang.String() } to EXPAND  IF { workers.activeSize() < workers.max }  group workers;
                 controller use { workers.contract();java.lang.String() } to CONTRACT IF { workers.activeSize() > workers.min } group workers;
             }

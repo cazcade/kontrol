@@ -25,6 +25,7 @@ import kontrol.api.sensor.SensorValue
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentHashMap
 import kontrol.api.ComparableTemporalStore
+import kontrol.api.Monitorable
 
 /**
  * @todo document.
@@ -38,8 +39,8 @@ public class MockMachine(val ip: String) : Machine{
         return "mock"
     }
 
-    override var disableAction: ((Machine) -> Unit)? = null
-    override var enableAction: ((Machine) -> Unit)? = null
+    override var disableAction: ((Monitorable<MachineState>) -> Unit)? = null
+    override var enableAction: ((Monitorable<MachineState>) -> Unit)? = null
     override var data: ConcurrentMap<String, ComparableTemporalStore<SensorValue>> = ConcurrentHashMap();
 
     override var monitor: Monitor<MachineState, Machine> = MockMachineMonitor();

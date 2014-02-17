@@ -39,9 +39,7 @@ public  class DigitalOceanMachineMonitor(val clientFactory: DigitalOceanClientFa
 
 
     override fun heartbeat() {
-        when (target.droplet.status?.toLowerCase()) {
-            "archive", "off" -> stateMachine.attemptTransition(MachineState.STOPPED)
-        }
+
     }
     override fun update() {
         val doa = clientFactory.instance();

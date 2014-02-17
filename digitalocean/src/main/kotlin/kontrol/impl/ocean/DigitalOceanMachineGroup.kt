@@ -34,6 +34,7 @@ import kontrol.api.Postmortem
 import kontrol.api.Controller
 import kontrol.common.*
 import kontrol.ext.string.ssh.onHost
+import kontrol.api.Monitorable
 
 /**
  * @todo document.
@@ -52,7 +53,8 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
                                       override val postmortems: List<Postmortem>,
                                       override val downStreamKonfigurator: DownStreamKonfigurator? = null,
                                       override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
-    override var disabled: Boolean = false
+    override var disableAction: ((Monitorable<MachineGroupState>) -> Unit)? = null
+    override var enableAction: ((Monitorable<MachineGroupState>) -> Unit)? = null
 
 
     override val downStreamGroups: MutableList<MachineGroup> = ArrayList()
@@ -222,7 +224,7 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
     }
 
 
-    override fun restart(machine: Machine): MachineGroup {
+    override fun fix(machine: Machine): MachineGroup {
         val id = machine.id().toInt()
         try {
             println("Rebooting $machine")
