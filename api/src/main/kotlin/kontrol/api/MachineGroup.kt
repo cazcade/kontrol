@@ -58,10 +58,10 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     fun machines(): List<Machine>
 
     fun workingSize(): Int = workingMachines().size();
-    fun activeSize(): Int = enabledMachines().filter { !(it.state() in listOf(MachineState.FAILED, MachineState.REPAIR, MachineState.DEAD, MachineState.BROKEN, MachineState.UPGRADE_FAILED)) }.size();
+    fun activeSize(): Int = enabledMachines().filter { !(it.state() in listOf(MachineState.FAILED, MachineState.STOPPED, MachineState.DEAD, MachineState.BROKEN, MachineState.UPGRADE_FAILED)) }.size();
     fun enabledMachines(): List<Machine> = machines().filter { it.enabled }
     fun brokenMachines(): List<Machine> = machines().filter { it.enabled && it.state() in listOf(MachineState.FAILED, MachineState.DEAD, MachineState.BROKEN, MachineState.UPGRADE_FAILED) }
-    fun workingMachines(): List<Machine> = enabledMachines().filter { it.state() in listOf(MachineState.OK, MachineState.STALE, null) }
+    fun workingMachines(): List<Machine> = enabledMachines().filter { it.state() in listOf(MachineState.OK, MachineState.STALE) }
     fun workingAndReadyMachines(): List<Machine> = enabledMachines().filter { it.state() in listOf(MachineState.OK, MachineState.STALE) }
 
     fun get(value: String): Double? {

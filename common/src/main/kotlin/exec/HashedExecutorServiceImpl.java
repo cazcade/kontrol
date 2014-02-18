@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Neil Ellis
  */
 
-public class FountainExecutorServiceImpl extends AbstractServiceStateMachine implements FountainExecutorService {
+public class HashedExecutorServiceImpl extends AbstractServiceStateMachine implements HashedExecutorService {
 
     private final String name;
     private final int maxRetry;
@@ -32,7 +32,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
 
     private final AtomicLong count = new AtomicLong();
 
-    public FountainExecutorServiceImpl(final String name, final int maxRetry, final int buckets, final int queueSize, final int requeueDelay, final int threadsPerBucket) {
+    public HashedExecutorServiceImpl(final String name, final int maxRetry, final int buckets, final int queueSize, final int requeueDelay, final int threadsPerBucket) {
         super();
         this.name = name;
         this.maxRetry = maxRetry;
@@ -42,7 +42,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
         this.threadsPerBucket = threadsPerBucket;
     }
 
-    public void execute(final boolean retry, final Object key, final FountainExecutable executable) throws InterruptedException {
+    public void execute(final boolean retry, final Object key, final HashedExecutable executable) throws InterruptedException {
         begin();
         try {
             executeInternal(retry, false, executable, getThreadPoolExecutor(key));
@@ -62,7 +62,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
     }
 
     @Override
-    public void submit(final boolean retry, final Object key, final FountainExecutable executable) throws InterruptedException {
+    public void submit(final boolean retry, final Object key, final HashedExecutable executable) throws InterruptedException {
         begin();
         try {
             executeInternal(retry, true, executable, getThreadPoolExecutor(key));
@@ -89,7 +89,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
         return hashInt;
     }
 
-    private void executeInternal(final boolean retry, boolean submit, final FountainExecutable executable, final ThreadPoolExecutor threadPoolExecutor) throws InterruptedException {
+    private void executeInternal(final boolean retry, boolean submit, final HashedExecutable executable, final ThreadPoolExecutor threadPoolExecutor) throws InterruptedException {
         boolean cont = true;
         while (cont) {
             try {
@@ -135,11 +135,11 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
                     }
                 };
                 if (submit) {
-                    System.out.println(name + ": Submitted request, queue is " + threadPoolExecutor.getQueue().size() + " long");
+//                    System.out.println(name + ": Submitted request, queue is " + threadPoolExecutor.getQueue().size() + " long");
 
                     threadPoolExecutor.submit(command);
                 } else {
-                    System.out.println(name + ": Executing request, queue is " + threadPoolExecutor.getQueue().size() + " long");
+//                    System.out.println(name + ": Executing request, queue is " + threadPoolExecutor.getQueue().size() + " long");
                     threadPoolExecutor.execute(command);
                 }
                 cont = false;
@@ -151,7 +151,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
         }
     }
 
-    public void execute(final boolean retry, final FountainExecutable executable) throws InterruptedException {
+    public void execute(final boolean retry, final HashedExecutable executable) throws InterruptedException {
         begin();
         try {
             int minimum = Integer.MAX_VALUE;
@@ -170,7 +170,7 @@ public class FountainExecutorServiceImpl extends AbstractServiceStateMachine imp
         }
     }
 
-    public void execute(final FountainExecutable executable) throws InterruptedException {
+    public void execute(final HashedExecutable executable) throws InterruptedException {
         final ThreadPoolExecutor threadPoolExecutor = executors.get((int) (buckets * Math.random()));
         executeInternal(false, false, executable, threadPoolExecutor);
     }

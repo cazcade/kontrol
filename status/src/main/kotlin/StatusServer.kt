@@ -36,14 +36,14 @@ public class StatusServer(infra: Infrastructure, bus: Bus, postmortem: Postmorte
         if (session.uri.endsWith(".do")) {
             when(session.uri.substring(1, session.uri.length - 3)) {
                 "log" -> {
-                    context["events"] = eventLog.last(100)
+                    context["events"] = eventLog.last(500)
                     "log.html.vm"
                 }
                 "costing" -> {
                     "costing.html.vm"
                 }
                 "postmortems" -> {
-                    context["postmortems"] = postmortem.last(50)
+                    context["postmortems"] = postmortem.last(100)
                     "postmortems.html.vm"
                 }
                 "postmortem_detail" -> {

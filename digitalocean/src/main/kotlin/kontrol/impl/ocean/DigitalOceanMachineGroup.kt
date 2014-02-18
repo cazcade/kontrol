@@ -88,18 +88,29 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
     }
 
     override fun contract(): MachineGroup {
+        if ( this.workingSize() < this.min) {
+            throw IllegalStateException("Too few machines, cancelling contract")
+        }
+
         val digitalOcean = clientFactory.instance()
         println("CONTRACTING GROUP ${name()} REQUESTED")
         try {
 
             println("Destroying m/c")
-            var machs = machines.values().filter { it.enabled && it.state() !in listOf(MachineState.OK, MachineState.STALE, null) }
+            var machs = machines.values().filter { it.enabled && it.state() !in listOf(MachineState.OK, MachineState.STALE, MachineState.OVERLOADED) }
+            if (machs.size() == 0) {
+                machs = machines.values().filter { it.enabled && it.state() in listOf(MachineState.OVERLOADED) }
+            }
             if (machs.size() == 0) {
                 machs = machines.values().filter { it.enabled && it.droplet.status?.toLowerCase() == "active" }.sortBy { it.id() };
             }
             val machine = machs.first()
             machine.disable()
-            failover(machine)
+            //Don't bother failing over machines that are already in the state DEAD or FAILED, they should have been failed over already.
+            if (max > 0 && machine.state() !in listOf(MachineState.FAILED, MachineState.DEAD)) {
+                failover(machine)
+            }
+
             val id = machine.droplet.id!!
             digitalOcean.deleteDroplet(id)
             while (digitalOcean.getDropletInfo(id).status?.toLowerCase() == "active") {
@@ -114,14 +125,17 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
             }
         } catch(e: Exception) {
             println("(${name()}) DO: " + e.getMessage())
+        } finally {
+            monitor.update();
         }
-        configure()
-        Thread.sleep(60 * 1000)
         return this
     }
 
 
     override fun expand(): Machine {
+        if ( this.machines().size >= this.hardMax) {
+            throw IllegalStateException("Too many machines, cancelling expand")
+        }
         val droplet = Droplet()
         droplet.name = (config.machinePrefix + name)
         droplet.size_id = (config.dropletSizeId)
@@ -155,10 +169,11 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
             Thread.sleep(20000);
         } else {
         }
-        configure()
         val newMachine = DigitalOceanMachine(createdDroplet, clientFactory, sensors, controller, name)
         machines.put(createdDroplet.id.toString(), newMachine);
         newMachine.fsm.rules = defaultMachineRules
+        Thread.sleep(60 * 1000)
+        monitor.update();
         return newMachine;
 
     }
@@ -170,6 +185,7 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
             println("Destroying $machine")
             val digitalOcean = clientFactory.instance();
             digitalOcean.deleteDroplet(id);
+            monitor.update();
         } catch (e: Exception) {
             println("Failed to destroy ${id} due to ${e.getMessage()}")
         }
@@ -181,7 +197,7 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
     fun waitForRestart(id: Int) {
         var count1: Int = 0;
         val instance = clientFactory.instance()
-        while (instance.getDropletInfo(id).status == "active" && count1++ < 60) {
+        while (instance.getDropletInfo(id).status == "active" && count1++ < 10) {
             println("Waiting for machine ${id} to stop being active")
             Thread.sleep(5000);
         }
@@ -190,7 +206,7 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
             println("Waiting for machine ${id} to become active")
             Thread.sleep(5000);
         }
-        Thread.sleep(60000);
+        Thread.sleep(120000);
 
     }
 

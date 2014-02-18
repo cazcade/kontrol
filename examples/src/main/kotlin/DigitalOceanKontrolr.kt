@@ -29,7 +29,6 @@ import kontrol.postmortem.CentosPostmortem
 import kontrol.postmortem.JettyPostmortem
 import kontrol.server.Server
 import kontrol.api.Controller
-import kontrol.api.MachineGroupState.*
 import kontrol.common.group.ext.addGroupSensorRules
 import kontrol.common.group.ext.addMachineOverloadRules
 import kontrol.digitalocean.StaticMachine
@@ -42,9 +41,6 @@ import kontrol.common.group.ext.applyDefaultPolicies
 import kontrol.common.group.ext.applyDefaultRules
 import kontrol.common.group.ext.addMachineBrokenRules
 import kontrol.konfigurators.HaproxyKonfigurator
-import kontrol.HttpUtil
-import java.net.URI
-import java.util.Locale
 import kontrol.staticmc.StaticMachineGroup
 import kontrol.ext.string.ssh.onHost
 import kontrol.api.OS
@@ -52,14 +48,15 @@ import kontrol.api.OS
 
 public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
-        group.addMachineOverloadRules("load" to 10.0, "http-response-time" to 5000.0)
         group.addMachineBrokenRules("http-status" to 399.0)
         when(group.name()) {
             "lb", "gateway" -> {
-                group.addGroupSensorRules("http-response-time" to -1.0..2000.0, "load" to 0.5..4.0)
+                group.addMachineOverloadRules("load" to 6.0, "http-response-time" to 500.0)
+                group.addGroupSensorRules("http-response-time" to -1.0..200.0, "load" to 2.0..5.0)
             }
             "worker", "static-worker" -> {
                 //change this when deployed
+                group.addMachineOverloadRules("load" to 10.0, "http-response-time" to 5000.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..2000.0, "http-load" to 4.0..10.0)
             }
         }
@@ -129,22 +126,22 @@ fun main(args: Array<String>): Unit {
         }
         cloud["pinstamatic"].applyDefaultPolicies(controller, postmortems);
         cloud["gateway"].applyDefaultPolicies(controller, postmortems, { m, g ->
-            " cd snapito; git checkout prod; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png; ~/jetty/bin/jetty.sh restart".onHost(m.ip())
+            " su  cazcade -c 'cd ~/snapito; git checkout prod; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png;sleep 30; ~/jetty/bin/jetty.sh start;sleep 180'".onHost(m.ip())
         }, { m, g ->
-            " cd snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png; ~/jetty/bin/jetty.sh restart".onHost(m.ip())
+            "su cazcade -c 'cd ~/snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png; ~/jetty/bin/jetty.sh restart'".onHost(m.ip())
         })
         cloud["lb"].applyDefaultPolicies(controller, postmortems, { m, g -> g.configure(m) })
         cloud["static-worker"].applyDefaultPolicies(controller, postmortems, { m, g ->
-            " cd app/snapito; git checkout prod; git pull; mvn clean install -Dmaven.test.skip=true; killall java; cp -f ./snapito-api/target/snapito-api-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/api.war; rm -rf /tmp/*.png; sleep 120".onHost(m.ip(), "administrator")
+            " cd app/snapito; git checkout prod; git pull; mvn clean install -Dmaven.test.skip=true; killall java; cp -f ./snapito-api/target/snapito-api-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/api.war; rm -rf /tmp/*.png; sleep 180".onHost(m.ip(), "administrator")
         },
                 { m, g ->
                     " cd app/snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java;cp -f ./snapito-api/target/snapito-api-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/api.war; rm -rf /tmp/*.png; sleep 120".onHost(m.ip(), "administrator")
                 }
         )
         cloud["worker"].applyDefaultPolicies(controller, postmortems, { m, g ->
-            " cd snapito; git checkout prod; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png; ~/jetty/bin/jetty.sh restart; sleep 120".onHost(m.ip())
+            " su cazcade -c 'cd ~/snapito; git checkout prod; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png; ~/jetty/bin/jetty.sh restart; sleep 120'".onHost(m.ip())
         }, { m, g ->
-            " cd snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png; ~/jetty/bin/jetty.sh restart; sleep 120".onHost(m.ip())
+            " su cazcade -c 'cd ~/snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png; ~/jetty/bin/jetty.sh restart; sleep 120'".onHost(m.ip())
         })
 
         cloud["lb"].applyDefaultRules(60);
@@ -153,10 +150,10 @@ fun main(args: Array<String>): Unit {
         cloud["gateway"].applyDefaultRules(60);
         cloud["pinstamatic"].applyDefaultRules(60);
 
-        cloud["lb"] becomes GROUP_BROKEN ifStateIn listOf(QUIET, BUSY, NORMAL, null) andTest {
-            cloud["gateway"].state() != GROUP_BROKEN && cloud["worker"].state() != GROUP_BROKEN && it.machines().size < it.hardMax
-            HttpUtil.getStatus(URI("http://api.snapito.com/web/monitor/lc/sky.com?freshness=1"), Locale.getDefault(), 60000) >= 400
-        } after 300 seconds "api-broken"
+        //        cloud["lb"] becomes GROUP_BROKEN ifStateIn listOf(QUIET, BUSY, NORMAL, null) andTest {
+        //            cloud["gateway"].state() != GROUP_BROKEN && cloud["worker"].state() != GROUP_BROKEN && it.machines().size < it.hardMax
+        //            HttpUtil.getStatus(URI("http://api.snapito.com/web/monitor/lc/sky.com?freshness=1"), Locale.getDefault(), 60000) >= 400
+        //        } after 60 seconds "api-broken"
 
         snapitoSensorActions(cloud);
     }

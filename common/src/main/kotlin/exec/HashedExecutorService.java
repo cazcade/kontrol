@@ -21,7 +21,7 @@ package exec;
  * @author Neil Ellis
  */
 
-public interface FountainExecutorService extends ServiceStateMachine {
+public interface HashedExecutorService extends ServiceStateMachine {
     /**
      * Execute some executable code in one of a pool of threads. If retry is specified (that is environmental conditions
      * could change and allow a succesful completion at a later date) then the job will be executed multiple times.
@@ -35,16 +35,16 @@ public interface FountainExecutorService extends ServiceStateMachine {
      * @param executable some executable code.
      * @throws InterruptedException if the submission thread (this thread) is interrupted while attempting to queue.
      */
-    void execute(boolean retry, Object hashObject, FountainExecutable executable) throws InterruptedException;
+    void execute(boolean retry, Object hashObject, HashedExecutable executable) throws InterruptedException;
 
-    void submit(boolean retry, Object key, FountainExecutable executable) throws InterruptedException;
+    void submit(boolean retry, Object key, HashedExecutable executable) throws InterruptedException;
 
     /**
      * No retry, random hash.
      *
-     * @see #execute(boolean, Object, FountainExecutable)
+     * @see #execute(boolean, Object, HashedExecutable)
      */
-    void execute(FountainExecutable executable) throws InterruptedException;
+    void execute(HashedExecutable executable) throws InterruptedException;
 
     /**
      * Waits until all the thread pools are empty, do not submit new work while this is running.

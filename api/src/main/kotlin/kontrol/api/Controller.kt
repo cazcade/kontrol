@@ -35,9 +35,9 @@ public trait Controller {
     fun monitor(machine: Machine, alerter: Alerter, vararg states: MachineState): Controller
     fun monitor(machineGroup: MachineGroup, alerter: Alerter, vararg states: MachineGroupState): Controller
 
-    fun register(group: MachineGroup, action: Action, pre: () -> Boolean = { true }, machineAction: (Machine) -> Serializable): Controller
-    fun register(machine: Machine, action: Action, pre: () -> Boolean = { true }, machineAction: (Machine) -> Serializable): Controller
-    fun register(group: MachineGroup, action: GroupAction, pre: () -> Boolean = { true }, machineGroupAction: (MachineGroup) -> Serializable): Controller
+    fun register(group: MachineGroup, action: Action, pre: (Machine) -> Boolean = { true }, machineAction: (Machine) -> Serializable): Controller
+    fun register(machine: Machine, action: Action, pre: (Machine) -> Boolean = { true }, machineAction: (Machine) -> Serializable): Controller
+    fun register(group: MachineGroup, action: GroupAction, pre: (MachineGroup) -> Boolean = { true }, machineGroupAction: (MachineGroup) -> Serializable): Controller
 
 
     fun start(gracePeriod: Int)
@@ -60,9 +60,9 @@ public trait Controller {
     class MachineRuleBuilder(val actionRegistry: Controller,
                              val action: (Machine) -> Serializable){
         var machineAction: Action? = null;
-        var ifClause: () -> Boolean = { true };
+        var ifClause: (Machine) -> Boolean = { true };
 
-        fun IF(ifClause: () -> Boolean): MachineRuleBuilder {
+        fun IF(ifClause: (Machine) -> Boolean): MachineRuleBuilder {
             this.ifClause = ifClause;
             return this;
         }
@@ -86,14 +86,14 @@ public trait Controller {
     class MachineGroupRuleBuilder(val actionRegistry: Controller,
                                   val action: (MachineGroup) -> Serializable){
         var groupAction: GroupAction? = null;
-        var ifClause: () -> Boolean = { true };
+        var ifClause: (MachineGroup) -> Boolean = { true };
 
         fun to(groupAction: GroupAction): MachineGroupRuleBuilder {
             this.groupAction = groupAction;
             return this;
         }
 
-        fun IF(ifClause: () -> Boolean): MachineGroupRuleBuilder {
+        fun IF(ifClause: (MachineGroup) -> Boolean): MachineGroupRuleBuilder {
             this.ifClause = ifClause;
             return this;
         }

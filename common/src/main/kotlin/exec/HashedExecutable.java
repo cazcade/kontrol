@@ -20,6 +20,6 @@ package exec;
  * @author Neil Ellis
  */
 
-public interface FountainExecutable {
+public interface HashedExecutable {
     void run() throws Exception;
 }
