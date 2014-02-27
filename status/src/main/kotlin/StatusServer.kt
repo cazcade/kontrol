@@ -26,6 +26,7 @@ import kontrol.api.Infrastructure
 import kontrol.api.Bus
 import kontrol.api.PostmortemStore
 import kontrol.api.EventLog
+import kontrol.api.MachineGroupState
 
 public class StatusServer(infra: Infrastructure, bus: Bus, postmortem: PostmortemStore, eventLog: EventLog, prefix: String = "/status-server", val refresh: Int = 60) {
     var infra: Infrastructure = infra
@@ -45,6 +46,23 @@ public class StatusServer(infra: Infrastructure, bus: Bus, postmortem: Postmorte
                 "postmortems" -> {
                     context["postmortems"] = postmortem.last(100)
                     "postmortems.html.vm"
+                }
+                "defcon" -> {
+                    var defcon = 5;
+                    if (infra.topology().members.values().any { it.overloadedMachines().size() > 0 }) {
+                        defcon = 4;
+                    }
+                    if (infra.topology().members.values().any { it.brokenMachines().size() > 0 }) {
+                        defcon = 3;
+                    }
+                    if (infra.topology().members.values().any { it.state() == MachineGroupState.GROUP_BROKEN }) {
+                        defcon = 2;
+                    }
+                    if (infra.topology().members.values().all { it.state() == MachineGroupState.GROUP_BROKEN }) {
+                        defcon = 1;
+                    }
+                    context["defcon"] = defcon;
+                    "defcon.html.vm"
                 }
                 "postmortem_detail" -> {
                     context["postmortem"] = postmortem.getWithParts(session.parms["id"]?.toInt()?:-1)

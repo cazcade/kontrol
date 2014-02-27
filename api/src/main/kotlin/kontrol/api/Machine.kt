@@ -92,7 +92,7 @@ public trait Machine : Monitorable<MachineState>, Serializable {
     }
 
     fun costPerHourInDollars(): Double
-    fun costPerMonthInDollars(): Double = costPerHourInDollars() * 24 * 30
+    fun costPerMonthInDollars(): Double = costPerHourInDollars() * 24 * 365.25 / 12
 
 
     var monitor: Monitor<MachineState, Machine>;

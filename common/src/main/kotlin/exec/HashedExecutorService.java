@@ -37,7 +37,7 @@ public interface HashedExecutorService extends ServiceStateMachine {
      */
     void execute(boolean retry, Object hashObject, HashedExecutable executable) throws InterruptedException;
 
-    void submit(boolean retry, Object key, HashedExecutable executable) throws InterruptedException;
+    void submit(boolean retry, boolean skipIfFull, Object key, HashedExecutable executable) throws InterruptedException;
 
     /**
      * No retry, random hash.

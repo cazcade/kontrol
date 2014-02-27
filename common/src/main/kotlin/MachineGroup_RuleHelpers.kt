@@ -159,21 +159,24 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
         this.enabled = false;
         try {
             try {
-                this.expand()
-            } catch (e: Exception) {
-                e.printStackTrace();
-            }
-            it.brokenMachines().sortBy { it.id() } forEach {
-                this.rebuild(it);
-                try {
-                    downgradeAction(it, this);
-                } catch(e: Exception) {
-                    e.printStackTrace()
+                it.brokenMachines().sortBy { it.id() } forEach {
+                    this.rebuild(it);
+                    try {
+                        downgradeAction(it, this);
+                    } catch(e: Exception) {
+                        e.printStackTrace()
+                    }
+                    this.clearState(it);
+                    this.configure(it)
                 }
-                this.clearState(it);
-                this.configure(it)
-            };
-            this.configure();
+                this.configure();
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                if (this.workingSize() == 0) {
+                    expand();
+                }
+            }
             java.lang.String()
         } finally {
             this.enabled = true
@@ -182,9 +185,8 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
 }
 
 public fun MachineGroup.applyDefaultRules(timeFactor: Int = 60) {
-    this memberIs STALE ifStateIn listOf(OK, OVERLOADED, null) andTest { this.other(it) != null && this.machines().filter { it.state() == STALE }.size() == 0 } after  timeFactor * 60  seconds "upgrade"
+    this memberIs STALE ifStateIn listOf(OK, OVERLOADED, null) andTest { this.other(it) != null && this.machines().filter { it.state() == STALE }.size() == 0 } after  timeFactor * 60000  seconds "upgrade"
     this memberIs BROKEN ifStateIn listOf(BROKEN, OVERLOADED, UPGRADE_FAILED) after timeFactor * 10 seconds "bad-now-broken"
-    this memberIs UPGRADE_FAILED ifStateIn listOf(STALE) after timeFactor * 30 seconds "stale-now-failed"
     this memberIs DEAD ifStateIn listOf(OVERLOADED, DEAD, BROKEN, STOPPED, null, UPGRADE_FAILED) after timeFactor * 15 seconds "escalate-broken-to-dead"
     val escalateDuration: Long = 60L * timeFactor * 1000L
     this memberIs DEAD ifStateIn listOf(DEAD, BROKEN, STOPPED, UPGRADE_FAILED) andTest { it.fsm.history.percentageInWindow(listOf(UPGRADE_FAILED, BROKEN, STOPPED, DEAD), (escalateDuration / 2)..escalateDuration) > 30.0 } after timeFactor seconds "flap-now-escalate-to-dead"
@@ -202,14 +204,14 @@ public fun MachineGroup.addMachineOverloadRules(vararg rules: Pair<String, Doubl
 public fun MachineGroup.addMachineBrokenRules(vararg rules: Pair<String, Double>, timeFactor: Int = 60) {
 
 
-    this memberIs OK ifStateIn listOf(UPGRADE_FAILED, BROKEN, null, DEAD, STOPPED, BROKEN) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor / 2 seconds "machine-ok"
+    this memberIs OK ifStateIn listOf(UPGRADE_FAILED, BROKEN, null, DEAD, STOPPED, FAILED, BROKEN) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor / 2 seconds "machine-ok"
 
     this memberIs OK ifStateIn listOf(UPGRADE_FAILED, STALE) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor * 10 seconds "machine-ok"
 
 
-    this memberIs UPGRADE_FAILED ifStateIn listOf(STALE) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after  timeFactor * 3 seconds "downgrade"
+    this memberIs UPGRADE_FAILED ifStateIn listOf(STALE) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after  timeFactor * 10 seconds "downgrade"
 
-    this memberIs BROKEN ifStateIn listOf(OK, OVERLOADED, BROKEN, STOPPED, null) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after timeFactor * 3 seconds "machine-broken"
+    this memberIs BROKEN ifStateIn listOf(OK, OVERLOADED, BROKEN, STOPPED, null) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } && this.downStreamGroups.all { it.state() != GROUP_BROKEN } } after timeFactor * 3 seconds "machine-broken"
 }
 
 

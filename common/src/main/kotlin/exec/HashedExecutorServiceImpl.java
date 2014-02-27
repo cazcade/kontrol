@@ -45,7 +45,7 @@ public class HashedExecutorServiceImpl extends AbstractServiceStateMachine imple
     public void execute(final boolean retry, final Object key, final HashedExecutable executable) throws InterruptedException {
         begin();
         try {
-            executeInternal(retry, false, executable, getThreadPoolExecutor(key));
+            executeInternal(retry, false, false, executable, getThreadPoolExecutor(key));
         } finally {
             end();
         }
@@ -62,10 +62,10 @@ public class HashedExecutorServiceImpl extends AbstractServiceStateMachine imple
     }
 
     @Override
-    public void submit(final boolean retry, final Object key, final HashedExecutable executable) throws InterruptedException {
+    public void submit(final boolean retry, boolean skipIfFUll, final Object key, final HashedExecutable executable) throws InterruptedException {
         begin();
         try {
-            executeInternal(retry, true, executable, getThreadPoolExecutor(key));
+            executeInternal(retry, true, skipIfFUll, executable, getThreadPoolExecutor(key));
         } finally {
             end();
         }
@@ -89,7 +89,7 @@ public class HashedExecutorServiceImpl extends AbstractServiceStateMachine imple
         return hashInt;
     }
 
-    private void executeInternal(final boolean retry, boolean submit, final HashedExecutable executable, final ThreadPoolExecutor threadPoolExecutor) throws InterruptedException {
+    private void executeInternal(final boolean retry, boolean submit, boolean skipIfFull, final HashedExecutable executable, final ThreadPoolExecutor threadPoolExecutor) throws InterruptedException {
         boolean cont = true;
         while (cont) {
             try {
@@ -145,8 +145,13 @@ public class HashedExecutorServiceImpl extends AbstractServiceStateMachine imple
                 cont = false;
                 count.incrementAndGet();
             } catch (RejectedExecutionException e) {
-                System.out.println(name + ": Queue size at limit " + threadPoolExecutor.getQueue().size() + " requeing");
-                Thread.sleep(requeueDelay);
+                if (skipIfFull) {
+                    System.out.println(name + ": Queue size at limit " + threadPoolExecutor.getQueue().size() + " skipping");
+                    return;
+                } else {
+                    System.out.println(name + ": Queue size at limit " + threadPoolExecutor.getQueue().size() + " requeing");
+                    Thread.sleep(requeueDelay);
+                }
             }
         }
     }
@@ -164,7 +169,7 @@ public class HashedExecutorServiceImpl extends AbstractServiceStateMachine imple
                 }
             }
             assert executor != null;
-            executeInternal(retry, false, executable, executor);
+            executeInternal(retry, false, false, executable, executor);
         } finally {
             end();
         }
@@ -172,7 +177,7 @@ public class HashedExecutorServiceImpl extends AbstractServiceStateMachine imple
 
     public void execute(final HashedExecutable executable) throws InterruptedException {
         final ThreadPoolExecutor threadPoolExecutor = executors.get((int) (buckets * Math.random()));
-        executeInternal(false, false, executable, threadPoolExecutor);
+        executeInternal(false, false, false, executable, threadPoolExecutor);
     }
 
     @Override
