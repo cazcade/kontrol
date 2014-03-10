@@ -1,6 +1,8 @@
 kontrol
 =======
 
+Currently under heavy development - don't try and use this yet :-)
+
 A Kotlin based API for automatic control of cloud based servers, starting with Digital Ocean.
 
 This also includes in sub projects a Kotlin based Cloudflare API and Digital Ocean API
