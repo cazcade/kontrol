@@ -26,7 +26,6 @@ import kontrol.api.Infrastructure
 import kontrol.api.Bus
 import kontrol.api.PostmortemStore
 import kontrol.api.EventLog
-import kontrol.api.MachineGroupState
 
 public class StatusServer(infra: Infrastructure, bus: Bus, postmortem: PostmortemStore, eventLog: EventLog, prefix: String = "/status-server", val refresh: Int = 60) {
     var infra: Infrastructure = infra
@@ -49,16 +48,16 @@ public class StatusServer(infra: Infrastructure, bus: Bus, postmortem: Postmorte
                 }
                 "defcon" -> {
                     var defcon = 5;
-                    if (infra.topology().members.values().any { it.overloadedMachines().size() > 0 }) {
+                    if (infra.topology().members.values().any { it.machines().size() > 0 && it.overloadedMachines().size() > 0 }) {
                         defcon = 4;
                     }
-                    if (infra.topology().members.values().any { it.brokenMachines().size() > 0 }) {
+                    if (infra.topology().members.values().any { it.machines().size() > 0 && it.overloadedMachines().size() == it.machines().size() }) {
                         defcon = 3;
                     }
-                    if (infra.topology().members.values().any { it.state() == MachineGroupState.GROUP_BROKEN }) {
+                    if (infra.topology().members.values().any { it.machines().size() > 0 && it.workingSize() == 0 }) {
                         defcon = 2;
                     }
-                    if (infra.topology().members.values().all { it.state() == MachineGroupState.GROUP_BROKEN }) {
+                    if (infra.topology().members.values().any { it.machines().size() > 0 && it.failedMachines().size() == it.machines().size() }) {
                         defcon = 1;
                     }
                     context["defcon"] = defcon;

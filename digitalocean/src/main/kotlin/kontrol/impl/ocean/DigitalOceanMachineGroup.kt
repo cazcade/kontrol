@@ -151,6 +151,9 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
             }
 
         }
+        if (droplet.image_id == null) {
+            throw  RuntimeException("No image ${config.templatePrefix + name} available in ${droplet.region_id}  ")
+        }
         var createdDroplet = instance.createDroplet(droplet, sshKeys, privateNetworking = true)
 
         println("Created droplet with ID " + createdDroplet.id + " ip address " + createdDroplet.ip_address)
@@ -244,7 +247,7 @@ public class DigitalOceanMachineGroup(val clientFactory: DigitalOceanClientFacto
         val id = machine.id().toInt()
         try {
             println("Rebooting $machine")
-            "reboot".onHost(machine.ip())
+            "reboot".onHost(machine.ip(), timeoutInSeconds = 20)
             waitForRestart(id)
             println("Rebuilt ${id}")
         } catch (e: Exception) {

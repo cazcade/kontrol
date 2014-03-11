@@ -12,14 +12,14 @@
 
 <div id="wrap">
     <!-- Fixed navbar -->
-    #parse("navbar.vm")
+##    #parse("navbar.vm")
 
-    <div class="container">
+    <div class="container" style="margin-bottom: -20px;margin-top: -10px">
         <table class="table">
             #if($defcon == 1)
-            <tr class="active">
+            <tr style="background-color:#aaa">
             #else
-            <tr>
+            <tr style="opacity:0.5">
             #end
             <td class="col-md-4"></td>
             <td style="background-color: #8b0000" class="col-md-4">
@@ -27,14 +27,14 @@
                     1
                 </div>
             </td>
-            <td class="col-md-4" style="font-size:200%;;text-align: center;vertical-align: middle;opacity: 0.5">All
-                Groups Broken
+            <td class="col-md-4" style="font-size:200%;;text-align: center;vertical-align: middle;color:#282828">Group
+                Failed
             </td>
         </tr>
             #if($defcon == 2)
-            <tr class="active">
+            <tr style="background-color:#aaa">
             #else
-            <tr>
+            <tr style="opacity:0.5">
             #end
             <td class="col-md-4"></td>
             <td style="background-color:#b04500" class="col-md-4">
@@ -42,14 +42,14 @@
                     2
                 </div>
             </td>
-            <td class="col-md-4" style="font-size:200%;;text-align: center;vertical-align: middle;opacity: 0.5">Entire
-                Group Broken
+            <td class="col-md-4" style="font-size:200%;;text-align: center;vertical-align: middle;color:#282828">Group
+                Broken
             </td>
         </tr>
             #if($defcon == 3)
-            <tr class="active">
+            <tr style="background-color:#aaa">
             #else
-            <tr>
+            <tr style="opacity:0.5">
             #end
             <td class="col-md-4"></td>
             <td style="background-color: #ff8c00" class="col-md-4">
@@ -57,14 +57,14 @@
                     3
                 </div>
             </td>
-            <td class="col-md-4" style="font-size:200%;;text-align: center;vertical-align: middle;opacity: 0.5">Machines
-                Broken
+            <td class="col-md-4" style="font-size:200%;;text-align: center;vertical-align: middle;color:#282828">Group
+                Overloaded
             </td>
         </tr>
             #if($defcon == 4)
-            <tr class="active">
+            <tr style="background-color:#aaa">
             #else
-            <tr>
+            <tr style="opacity:0.5">
             #end
             <td class="col-md-4"></td>
             <td style="background-color: #b8860b" class="col-md-4">
@@ -72,14 +72,15 @@
                     4
                 </div>
             </td>
-            <td class="col-md-4" style="font-size:200%;;text-align: center;vertical-align: middle;opacity: 0.5">Machines
+            <td class="col-md-4" style="font-size:200%;;text-align: center;vertical-align: middle;color:#282828">
+                Machines
                 Overloaded
             </td>
         </tr>
             #if($defcon == 5)
-            <tr class="active">
+            <tr style="background-color:#707070">
             #else
-            <tr>
+            <tr style="opacity:0.5">
             #end
             <td class="col-md-4"></td>
             <td style="background-color: #006400" class="col-md-4">
@@ -87,14 +88,12 @@
                     5
                 </div>
             </td>
-            <td class="col-md-4" style="font-size:200%;;text-align: center;vertical-align: middle;opacity: 0.5">All
-                Clear
-            </td>
+            <td class="col-md-4" style="font-size:400%;;text-align: center;vertical-align: middle;color:#282828">OK</td>
         </tr>
         </table>
     </div>
 </div>
 
-    #parse("footer.vm")
+##    #parse("footer.vm")
 </body>
 </html>

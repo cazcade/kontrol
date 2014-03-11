@@ -58,7 +58,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     val monitorExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Monitor Queue", 0, 64, 98, 100, 20);
     val groupMonitorExec: HashedExecutorService = HashedExecutorServiceImpl("Group Monitor Queue", 0, 10, 97, 100, 20);
     var groupExec: HashedExecutorService = HashedExecutorServiceImpl("Group Exec Queue", 0, 64, 100, 100, 1);
-    var machineExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Exec Queue", 0, 64, 100, 100, 1);
+    var machineExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Exec Queue", 0, 10000, 100, 100, 1);
     val unExecutedActions: MutableSet<String> = CopyOnWriteArraySet()
 
     override fun addGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>, target: MachineGroup, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
@@ -202,7 +202,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 println("Performing group action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 unExecutedActions.add(executionKey);
-                groupExec.submit(false, false, machine.groupName()) {
+                machineExec.submit(false, false, machine.id()) {
                     unExecutedActions.remove(executionKey);
                     if (action.first(machine)) {
                         machine.disable();
@@ -231,7 +231,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 println("Performing action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 unExecutedActions.add(executionKey2)
-                groupExec.submit(false, false, machine.groupName()) {
+                machineExec.submit(false, false, machine.id()) {
                     unExecutedActions.remove(executionKey2);
                     if (action2.first(machine)) {
                         machine.disable();
@@ -326,7 +326,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                         println("Performing action for $actionArg on ${it.id()}")
                         bus.dispatch("machine.group.pre", actionArg to group.name());
                         unExecutedActions.add(executionKey);
-                        groupExec.submit(false, false, it.groupName()) {
+                        machineExec.submit(false, false, it.id()) {
                             unExecutedActions.remove(executionKey);
                             if (action.first(it)) {
                                 it.disable();
@@ -343,7 +343,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                         }
                     }
                 } else {
-                    println("Action  $actionArg on ${group.name()} memberwas not taken")
+                    println("Action  $actionArg on ${group.name()} member was not taken")
 
                 }
 

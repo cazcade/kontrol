@@ -16,7 +16,40 @@
 
 package kontrol.examples.docean
 
-/*
+import kontrol.digitalocean.DigitalOceanMachineGroup
+import kontrol.digitalocean.DigitalOceanClientFactory
+import kontrol.sensor.SSHLoadSensor
+import kontrol.sensor.HttpStatusSensor
+import kontrol.digitalocean.DigitalOceanConfig
+import kontrol.sensor.HttpLoadSensor
+import kontrol.common.DefaultSensorArray
+import kontrol.api.Infrastructure
+import kontrol.sensor.HttpResponseTimeSensor
+import kontrol.postmortem.CentosPostmortem
+import kontrol.postmortem.TomcatPostmortem
+import kontrol.server.Server
+import kontrol.api.Controller
+import kontrol.common.group.ext.addGroupSensorRules
+import kontrol.common.group.ext.addMachineOverloadRules
+import kontrol.digitalocean.StaticMachine
+import java.util.ArrayList
+import kontrol.api.sensors.SensorArray
+import kontrol.api.MachineGroup
+import kontrol.staticmc.MixedCloud
+import kontrol.common.group.ext.allowDefaultTransitions
+import kontrol.common.group.ext.configureDefaultActions
+import kontrol.common.group.ext.applyDefaultRules
+import kontrol.common.group.ext.addMachineBrokenRules
+import kontrol.konfigurators.HaproxyKonfigurator
+import kontrol.staticmc.StaticMachineGroup
+import kontrol.ext.string.ssh.onHost
+import kontrol.api.OS
+import kontrol.postmortem.JettyPostmortem
+import kontrol.postmortem.HeapDumpsPostmortem
+import kontrol.common.group.ext.configureStaticActions
+import kontrol.impl.sensor.DiskUsageSensor
+
+
 public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
         group.addMachineBrokenRules("http-status" to 399.0)
@@ -29,10 +62,10 @@ public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
                 group.addMachineOverloadRules("load" to 6.0, "http-response-time" to 500.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..200.0, "load" to 2.0..5.0)
             }
-            "worker", "static-linux-workers", "pinstamatic" -> {
+            "dockworker", "static-linux-workers", "pinstamatic" -> {
                 //change this when deployed
-                group.addMachineOverloadRules("http-load" to 50.0,"load" to 10.0, "http-response-time" to 3000.0)
-                group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "http-load" to 4.0..8.0)
+                group.addMachineOverloadRules("http-load" to 50.0, "load" to 3.0, "http-response-time" to 500.0)
+                group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "http-load" to 1.0..3.0)
             }
             "static-osx-workers" -> {
                 //change this when deployed
@@ -59,12 +92,12 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
 
     val gatewaySensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?status"), HttpResponseTimeSensor("/gateway?status")));
     val loadBalancerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?status"), HttpResponseTimeSensor("/_stats", 8888)));
-    val workerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpLoadSensor("/api/load"), HttpStatusSensor("/api?key=monitor&url=google.com&freshness=1"), HttpResponseTimeSensor("/api?key=monitor&url=google.com&freshness=1")));
-    val staticWorkerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpLoadSensor("/api/load"), HttpStatusSensor("/api?key=monitor&url=google.com&freshness=1"), HttpResponseTimeSensor("/api?key=monitor&url=google.com&freshness=1"),DiskUsageSensor()));
+    val workerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/"), HttpResponseTimeSensor("/"), DiskUsageSensor()));
+    val staticWorkerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), DiskUsageSensor(), HttpStatusSensor("/")));
     val staticOSXWorkerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor("administrator", OS.OSX), HttpLoadSensor("/api/load"), HttpStatusSensor("/api?url=google.com&freshness=60&key=monitor"), HttpResponseTimeSensor("/api?url=google.com&freshness=1&key=monitor")));
     val lbConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 66)
     val gatewayConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
-    val workerConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 65)
+    val workerConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
 
     val keys = "Neil Laptop,Eric New"
 
@@ -74,21 +107,21 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
 
     val gatewayGroup = DigitalOceanMachineGroup(client, controller, "gateway", gatewaySensorArray, gatewayConfig, keys, 2, 2, 5, arrayListOf(loadBalancerGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()))
 
-    val workerGroup = DigitalOceanMachineGroup(client, controller, "worker", workerSensorArray, workerConfig, keys, 0, 2, 3, arrayListOf<MachineGroup>(), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()), upStreamKonfigurator = WorkerKonfigurator())
+    val workerGroup = DigitalOceanMachineGroup(client, controller, "dockworker", workerSensorArray, workerConfig, keys, 0, 0, 0, arrayListOf<MachineGroup>(), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()))
 
 
     val staticOSXWorkers = StaticMachineGroup(staticMachines("static-osx-workers", controller, staticOSXWorkerSensorArray, 109.0, "osx-worker-1" to "208.52.187.175", "osx-worker-2" to "208.52.187.176", "osx-worker-3" to "208.52.187.180", "osx-worker-4" to "208.52.187.178", "osx-worker-5" to "208.52.187.179"), " sudo reboot ", "rm -rf ~/cazcade/images/*; sudo reboot", "administrator", controller, "static-osx-workers", staticOSXWorkerSensorArray, keys, arrayListOf(), arrayListOf(TomcatPostmortem("/usr/local/tomcat"), HeapDumpsPostmortem()), upStreamKonfigurator = WorkerKonfigurator("administrator"))
 
     val contaboMachines = staticMachines("static-linux-workers", controller, workerSensorArray, 149.0, "contabo-worker-1" to "80.241.209.220")
     val hetznerMachines = staticMachines("static-linux-workers", controller, workerSensorArray, 149.0, "EOL!!!-hetzner-worker-1" to "144.76.194.178")
-//    val onlineNetMachines = staticMachines("static-linux-workers", controller, workerSensorArray, 80.0, "online.net-1" to "62.210.148.130")
-    val staticLinuxMachines = contaboMachines plus hetznerMachines //plus onlineNetMachines;
+    val onlineNetMachines = staticMachines("static-linux-workers", controller, workerSensorArray, 80.0, "online.net-1" to "62.210.188.41", "online.net-2" to "62.210.188.85", "online.net-2" to  "62.210.146.72")
+    val staticLinuxMachines = contaboMachines plus hetznerMachines plus onlineNetMachines;
 
-    val staticLinuxWorkers = StaticMachineGroup(staticLinuxMachines, "su - cazcade -c 'cd snapito; git pull; mvn clean install -Dmaven.test.skip'; nohup service jetty restart &", "rm -rf /home/cazcade/var/snapito/images/short-lived/; rm -rf /home/cazcade/var/snapito/session/; killall java; reboot", "root", controller, "static-linux-workers", staticWorkerSensorArray, keys, arrayListOf(), arrayListOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty")),upStreamKonfigurator = WorkerKonfigurator())
+    val staticLinuxWorkers = StaticMachineGroup(staticLinuxMachines, "sudo service supervisor restart", "sudo reboot", "cazcade", controller, "static-linux-workers", staticWorkerSensorArray, keys, arrayListOf(), arrayListOf(CentosPostmortem()))
 
 
     val snapitoIOSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/snapito.txt"), HttpResponseTimeSensor("/snapito.txt")));
-    val snapitoIOMachines = staticMachines( "static-linux-snapito.io", controller, snapitoIOSensorArray, 80.0, "snapito.io-new-1" to "142.4.219.14")
+    val snapitoIOMachines = staticMachines("static-linux-snapito.io", controller, snapitoIOSensorArray, 80.0, "snapito.io-new-1" to "142.4.219.14")
     val snapitoIO = StaticMachineGroup(snapitoIOMachines, "reboot", "reboot", "root", controller, "static-linux-snapito.io", snapitoIOSensorArray, keys, arrayListOf(), arrayListOf(CentosPostmortem()));
 
 
@@ -99,7 +132,7 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
 
 
     return hashMapOf(
-            "worker" to workerGroup,
+            "dockworker" to workerGroup,
             //            "lb" to loadBalancerGroup,
             //            "gateway" to gatewayGroup,
             "static-osx-workers" to staticOSXWorkers,
@@ -132,21 +165,17 @@ fun main(args: Array<String>): Unit {
 
 
         cloud["static-osx-workers"].configureStaticActions(controller, postmortems, { m, g ->
-        " cd app/snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java; cp -f ./snapito-api/target/snapito-api-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/api.war; rm -rf /tmp/*.png; sleep 180".onHost(m.ip(), "administrator",timeoutInSeconds=300)
+            " cd app/snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java; cp -f ./snapito-api/target/snapito-api-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/api.war; rm -rf /tmp/*.png; sleep 180".onHost(m.ip(), "administrator", timeoutInSeconds = 300)
         },
                 { m, g ->
-                    " cd app/snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java;cp -f ./snapito-api/target/snapito-api-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/api.war; rm -rf /tmp/*.png; sleep 120".onHost(m.ip(), "administrator",timeoutInSeconds=300)
+                    " cd app/snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java;cp -f ./snapito-api/target/snapito-api-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/api.war; rm -rf /tmp/*.png; sleep 120".onHost(m.ip(), "administrator", timeoutInSeconds = 300)
 
                 }
         )
 
         cloud["static-linux-snapito.io"].configureStaticActions(controller, postmortems);
         cloud["static-linux-workers"].configureStaticActions(controller, postmortems);
-        cloud["worker"].configureDefaultActions(controller, postmortems, { m, g ->
-            " su cazcade -c 'cd ~/snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png; ~/jetty/bin/jetty.sh restart; sleep 120'".onHost(m.ip(),timeoutInSeconds=300)
-        }, { m, g ->
-            " su cazcade -c 'cd ~/snapito; git checkout master; git pull; mvn clean install -Dmaven.test.skip=true; killall java; rm -rf /tmp/*.png; ~/jetty/bin/jetty.sh restart; sleep 120'".onHost(m.ip(),timeoutInSeconds=300)
-        })
+        cloud["dockworker"].configureDefaultActions(controller, postmortems)
 
         //        cloud["lb"] becomes MachineGroupState.GROUP_BROKEN ifStateIn listOf(MachineGroupState.QUIET, MachineGroupState.BUSY, MachineGroupState.NORMAL, null) andTest {
         //            cloud["gateway"].state() != MachineGroupState.GROUP_BROKEN && cloud["worker"].state() != MachineGroupState.GROUP_BROKEN && it.machines().size < it.hardMax
@@ -168,6 +197,5 @@ fun main(args: Array<String>): Unit {
     }
 
 }
-*/
 
 

@@ -18,13 +18,9 @@ package kontrol.sensor
 
 import kontrol.api.LoadSensor
 import kontrol.api.Machine
-import net.schmizz.sshj.SSHClient
-import net.schmizz.sshj.common.IOUtils
-import net.schmizz.sshj.connection.channel.direct.Session
-import java.util.concurrent.TimeUnit
-import net.schmizz.sshj.connection.channel.direct.Session.Command
 import kontrol.api.sensor.SensorValue
 import kontrol.api.OS
+import kontrol.ext.string.ssh.onHost
 
 /**
  * @todo document.
@@ -44,33 +40,16 @@ public class SSHLoadSensor(val user: String = "root", val os: OS = OS.LINUX) : L
 
     override fun value(machine: Machine): SensorValue {
         try {
-            val ssh: SSHClient = SSHClient();
-            ssh.addHostKeyVerifier { a, b, c -> true };
-            ssh.connect(machine.ip());
-            try {
-                ssh.authPublickey(user);
-                val session: Session? = ssh.startSession();
-                try {
-                    val cmd: Command?
-                    cmd = when (os) {
-                        OS.LINUX -> {
-                            session?.exec("cat /proc/loadavg | cut -d' ' -f1 | tr -d ' '")
-                        }
-                        OS.OSX -> {
-                            session?.exec("uptime | cut -d, -f3 | cut -d: -f2 | cut -d' ' -f2 | tr -d ' '");
-                        }
-                        else -> throw IllegalArgumentException("Unsupported OS $os")
-                    }
-
-                    val load = IOUtils.readFully(cmd?.getInputStream()).toString().trim().toDouble()
-                    cmd?.join(5, TimeUnit.SECONDS);
-                    return SensorValue(name(), load);
-                } finally {
-                    session?.close();
+            val load = when (os) {
+                OS.LINUX -> {
+                    "cat /proc/loadavg | cut -d' ' -f1 | tr -d ' '".onHost(machine.ip(), user, 30)
                 }
-            } finally {
-                ssh.disconnect();
+                OS.OSX -> {
+                    "uptime | cut -d, -f3 | cut -d: -f2 | cut -d' ' -f2 | tr -d ' '".onHost(machine.ip(), user, 30)
+                }
+                else -> throw IllegalArgumentException("Unsupported OS $os")
             }
+            return SensorValue(name(), load);
         } catch (e: Exception) {
             println("SSHLoadSensor: ${e.javaClass} for ${machine.name()}")
             return  SensorValue(name(), null);

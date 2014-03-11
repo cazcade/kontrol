@@ -42,7 +42,13 @@ public class DefaultSensorArray(val sensors: List<Sensor>) : SensorArray{
 
     override fun values(machine: Machine): Map<String, SensorValue> {
         var result = HashMap<String, SensorValue>();
-        sensors.forEach { result.put(it.name(), it.value(machine)) };
+        sensors.forEach {
+            try {
+                result.put(it.name(), it.value(machine))
+            } catch (e: Exception) {
+                e.printStackTrace();
+            }
+        };
         return result;
     }
 }

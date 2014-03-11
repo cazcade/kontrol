@@ -48,9 +48,6 @@ public fun MachineGroup.allowDefaultTransitions() {
     this allowMachine (OK to OVERLOADED);
     this allowMachine (OVERLOADED to OK);
     this allowMachine (OVERLOADED to BROKEN);
-    this allowMachine (OVERLOADED to DEAD);
-    this allowMachine (OVERLOADED to FAILED);
-    this allowMachine (OVERLOADED to STALE);
     this allowMachine (STALE to UPGRADE_FAILED);
     this allowMachine (UPGRADE_FAILED to OK);
     this allowMachine (UPGRADE_FAILED to BROKEN);
@@ -59,6 +56,7 @@ public fun MachineGroup.allowDefaultTransitions() {
     this allowMachine (DEAD to FAILED);
     this allowMachine (DEAD to OK);
     this allowMachine (OK to FAILED);
+    this allowMachine (FAILED to OK);
 
 
     this allow (QUIET to BUSY);
@@ -76,7 +74,7 @@ public fun MachineGroup.allowDefaultTransitions() {
 }
 
 
-public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemStore: PostmortemStore, upgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> ;g.rebuild(m) }, downgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> }) {
+public fun MachineGroup.configureDefaultActions(controller: Controller, postmortemStore: PostmortemStore, upgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> ;g.rebuild(m) }, downgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> }) {
 
     //nb: All actions listed under takeActions must be atomic, don't assume you can add together multiple actions to form an atomic action.
     //nb: This is because the multiple actions are not guaranteed to both be executed or even their order!
@@ -184,10 +182,109 @@ public fun MachineGroup.applyDefaultPolicies(controller: Controller, postmortemS
     } to EMERGENCY_FIX  IF { this.workingSize() == 0 } group this;
 }
 
+
+public fun MachineGroup.configureStaticActions(controller: Controller, postmortemStore: PostmortemStore, upgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> ;g.rebuild(m) }, downgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> }) {
+
+    //nb: All actions listed under takeActions must be atomic, don't assume you can add together multiple actions to form an atomic action.
+    //nb: This is because the multiple actions are not guaranteed to both be executed or even their order!
+
+    this whenMachine BROKEN recheck THEN tell controller takeActions listOf(FIX);
+    this whenMachine OK recheck THEN tell controller takeAction FAILBACK;
+    this whenMachine DEAD recheck THEN tell controller takeActions listOf(REBUILD) ;
+    //    this whenMachine STALE recheck THEN tell controller takeActions listOf(UPGRADE);
+    //    this whenMachine UPGRADE_FAILED recheck THEN tell controller takeActions listOf(DOWNGRADE);
+    this whenMachine FAILED recheck THEN tell controller takeActions listOf(REBUILD);
+    //    this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EMERGENCY_FIX);
+    this whenMachine OVERLOADED recheck THEN tell controller  takeActions listOf(FAILOVER);
+
+    //make sure the action performed is atomic as multiple actions can be split
+
+    controller will {
+        this.failover(it);
+        if (this.workingSize() > 1 ) {
+            upgradeAction(it, this);
+        } else {
+            println("Upgrade skipped, not enough working machines.")
+        }
+        java.lang.String()
+    } takeAction UPGRADE IF { this.workingSize() > 1 && it.state() in listOf(STALE) }  inGroup this;
+
+    controller will {
+        downgradeAction(it, this);
+        java.lang.String()
+    } takeAction DOWNGRADE inGroup this;
+
+    controller will {
+        this.failback(it);
+        java.lang.String()
+    } takeAction FAILBACK IF { it.state() in listOf(OK, STALE, OVERLOADED, null) } inGroup this;
+
+    controller will {
+        //Basically take it offline for a short while to see if that sorts it out.
+        this.failover(it);
+        Thread.sleep(120 * 1000)
+        java.lang.String()
+    } takeAction FAILOVER IF { it.state() in listOf(OVERLOADED) && this.workingSize() >= this.machines().size() / 2 } inGroup this;
+
+    controller will {
+        this.failover(it);
+        this.rebuild(it);
+        try {
+            downgradeAction(it, this);
+        } catch(e: Exception) {
+            e.printStackTrace()
+        }
+        this.clearState(it);
+        this.configure(it)
+        java.lang.String()
+    } takeAction REBUILD IF { it.state() !in listOf(OK, STALE, OVERLOADED, null) } inGroup this;
+
+    controller will {
+        this.failover(it);
+        postmortemStore.addAll(this.postmortem(it));
+        try {
+            downgradeAction(it, this);
+        } catch(e: Exception) {
+            e.printStackTrace()
+        }
+        this.fix(it);
+        this.configure(it);
+        java.lang.String()
+    } takeAction FIX IF { this.other(it) != null && it.state() !in listOf(null, OK) } inGroup this;
+
+    controller will {
+        this.failover(it);
+        this.destroy(it);
+        java.lang.String()
+    } takeAction DESTROY_MACHINE  IF { this.other(it) != null && this.workingSize() > this.min }  inGroup this;
+    controller use {
+        this.enabled = false;
+        try {
+            try {
+                it.brokenMachines().sortBy { it.id() } forEach {
+                    this.rebuild(it);
+                    this.clearState(it);
+                    this.configure(it)
+                }
+                this.configure();
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+            }
+            java.lang.String()
+        } finally {
+            this.enabled = true
+        }
+    } to EMERGENCY_FIX  IF { this.workingSize() == 0 } group this;
+
+}
+
+
 public fun MachineGroup.applyDefaultRules(timeFactor: Int = 60) {
     this memberIs STALE ifStateIn listOf(OK, OVERLOADED, null) andTest { this.other(it) != null && this.machines().filter { it.state() == STALE }.size() == 0 } after  timeFactor * 60000  seconds "upgrade"
-    this memberIs BROKEN ifStateIn listOf(BROKEN, OVERLOADED, UPGRADE_FAILED) after timeFactor * 10 seconds "bad-now-broken"
-    this memberIs DEAD ifStateIn listOf(OVERLOADED, DEAD, BROKEN, STOPPED, null, UPGRADE_FAILED) after timeFactor * 15 seconds "escalate-broken-to-dead"
+    this memberIs BROKEN ifStateIn listOf(BROKEN, UPGRADE_FAILED) after timeFactor * 10 seconds "bad-now-broken"
+    this memberIs BROKEN ifStateIn listOf(OVERLOADED) after timeFactor * 10 seconds "overloaded-now-broken"
+    this memberIs DEAD ifStateIn listOf(DEAD, BROKEN, STOPPED, null, UPGRADE_FAILED) after timeFactor * 15 seconds "escalate-broken-to-dead"
     val escalateDuration: Long = 60L * timeFactor * 1000L
     this memberIs DEAD ifStateIn listOf(DEAD, BROKEN, STOPPED, UPGRADE_FAILED) andTest { it.fsm.history.percentageInWindow(listOf(UPGRADE_FAILED, BROKEN, STOPPED, DEAD), (escalateDuration / 2)..escalateDuration) > 30.0 } after timeFactor seconds "flap-now-escalate-to-dead"
     this memberIs FAILED ifStateIn listOf(DEAD, FAILED) after timeFactor * 10 seconds "dead-now-failed"
@@ -217,11 +314,11 @@ public fun MachineGroup.addMachineBrokenRules(vararg rules: Pair<String, Double>
 
 fun MachineGroup.addGroupSensorRules(vararg ranges: Pair<String, Range<Double>>, timeFactor: Int = 60) {
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(QUIET, BUSY, NORMAL) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor seconds "group-size-dangerously-low"
+    this becomes GROUP_BROKEN ifStateIn  listOf(QUIET, BUSY, NORMAL) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 5 seconds "group-size-dangerously-low"
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(null) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor  seconds "group-size-dangerously-low-initial"
+    this becomes GROUP_BROKEN ifStateIn  listOf(null) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 5  seconds "group-size-dangerously-low-initial"
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 2 seconds "group-size-still-dangerously-low"
+    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 10 seconds "group-size-still-dangerously-low"
 
     this becomes NORMAL ifStateIn  listOf(GROUP_BROKEN) andTest { it.max != 0 && it.workingSize() > 0 && it.activeSize() > 0 } after timeFactor seconds "group-size-okay"
 

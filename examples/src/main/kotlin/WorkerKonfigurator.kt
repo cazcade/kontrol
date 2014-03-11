@@ -29,13 +29,13 @@ public class WorkerKonfigurator(val user: String = "root") : UpStreamKonfigurato
 
 
     override fun onMachineFail(machine: Machine, machineGroup: MachineGroup) {
-        "touch /tmp/snapito-disable".onHost(machine.hostname(), user)
+        "touch /tmp/snapito-disable".onHost(machine.hostname(), user, timeoutInSeconds = 20)
         Thread.sleep(30 * 1000)
     }
 
 
     override fun onMachineUnfail(machine: Machine, machineGroup: MachineGroup) {
-        "rm /tmp/snapito-disable".onHost(machine.hostname(), user)
+        "rm /tmp/snapito-disable".onHost(machine.hostname(), user, timeoutInSeconds = 20)
     }
 
 

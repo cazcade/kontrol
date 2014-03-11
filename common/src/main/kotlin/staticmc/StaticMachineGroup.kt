@@ -42,7 +42,7 @@ import kontrol.api.Monitorable
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
 public class StaticMachineGroup(members: List<StaticMachine>,
-                                val restartAction: String = "reboot",
+                                val fixAction: String = "reboot",
                                 val rebuildAction: String = "reboot",
                                 val user: String = "root",
                                 public override val controller: Controller,
@@ -115,12 +115,12 @@ public class StaticMachineGroup(members: List<StaticMachine>,
         val id = machine.id();
         try {
             println("Rebuilding $machine")
-            rebuildAction.onHost(machine.ip(), user)
-            Thread.sleep(300 * 1000)
+            rebuildAction.onHost(machine.ip(), user, 600)
+            Thread.sleep(600 * 1000)
             println("Rebuilt ${id}")
         } catch (e: Exception) {
             println("Failed to rebuild ${id} due to ${e.getMessage()}")
-            machine.fsm.attemptTransition(MachineState.DEAD)
+            machine.fsm.attemptTransition(MachineState.FAILED)
         }
         return this;
     }
@@ -130,8 +130,8 @@ public class StaticMachineGroup(members: List<StaticMachine>,
         val id = machine.id();
         try {
             println("Restarting $machine")
-            restartAction.onHost(machine.ip(), user)
-            Thread.sleep(300 * 1000)
+            fixAction.onHost(machine.ip(), user, 600)
+            Thread.sleep(600 * 1000)
             println("Restarted ${id}")
         } catch (e: Exception) {
             println("Failed to restart ${id} due to ${e.getMessage()}")

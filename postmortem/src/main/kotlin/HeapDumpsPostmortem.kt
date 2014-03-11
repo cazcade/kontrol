@@ -32,7 +32,7 @@ public class HeapDumpsPostmortem(val heapDir: String = "/tmp") : Postmortem{
         println("Performing Heap Dump Postmortem for ${machine.name()}")
 
         return PostmortemResult("heap-dumps", machine, arrayListOf(
-                TextPart("java-heap-dumps", "cat $heapDir/*.hprof; rm $heapDir/*.hprof" onHost machine.ip())
+                TextPart("java-heap-dumps", "cat $heapDir/*.hprof; rm $heapDir/*.hprof" .onHost (machine.ip(), timeoutInSeconds = 600))
         ), HashMap(machine.latestDataValues()));
     }
 

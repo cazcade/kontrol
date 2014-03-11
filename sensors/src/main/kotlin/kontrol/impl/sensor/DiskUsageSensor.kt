@@ -34,7 +34,7 @@ public class DiskUsageSensor(val user: String = "root", val disk: String = "/") 
     }
 
     override fun value(machine: Machine): SensorValue {
-        return SensorValue("df -m ${disk} | tail -1 | awk '{$1=$1}1' OFS=',' | cut -d, -f 8 | tr -d '%'".onHost(machine.ip(), user));
+        return SensorValue("df -m ${disk} | tail -1 | awk '{$1=$1}1' OFS=',' | cut -d, -f 5 | tr -d '%'".onHost(machine.ip(), user));
     }
 
 }

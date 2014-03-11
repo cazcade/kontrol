@@ -42,7 +42,7 @@ public class CentosPostmortem(val logMax: Int = 1000) : Postmortem{
                 TextPart("mem", "cat /proc/meminfo" onHost machine.ip()),
                 TextPart("cpu", "cat /proc/cpuinfo" onHost machine.ip()),
                 TextPart("ulimit", "ulimit -a" onHost machine.ip()),
-                TextPart("du", "du -sh /*" onHost machine.ip()),
+                TextPart("du", "du -sh /*".onHost (machine.ip(), timeoutInSeconds = 120)),
                 TextPart("df", "df -h" onHost machine.ip()),
                 TextPart("services", "service --status-all" onHost machine.ip()),
                 TextPart("netstat", "netstat -tulpn" onHost machine.ip())

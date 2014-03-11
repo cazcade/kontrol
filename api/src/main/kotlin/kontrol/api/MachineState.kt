@@ -24,6 +24,7 @@ public enum class MachineState {
     STOPPED
     BROKEN
     OVERLOADED
+    FULL
     DEAD
     FAILED
     STALE

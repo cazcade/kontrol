@@ -6,10 +6,7 @@ package exec;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -31,6 +28,7 @@ public class HashedExecutorServiceImpl extends AbstractServiceStateMachine imple
 
 
     private final AtomicLong count = new AtomicLong();
+    private int threadCount;
 
     public HashedExecutorServiceImpl(final String name, final int maxRetry, final int buckets, final int queueSize, final int requeueDelay, final int threadsPerBucket) {
         super();
@@ -55,7 +53,7 @@ public class HashedExecutorServiceImpl extends AbstractServiceStateMachine imple
         int index = hashToBucket(key);
         ThreadPoolExecutor threadPoolExecutor = executors.get(index);
         if (threadPoolExecutor == null) {
-            threadPoolExecutor = createExecutor();
+            threadPoolExecutor = createExecutor(key, index);
             executors.set(index, threadPoolExecutor);
         }
         return threadPoolExecutor;
@@ -190,8 +188,13 @@ public class HashedExecutorServiceImpl extends AbstractServiceStateMachine imple
         unlock();
     }
 
-    private ThreadPoolExecutor createExecutor() {
-        return new ThreadPoolExecutor(threadsPerBucket, threadsPerBucket, 3600, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(queueSize), new ThreadPoolExecutor.AbortPolicy());
+    private ThreadPoolExecutor createExecutor(final Object key, final int index) {
+        return new ThreadPoolExecutor(threadsPerBucket, threadsPerBucket, 3600, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(queueSize), new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, name + "[" + index + "," + threadCount++ + "] (" + key.toString() + ")");
+            }
+        }, new ThreadPoolExecutor.AbortPolicy());
     }
 
     @Override
