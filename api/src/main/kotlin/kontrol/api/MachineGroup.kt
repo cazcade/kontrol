@@ -20,6 +20,7 @@ import kontrol.api.sensors.SensorArray
 import java.util.SortedSet
 import kontrol.ext.collections.avgAsDouble
 import kontrol.ext.collections.median
+import kontrol.api.sensors.GroupSensorArray
 
 
 /**
@@ -34,6 +35,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     val downStreamKonfigurator: DownStreamKonfigurator?
     val stateMachine: StateMachine<MachineGroupState>
     val sensors: SensorArray;
+    val groupSensors: GroupSensorArray;
     val defaultMachineRules: StateMachineRules<MachineState>
     val monitor: Monitor<MachineGroupState, MachineGroup>
     val machineMonitorRules: SortedSet<MonitorRule<MachineState, Machine>>
@@ -68,25 +70,30 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     fun workingAndReadyMachines(): List<Machine> = enabledMachines().filter { it.state() in listOf(MachineState.OK, MachineState.STALE) }
 
     fun get(value: String): Double? {
-        val values = machines()  map { it[value] }
-        val average = values.map { it?.D() }.avgAsDouble()
-        val median = values.map { it?.D() }.median()
-        //The average should be within a factor of 5 of the median, if not we use the median instead
-        val result = when {
-            average == null -> null
-            median == null -> null
-            average!! > median!! * 5 -> {
-                median
+        val groupSensorValue = groupSensors[this, value]
+        if (groupSensorValue != null) {
+            return groupSensorValue.D();
+        } else {
+            val values = machines()  map { it[value] }
+            val average = values.map { it?.D() }.avgAsDouble()
+            val median = values.map { it?.D() }.median()
+            //The average should be within a factor of 5 of the median, if not we use the median instead
+            val result = when {
+                average == null -> null
+                median == null -> null
+                average!! > median!! * 5 -> {
+                    median
+                }
+                average!! < median!! / 5 -> {
+                    median
+                }
+                else -> {
+                    average
+                }
             }
-            average!! < median!! / 5 -> {
-                median
-            }
-            else -> {
-                average
-            }
+            //        println("$value was $result")
+            return result;
         }
-        //        println("$value was $result")
-        return result;
     }
 
 

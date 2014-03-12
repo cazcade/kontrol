@@ -34,12 +34,14 @@ import java.util.TreeSet
 import kontrol.api.Postmortem
 import kontrol.api.Controller
 import kontrol.api.Monitorable
+import kontrol.api.sensors.GroupSensorArray
+import kontrol.common.DefaultGroupSensorArray
 
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>, override val upstreamGroups: MutableList<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator?, override val upStreamKonfigurator: UpStreamKonfigurator?, override val controller: Controller) : MachineGroup{
+public class MockMachineGroup(val name: String, val machines: MutableList<MockMachine>, override val monitor: Monitor<MachineGroupState, MachineGroup>, override val upstreamGroups: MutableList<MachineGroup>, override val downStreamKonfigurator: DownStreamKonfigurator?, override val upStreamKonfigurator: UpStreamKonfigurator?, override val controller: Controller, override val groupSensors: GroupSensorArray = DefaultGroupSensorArray()) : MachineGroup{
     override var disableAction: ((Monitorable<MachineGroupState>) -> Unit)? = null
     override var enableAction: ((Monitorable<MachineGroupState>) -> Unit)? = null
     override val hardMax: Int = 10000000

@@ -99,15 +99,14 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
     val gatewayConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
     val workerConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
 
-    val keys = "Neil Laptop,Eric New"
-
+    val keys = "Neil Laptop,Eric New,Neil New"
 
     val loadBalancerGroup = DigitalOceanMachineGroup(client, controller, "lb", loadBalancerSensorArray, lbConfig, keys, 2, 2, 5, arrayListOf(), listOf(CentosPostmortem()), downStreamKonfigurator = HaproxyKonfigurator("/haproxy.cfg.vm"), upStreamKonfigurator = cloudFlareKonfigurator
     )
 
     val gatewayGroup = DigitalOceanMachineGroup(client, controller, "gateway", gatewaySensorArray, gatewayConfig, keys, 2, 2, 5, arrayListOf(loadBalancerGroup), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()))
 
-    val workerGroup = DigitalOceanMachineGroup(client, controller, "dockworker", workerSensorArray, workerConfig, keys, 0, 0, 0, arrayListOf<MachineGroup>(), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()))
+    val workerGroup = DigitalOceanMachineGroup(client, controller, "dockworker", workerSensorArray, workerConfig, keys, 0, 24, 32, arrayListOf<MachineGroup>(), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()))
 
 
     val staticOSXWorkers = StaticMachineGroup(staticMachines("static-osx-workers", controller, staticOSXWorkerSensorArray, 109.0, "osx-worker-1" to "208.52.187.175", "osx-worker-2" to "208.52.187.176", "osx-worker-3" to "208.52.187.180", "osx-worker-4" to "208.52.187.178", "osx-worker-5" to "208.52.187.179"), " sudo reboot ", "rm -rf ~/cazcade/images/*; sudo reboot", "administrator", controller, "static-osx-workers", staticOSXWorkerSensorArray, keys, arrayListOf(), arrayListOf(TomcatPostmortem("/usr/local/tomcat"), HeapDumpsPostmortem()), upStreamKonfigurator = WorkerKonfigurator("administrator"))
@@ -117,11 +116,11 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
     val onlineNetMachines = staticMachines("static-linux-workers", controller, workerSensorArray, 80.0, "online.net-1" to "62.210.188.41", "online.net-2" to "62.210.188.85", "online.net-2" to  "62.210.146.72")
     val staticLinuxMachines = contaboMachines plus hetznerMachines plus onlineNetMachines;
 
-    val staticLinuxWorkers = StaticMachineGroup(staticLinuxMachines, "sudo service supervisor restart", "sudo reboot", "cazcade", controller, "static-linux-workers", staticWorkerSensorArray, keys, arrayListOf(), arrayListOf(CentosPostmortem()))
+    val staticLinuxWorkers = StaticMachineGroup(staticLinuxMachines, "sudo docker rm $(docker ps -q -a) ; sudo service supervisor restart", "sudo find /usr/share/nginx/html/temp_images -exec rm {} ; sudo reboot", "cazcade", controller, "static-linux-workers", staticWorkerSensorArray, keys, arrayListOf(), arrayListOf(CentosPostmortem()))
 
 
     val snapitoIOSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/snapito.txt"), HttpResponseTimeSensor("/snapito.txt")));
-    val snapitoIOMachines = staticMachines("static-linux-snapito.io", controller, snapitoIOSensorArray, 80.0, "snapito.io-new-1" to "142.4.219.14")
+    val snapitoIOMachines = staticMachines("static-linux-snapito.io", controller, snapitoIOSensorArray, 80.0, "snapito.io-new-1" to "62.210.206.130")
     val snapitoIO = StaticMachineGroup(snapitoIOMachines, "reboot", "reboot", "root", controller, "static-linux-snapito.io", snapitoIOSensorArray, keys, arrayListOf(), arrayListOf(CentosPostmortem()));
 
 

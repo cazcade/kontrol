@@ -36,6 +36,7 @@ import kontrol.ext.string.ssh.onHost
 import kontrol.digitalocean.StaticMachine
 import kontrol.staticmnc.StaticMachineGroupMonitor
 import kontrol.api.Monitorable
+import kontrol.api.sensors.GroupSensorArray
 
 /**
  * @todo document.
@@ -52,7 +53,8 @@ public class StaticMachineGroup(members: List<StaticMachine>,
                                 override val upstreamGroups: MutableList<MachineGroup>,
                                 override val postmortems: MutableList<Postmortem>,
                                 override val downStreamKonfigurator: DownStreamKonfigurator? = null,
-                                override val upStreamKonfigurator: UpStreamKonfigurator? = null) : MachineGroup{
+                                override val upStreamKonfigurator: UpStreamKonfigurator? = null,
+                                override val groupSensors: GroupSensorArray = DefaultGroupSensorArray()) : MachineGroup{
     override var disableAction: ((Monitorable<MachineGroupState>) -> Unit)? = null
     override var enableAction: ((Monitorable<MachineGroupState>) -> Unit)? = null
     override val min: Int = members.size

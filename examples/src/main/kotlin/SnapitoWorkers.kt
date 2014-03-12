@@ -14,64 +14,37 @@
  * limitations under the License.
  */
 
-package kontrol.common.group.ext
+package com.cazcade.snapito.kontrol.worker
 
+import kontrol.digitalocean.DigitalOceanMachineGroup
+import kontrol.digitalocean.DigitalOceanClientFactory
+import kontrol.sensor.SSHLoadSensor
+import kontrol.digitalocean.DigitalOceanConfig
+import kontrol.common.DefaultSensorArray
+import kontrol.api.Infrastructure
+import kontrol.sensor.HttpResponseTimeSensor
+import kontrol.postmortem.CentosPostmortem
+import kontrol.server.Server
+import kontrol.api.Controller
+import kontrol.digitalocean.StaticMachine
+import java.util.ArrayList
+import kontrol.api.sensors.SensorArray
+import kontrol.api.MachineGroup
+import kontrol.staticmc.MixedCloud
+import kontrol.postmortem.JettyPostmortem
+import kontrol.postmortem.HeapDumpsPostmortem
+import kontrol.impl.sensor.DiskUsageSensor
+import kontrol.api.PostmortemStore
+import kontrol.api.Machine
 import kontrol.api.MachineGroup.Recheck.*
 import kontrol.api.MachineGroupState.*
 import kontrol.api.GroupAction.*
 import kontrol.api.Action.*
 import kontrol.api.MachineState.*
-import kontrol.api.Controller
-import kontrol.api.MachineGroup
-import kontrol.api.PostmortemStore
-import kontrol.api.Machine
-
-/**
- * @todo document.
- * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
- */
-
-
-public fun MachineGroup.allowDefaultTransitions() {
-
-    this allowMachine (OK to STOPPED);
-    this allowMachine (OK to BROKEN);
-    this allowMachine (OK to STALE);
-    this allowMachine (STOPPED to DEAD);
-    this allowMachine (STOPPED to OK);
-    this allowMachine (STOPPED to BROKEN);
-    this allowMachine (BROKEN to STALE);
-    this allowMachine (BROKEN to OK);
-    this allowMachine (BROKEN to DEAD);
-    this allowMachine (BROKEN to FAILED);
-    this allowMachine (STALE to OK);
-    this allowMachine (OK to OVERLOADED);
-    this allowMachine (OVERLOADED to OK);
-    this allowMachine (OVERLOADED to BROKEN);
-    this allowMachine (STALE to UPGRADE_FAILED);
-    this allowMachine (UPGRADE_FAILED to OK);
-    this allowMachine (UPGRADE_FAILED to BROKEN);
-    this allowMachine (UPGRADE_FAILED to DEAD);
-    this allowMachine (UPGRADE_FAILED to FAILED);
-    this allowMachine (DEAD to FAILED);
-    this allowMachine (DEAD to OK);
-    this allowMachine (OK to FAILED);
-    this allowMachine (FAILED to OK);
-
-
-    this allow (QUIET to BUSY);
-    this allow (QUIET to NORMAL);
-    this allow (QUIET to GROUP_BROKEN);
-    this allow (BUSY to NORMAL);
-    this allow (BUSY to QUIET);
-    this allow (BUSY to  GROUP_BROKEN);
-    this allow (NORMAL to GROUP_BROKEN);
-    this allow (NORMAL to QUIET);
-    this allow (NORMAL to BUSY);
-    this allow (GROUP_BROKEN to QUIET);
-    this allow (GROUP_BROKEN to BUSY);
-    this allow (GROUP_BROKEN to NORMAL);
-}
+import kontrol.common.group.ext.allowDefaultTransitions
+import kontrol.sensor.HttpStatusSensor
+import kontrol.common.DefaultGroupSensorArray
+import kontrol.common.group.ext.addGroupSensorRules
 
 
 public fun MachineGroup.configureDefaultActions(controller: Controller, postmortemStore: PostmortemStore, upgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> ;g.rebuild(m) }, downgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> }) {
@@ -87,7 +60,7 @@ public fun MachineGroup.configureDefaultActions(controller: Controller, postmort
     this whenMachine FAILED recheck THEN tell controller takeActions listOf(DESTROY_MACHINE);
     this whenGroup BUSY recheck THEN use controller takeAction EXPAND;
     this whenGroup QUIET recheck THEN use controller takeAction CONTRACT;
-    this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EMERGENCY_FIX);
+    this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EXPAND);
 
     //make sure the action performed is atomic as multiple actions can be split
 
@@ -183,103 +156,6 @@ public fun MachineGroup.configureDefaultActions(controller: Controller, postmort
 }
 
 
-public fun MachineGroup.configureStaticActions(controller: Controller, postmortemStore: PostmortemStore, upgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> ;g.rebuild(m) }, downgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> }) {
-
-    //nb: All actions listed under takeActions must be atomic, don't assume you can add together multiple actions to form an atomic action.
-    //nb: This is because the multiple actions are not guaranteed to both be executed or even their order!
-
-    this whenMachine BROKEN recheck THEN tell controller takeActions listOf(FIX);
-    this whenMachine OK recheck THEN tell controller takeAction FAILBACK;
-    this whenMachine DEAD recheck THEN tell controller takeActions listOf(REBUILD) ;
-    //    this whenMachine STALE recheck THEN tell controller takeActions listOf(UPGRADE);
-    //    this whenMachine UPGRADE_FAILED recheck THEN tell controller takeActions listOf(DOWNGRADE);
-    this whenMachine FAILED recheck THEN tell controller takeActions listOf(REBUILD);
-    //    this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EMERGENCY_FIX);
-    this whenMachine OVERLOADED recheck THEN tell controller  takeActions listOf(FAILOVER);
-
-    //make sure the action performed is atomic as multiple actions can be split
-
-    controller will {
-        this.failover(it);
-        if (this.workingSize() > 1 ) {
-            upgradeAction(it, this);
-        } else {
-            println("Upgrade skipped, not enough working machines.")
-        }
-        java.lang.String()
-    } takeAction UPGRADE IF { this.workingSize() > 1 && it.state() in listOf(STALE) }  inGroup this;
-
-    controller will {
-        downgradeAction(it, this);
-        java.lang.String()
-    } takeAction DOWNGRADE inGroup this;
-
-    controller will {
-        this.failback(it);
-        java.lang.String()
-    } takeAction FAILBACK IF { it.state() in listOf(OK, STALE, OVERLOADED, null) } inGroup this;
-
-    controller will {
-        //Basically take it offline for a short while to see if that sorts it out.
-        this.failover(it);
-        Thread.sleep(120 * 1000)
-        java.lang.String()
-    } takeAction FAILOVER IF { it.state() in listOf(OVERLOADED) && this.workingSize() >= this.machines().size() / 2 } inGroup this;
-
-    controller will {
-        this.failover(it);
-        this.rebuild(it);
-        try {
-            downgradeAction(it, this);
-        } catch(e: Exception) {
-            e.printStackTrace()
-        }
-        this.clearState(it);
-        this.configure(it)
-        java.lang.String()
-    } takeAction REBUILD IF { it.state() !in listOf(OK, STALE, OVERLOADED, null) } inGroup this;
-
-    controller will {
-        this.failover(it);
-        postmortemStore.addAll(this.postmortem(it));
-        try {
-            downgradeAction(it, this);
-        } catch(e: Exception) {
-            e.printStackTrace()
-        }
-        this.fix(it);
-        this.configure(it);
-        java.lang.String()
-    } takeAction FIX IF { this.other(it) != null && it.state() !in listOf(null, OK) } inGroup this;
-
-    controller will {
-        this.failover(it);
-        this.destroy(it);
-        java.lang.String()
-    } takeAction DESTROY_MACHINE  IF { this.other(it) != null && this.workingSize() > this.min }  inGroup this;
-    controller use {
-        this.enabled = false;
-        try {
-            try {
-                it.brokenMachines().sortBy { it.id() } forEach {
-                    this.rebuild(it);
-                    this.clearState(it);
-                    this.configure(it)
-                }
-                this.configure();
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-            }
-            java.lang.String()
-        } finally {
-            this.enabled = true
-        }
-    } to EMERGENCY_FIX  IF { this.workingSize() == 0 } group this;
-
-}
-
-
 public fun MachineGroup.applyDefaultRules(timeFactor: Int = 60) {
     this memberIs STALE ifStateIn listOf(OK, OVERLOADED, null) andTest { this.other(it) != null && this.machines().filter { it.state() == STALE }.size() == 0 } after  timeFactor * 60000  seconds "upgrade"
     this memberIs BROKEN ifStateIn listOf(BROKEN, UPGRADE_FAILED) after timeFactor * 10 seconds "bad-now-broken"
@@ -312,35 +188,62 @@ public fun MachineGroup.addMachineBrokenRules(vararg rules: Pair<String, Double>
 }
 
 
-fun MachineGroup.addGroupSensorRules(vararg ranges: Pair<String, Range<Double>>, timeFactor: Int = 60) {
+public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
+    infra.topology().each { group ->
+        group.addMachineBrokenRules("http-status" to 399.0)
+        when(group.name()) {
+            "dockworker" -> {
+                //change this when deployed
+                group.addMachineOverloadRules("load" to 3.0, "http-response-time" to 500.0)
+                group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "load" to 1.0..3.0, "redis-snapito_snap_queue:linux" to  50.0..500.0)
+            }
+        }
+    }
+    return infra;
+}
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(QUIET, BUSY, NORMAL) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 5 seconds "group-size-dangerously-low"
-
-    this becomes GROUP_BROKEN ifStateIn  listOf(null) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 5  seconds "group-size-dangerously-low-initial"
-
-    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 10 seconds "group-size-still-dangerously-low"
-
-    this becomes NORMAL ifStateIn  listOf(GROUP_BROKEN) andTest { it.max != 0 && it.workingSize() > 0 && it.activeSize() > 0 } after timeFactor seconds "group-size-okay"
-
-
-    this becomes BUSY ifStateIn  listOf(QUIET, BUSY, NORMAL, null) andTest { it.max != 0 && it.workingSize() < it.min } after timeFactor seconds "not-enough-working-machines-in-group"
-
-    this becomes BUSY ifStateIn listOf(QUIET, BUSY, NORMAL, null) andTest {
-        it.max != 0 &&
-        ranges.any { this[it.first]?:it.second.end > it.second.end }
-    }  after timeFactor * 10 seconds "overload"
-
-    this becomes QUIET ifStateIn listOf(QUIET, BUSY, NORMAL, null) andTest { this.workingSize() > this.max || this.machines().size() > this.hardMax }  after timeFactor seconds "too-many-machines"
-
-
-    this becomes QUIET ifStateIn listOf(QUIET, BUSY, NORMAL, null) andTest {
-        ranges.all { this[it.first]?:it.second.start < it.second.start }
-    }  after timeFactor * 10 seconds "underload"
-
-    this becomes NORMAL ifStateIn listOf(QUIET, BUSY, null) andTest {
-        it.max != 0 &&
-        ranges.all { this[it.first]?:it.second.start in it.second }
-        && this.workingSize() in this.min..this.max
-    }  after timeFactor / 2 seconds "group-ok"
+fun staticMachines(groupName: String, controller: Controller sensors: SensorArray, cost: Double, vararg mcs: Pair<String, String>): List<StaticMachine> {
+    val list: ArrayList<StaticMachine> = arrayListOf()
+    for (mc in mcs) {
+        list.add(StaticMachine(sensors, controller, groupName, cost / 24 / 30.5, mc.second, mc.second, mc.second, mc.first))
+    }
+    return list;
 
 }
+
+
+fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = true): Map<String, MachineGroup> {
+    val workerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/"), HttpResponseTimeSensor("/"), DiskUsageSensor()));
+    val workerConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
+    val keys = "93676"
+    val workerGroup = DigitalOceanMachineGroup(client, controller, "dockworker", workerSensorArray, workerConfig, keys, 0, 24, 32, arrayListOf<MachineGroup>(), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "107.170.24.38", 6379, autoTrimAt = 50000))))
+    return hashMapOf("dockworker" to workerGroup);
+}
+
+
+fun main(args: Array<String>): Unit {
+
+    val server = Server { controller, bus, postmortems ->
+        val client = DigitalOceanClientFactory(System.getProperty("do.cid")?:"", System.getProperty("do.apikey")?:"")
+        val cloud = MixedCloud(buildGroups(client, controller, false))
+        cloud.topology().each { group ->
+            group.allowDefaultTransitions();
+            group.applyDefaultRules(60);
+        }
+        cloud["dockworker"].configureDefaultActions(controller, postmortems)
+        snapitoSensorActions(cloud);
+    }
+
+    server.start(30)
+    try {
+
+        while (true) {
+            Thread.sleep(10000)
+        }
+    } finally  {
+        server.stop();
+    }
+
+}
+
+

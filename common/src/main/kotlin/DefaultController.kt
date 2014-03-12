@@ -86,16 +86,16 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             try {
 
                 groupMonitors.keySet().forEach {
-                    if (it.target()?.enabled?:false) {
-                        val details = groupMonitors.get(it);
-                        groupMonitorExec.submit(false, true, details?.first?.id()) {
+                    val details = groupMonitors.get(it);
+                    groupMonitorExec.submit(false, true, details?.first?.id()) {
+                        if (details?.first?.enabled()?:false) {
                             if (details != null) {
                                 details.second.forEach { it.evaluate(details.first, eventLog) }
+                                it.heartbeat()
+                            } else {
+                                //                        println("Group monitor rules skipped as group ${it.target()?.id()} is disabled");
                             }
-                            it.heartbeat()
                         }
-                    } else {
-                        //                        println("Group monitor rules skipped as group ${it.target()?.id()} is disabled");
                     }
 
                 }
@@ -108,17 +108,21 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
 
                 //                println("*** Machine Heartbeat ${Date()} ***")
                 machineMonitors.keySet().forEach {
-                    if (it.target()?.enabled?:false) {
-                        val details = machineMonitors.get(it);
-                        monitorExec.submit(false, true, it.target()?.id()) {
+                    val details = machineMonitors.get(it);
+                    monitorExec.submit(false, true, it.target()?.id()) {
+                        if (details?.first?.enabled()?:false) {
+
                             if (details != null) {
                                 details.second.forEach { it.evaluate(details.first, eventLog) }
+                                it.heartbeat()
                             }
-                            it.heartbeat()
+
+                        } else {
+                            println("Machine monitor rules skipped as machine ${it.target()?.id()} is disabled");
+
+
                         }
-                    } else {
-                        //                        println("Machine monitor rules skipped as machine ${it.target()?.id()} is disabled");
-                    }
+                    };
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

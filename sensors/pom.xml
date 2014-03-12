@@ -11,23 +11,29 @@
 
     <groupId>com.cazcade</groupId>
     <artifactId>kontrol-sensors</artifactId>
-     <dependencies>
-         <dependency>
-             <groupId>com.cazcade</groupId>
-             <artifactId>kontrol-api</artifactId>
-             <version>0.1-SNAPSHOT</version>
-         </dependency>
-         <dependency>
-             <groupId>com.cazcade</groupId>
-             <artifactId>kontrol-common</artifactId>
-             <version>0.1-SNAPSHOT</version>
-         </dependency>
-         <dependency>
-             <groupId>com.cazcade</groupId>
-             <artifactId>kontrol-mock</artifactId>
-             <version>0.1-SNAPSHOT</version>
-             <scope>test</scope>
-         </dependency>
-     </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.cazcade</groupId>
+            <artifactId>kontrol-api</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cazcade</groupId>
+            <artifactId>kontrol-common</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cazcade</groupId>
+            <artifactId>kontrol-mock</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+
+    </dependencies>
 
 </project>
