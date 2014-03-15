@@ -112,4 +112,7 @@ public trait Controller {
     fun use(action: (MachineGroup) -> Serializable): MachineGroupRuleBuilder {
         return MachineGroupRuleBuilder(this, action);
     }
+
+    fun pause();
+    fun resume();
 }

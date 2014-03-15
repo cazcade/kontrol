@@ -46,7 +46,7 @@ public class DefaultSensorArray(val sensors: List<Sensor>) : SensorArray{
             try {
                 result.put(it.name(), it.value(machine))
             } catch (e: Exception) {
-                e.printStackTrace();
+                System.err.println(e.javaClass.getName() + ": " + e.getMessage())
             }
         };
         return result;

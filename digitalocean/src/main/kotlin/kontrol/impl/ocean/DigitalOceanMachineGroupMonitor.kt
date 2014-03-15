@@ -47,7 +47,7 @@ public class DigitalOceanMachineGroupMonitor(val group: DigitalOceanMachineGroup
             val machines = HashMap<String, DigitalOceanMachine>();
 
             for (droplet in group.clientFactory.instance().droplets()) {
-                if (droplet.name?.startsWith(group.config.machinePrefix + group.name)!!) {
+                if (droplet.name?.equals(group.config.machinePrefix + group.name)!!) {
                     val digitalOceanMachine = DigitalOceanMachine(droplet, group.clientFactory, sensorArray, controller, group.name)
                     machines.put(droplet.id.toString(), digitalOceanMachine)
                 }

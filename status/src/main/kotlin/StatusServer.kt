@@ -26,6 +26,7 @@ import kontrol.api.Infrastructure
 import kontrol.api.Bus
 import kontrol.api.PostmortemStore
 import kontrol.api.EventLog
+import kontrol.api.Action
 
 public class StatusServer(infra: Infrastructure, bus: Bus, postmortem: PostmortemStore, eventLog: EventLog, prefix: String = "/status-server", val refresh: Int = 60) {
     var infra: Infrastructure = infra
@@ -35,6 +36,12 @@ public class StatusServer(infra: Infrastructure, bus: Bus, postmortem: Postmorte
         context["refresh"] = refresh
         if (session.uri.endsWith(".do")) {
             when(session.uri.substring(1, session.uri.length - 3)) {
+                "upgrade" -> {
+                    val machineGroup = infra.topology().members[session.parms["group"]]
+                    machineGroup?.controller?.execute(machineGroup!!, { true }, Action.UPGRADE);
+                    context["message"] = "Upgrade requested for ${machineGroup?.name()}"
+                    "full-status.html.vm";
+                }
                 "log" -> {
                     context["events"] = eventLog.last(500)
                     "log.html.vm"

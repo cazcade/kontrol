@@ -99,7 +99,7 @@ public fun MachineGroup.configureDefaultActions(controller: Controller, postmort
             println("Upgrade skipped, not enough working machines.")
         }
         java.lang.String()
-    } takeAction UPGRADE IF { this.workingSize() > 1 && it.state() in listOf(STALE) }  inGroup this;
+    } takeAction UPGRADE IF { this.workingSize() > 1 && it.state() in listOf(STALE, OK) }  inGroup this;
 
     controller will {
         downgradeAction(it, this);
@@ -187,15 +187,14 @@ public fun MachineGroup.configureStaticActions(controller: Controller, postmorte
 
     //nb: All actions listed under takeActions must be atomic, don't assume you can add together multiple actions to form an atomic action.
     //nb: This is because the multiple actions are not guaranteed to both be executed or even their order!
-
+    this whenMachine STALE recheck THEN tell controller takeActions listOf(UPGRADE);
     this whenMachine BROKEN recheck THEN tell controller takeActions listOf(FIX);
     this whenMachine OK recheck THEN tell controller takeAction FAILBACK;
     this whenMachine DEAD recheck THEN tell controller takeActions listOf(REBUILD) ;
-    //    this whenMachine STALE recheck THEN tell controller takeActions listOf(UPGRADE);
-    //    this whenMachine UPGRADE_FAILED recheck THEN tell controller takeActions listOf(DOWNGRADE);
     this whenMachine FAILED recheck THEN tell controller takeActions listOf(REBUILD);
-    //    this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EMERGENCY_FIX);
     this whenMachine OVERLOADED recheck THEN tell controller  takeActions listOf(FAILOVER);
+    this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EMERGENCY_FIX);
+
 
     //make sure the action performed is atomic as multiple actions can be split
 
@@ -207,7 +206,7 @@ public fun MachineGroup.configureStaticActions(controller: Controller, postmorte
             println("Upgrade skipped, not enough working machines.")
         }
         java.lang.String()
-    } takeAction UPGRADE IF { this.workingSize() > 1 && it.state() in listOf(STALE) }  inGroup this;
+    } takeAction UPGRADE IF { this.workingSize() > 1 && it.state() in listOf(STALE, OK) }  inGroup this;
 
     controller will {
         downgradeAction(it, this);
@@ -257,6 +256,7 @@ public fun MachineGroup.configureStaticActions(controller: Controller, postmorte
         this.destroy(it);
         java.lang.String()
     } takeAction DESTROY_MACHINE  IF { this.other(it) != null && this.workingSize() > this.min }  inGroup this;
+
     controller use {
         this.enabled = false;
         try {
@@ -281,7 +281,7 @@ public fun MachineGroup.configureStaticActions(controller: Controller, postmorte
 
 
 public fun MachineGroup.applyDefaultRules(timeFactor: Int = 60) {
-    this memberIs STALE ifStateIn listOf(OK, OVERLOADED, null) andTest { this.other(it) != null && this.machines().filter { it.state() == STALE }.size() == 0 } after  timeFactor * 60000  seconds "upgrade"
+    this memberIs STALE ifStateIn listOf(OK, OVERLOADED, null) andTest { this.other(it) != null && this.machines().filter { it.state() == STALE }.size() == 0 } after  timeFactor * 60  seconds "upgrade"
     this memberIs BROKEN ifStateIn listOf(BROKEN, UPGRADE_FAILED) after timeFactor * 10 seconds "bad-now-broken"
     this memberIs BROKEN ifStateIn listOf(OVERLOADED) after timeFactor * 10 seconds "overloaded-now-broken"
     this memberIs DEAD ifStateIn listOf(DEAD, BROKEN, STOPPED, null, UPGRADE_FAILED) after timeFactor * 15 seconds "escalate-broken-to-dead"

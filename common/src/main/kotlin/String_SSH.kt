@@ -38,7 +38,7 @@ public fun String.onHost(host: String? = "localhost", user: String = "root", tim
     timeoutTimer.schedule({
         ssh.disconnect();
         ssh.close();
-        println("SESSION TIMEOUT")
+        println("SESSION TIMEOUT on $host when trying to '$this'")
     }, timeoutInSeconds.toLong() + 1, TimeUnit.SECONDS)
     try {
 
@@ -62,7 +62,7 @@ public fun String.onHost(host: String? = "localhost", user: String = "root", tim
                     println("Retrying for the $i time to ssh $user@$host -c $this  (${e.getMessage()})")
                     Thread.sleep(100)
                 } else {
-                    throw e
+                    System.err.println("Error executing '$this' on $host as $user after $retry attempts, message was ${e.getMessage()}")
                 }
             }
         }

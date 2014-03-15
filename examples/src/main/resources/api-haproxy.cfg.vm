@@ -1,0 +1,107 @@
+#* @vtlvariable name="downstreamWorkingMachines" type="java.util.List<kontrol.api.Machine>" *#
+#* @vtlvariable name="machine" type="kontrol.api.Machine" *#
+#* @vtlvariable name="downstreamGroup" type="kontrol.api.MachineGroup" *#
+#---------------------------------------------------------------------
+# Example configuration for a possible web application.  See the
+# full configuration options online.
+#
+#   http://haproxy.1wt.eu/download/1.4/doc/configuration.txt
+#
+#---------------------------------------------------------------------
+
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+    # to have these messages end up in /var/log/haproxy.log you will
+    # need to:
+    #
+    # 1) configure syslog to accept network log events.  This is done
+    #    by adding the '-r' option to the SYSLOGD_OPTIONS in
+    #    /etc/sysconfig/syslog
+    #
+    # 2) configure local2 events to go to the /var/log/haproxy.log
+    #   file. A line like the following can be added to
+    #   /etc/sysconfig/syslog
+    #
+    #    local2.*                       /var/log/haproxy.log
+    #
+    log         127.0.0.1 local2
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    5s
+    timeout queue           30s
+    timeout connect         5s
+    timeout client          30s
+    timeout server          30s
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+#---------------------------------------------------------------------
+# main frontend which proxys to the backends
+#---------------------------------------------------------------------
+frontend  main *:80
+    acl url_static       path_beg       -i /static
+    use_backend static          if url_static
+    default_backend             app
+
+    # At most 1024 concurrent connections from a client
+    acl too_fast fe_sess_rate ge 1024
+
+    # Effectively working as a delay mechanism for clients that are too fast
+    tcp-request inspect-delay 1000ms
+
+    # Fast-path - accept connection if it's not this troublesome client
+    tcp-request content accept unless too_fast
+
+    # The very fast client gets here meaning they have to wait full inspect-delay
+    tcp-request content accept if WAIT_END
+
+#---------------------------------------------------------------------
+# static backend for serving up images, stylesheets and such
+#---------------------------------------------------------------------
+backend static
+    balance     roundrobin
+    server      static 127.0.0.1:8080 check
+
+backend app
+    balance roundrobin
+    option httpchk GET /image?url=example.com&freshness=60&key=monitor
+#foreach($machine in $downstreamMachines)
+    server  api-${machine.ip()} ${machine.ip()}:80 weight 1 maxconn 1024 check inter 5000
+#end
+
+
+
+listen stats :8888
+   mode http
+   stats enable
+   stats scope app
+   stats scope static
+   stats scope static_httpclose
+   stats realm Haproxy\ Statistics
+   stats uri /_stats
+##   stats auth haproxy:ked6gek6irt2on2ru2wen8ab7vos3beit5fern6at9nas4hy9s

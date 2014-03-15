@@ -57,8 +57,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     var executor: ScheduledExecutorService? = null
     val monitorExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Monitor Queue", 0, 64, 98, 100, 20);
     val groupMonitorExec: HashedExecutorService = HashedExecutorServiceImpl("Group Monitor Queue", 0, 10, 97, 100, 20);
-    var groupExec: HashedExecutorService = HashedExecutorServiceImpl("Group Exec Queue", 0, 64, 100, 100, 1);
-    var machineExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Exec Queue", 0, 10000, 100, 100, 1);
+    var groupExec: HashedExecutorService = HashedExecutorServiceImpl("Group Exec Queue", 0, 10000, 100, 100, 1);
+    var machineExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Exec Queue", 0, 4, 100, 100, 4);
     val unExecutedActions: MutableSet<String> = CopyOnWriteArraySet()
 
     override fun addGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>, target: MachineGroup, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
@@ -132,8 +132,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
         executor?.scheduleWithFixedDelay({
             try {
                 groupMonitors.keySet().forEach {
-                    groupMonitorExec.submit(false, true, it.target()?.groupName()) {
-                        it.update() ;
+                    groupExec.submit(false, true, it.target()?.groupName()) {
+                    it.update() ;
                         //println("*** Machine Group Update ${Date()} ***")
                     }
                 }
@@ -142,14 +142,14 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 e.printStackTrace()
             }
 
-        }, 1, 2, TimeUnit.MINUTES)
+        }, 5, 120, TimeUnit.SECONDS)
         executor?.scheduleWithFixedDelay({
             try {
                 val monitors = HashMap(machineMonitors)
                 monitors.keySet().forEach {
                     if (it.target()?.enabled?:false) {
-                        monitorExec.submit(false, true, it.target()?.id()) {
-                            it.update() ;
+                        groupExec.submit(false, true, it.target()?.groupName()) {
+                        it.update() ;
                             //println("*** Machine Update ${Date()} ***")
                         }
                     } else {
@@ -206,8 +206,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 println("Performing group action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 unExecutedActions.add(executionKey);
-                machineExec.submit(false, false, machine.id()) {
-                    unExecutedActions.remove(executionKey);
+                machineExec.submit(false, false, machine.groupName()) {
+                unExecutedActions.remove(executionKey);
                     if (action.first(machine)) {
                         machine.disable();
                         try {
@@ -235,8 +235,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 println("Performing action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 unExecutedActions.add(executionKey2)
-                machineExec.submit(false, false, machine.id()) {
-                    unExecutedActions.remove(executionKey2);
+                machineExec.submit(false, false, machine.groupName()) {
+                unExecutedActions.remove(executionKey2);
                     if (action2.first(machine)) {
                         machine.disable();
                         try {
@@ -330,8 +330,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                         println("Performing action for $actionArg on ${it.id()}")
                         bus.dispatch("machine.group.pre", actionArg to group.name());
                         unExecutedActions.add(executionKey);
-                        machineExec.submit(false, false, it.id()) {
-                            unExecutedActions.remove(executionKey);
+                        machineExec.submit(false, false, it.groupName()) {
+                        unExecutedActions.remove(executionKey);
                             if (action.first(it)) {
                                 it.disable();
                                 try {
@@ -373,6 +373,20 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     override fun register(group: MachineGroup, action: GroupAction, pre: (MachineGroup) -> Boolean, machineGroupAction: (MachineGroup) -> Serializable): Controller {
         groupActions.put(key(group, action), Pair<(MachineGroup) -> Boolean, (MachineGroup) -> Serializable>(pre, machineGroupAction));
         return this;
+    }
+
+    override fun pause() {
+        machineExec.pause();
+        groupExec.pause();
+        groupMonitorExec.pause();
+        monitorExec.pause();
+    }
+
+    override fun resume() {
+        machineExec.resume();
+        groupExec.resume();
+        groupMonitorExec.resume();
+        monitorExec.resume();
     }
 
 
