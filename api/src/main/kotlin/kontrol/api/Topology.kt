@@ -60,7 +60,7 @@ public trait Topology {
         }
     }
 
-    fun toString(): String {
+    override fun toString(): String {
         var string: String = "Toplogy: \n";
         for (member in members) {
             string += "${member.value}\n"

@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
+public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E?,
                                                            val eval: (T) -> Boolean,
                                                            val confirms: Int,
                                                            val name: String,
@@ -63,17 +63,17 @@ public  class MonitorRule<E : Enum<E>, T : Monitorable<E>>(val state: E,
     }
 
 
-    public fun toString(): String {
+    override fun toString(): String {
         val stringBuilder = StringBuilder()
         previousStates.appendString(stringBuilder)
         return "$name=${stringBuilder}->$state";
     }
 
-    public fun hashCode(): Int {
+    override fun hashCode(): Int {
         return toString().hashCode();
     }
 
-    public fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         return if (other is MonitorRule<*, *>) {
             toString() == other.toString();
         } else {

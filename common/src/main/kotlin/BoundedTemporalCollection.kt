@@ -159,7 +159,7 @@ public open class BoundedTemporalCollection<T>(var limit: Int = 1000) : Temporal
         return inWindow(key, window).map { if (it is Number) it as Number else null }.avgAsDouble()
     }
 
-    public fun toString(): String {
+    override fun toString(): String {
         return list.toString();
     }
 

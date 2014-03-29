@@ -30,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService
 
 public fun String.onHost(host: String? = "localhost", user: String = "root", timeoutInSeconds: Int = 120, retry: Int = 3): String {
     val timeoutTimer: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-    println("ssh ${user}@${host}  '$this' ")
+    //    println("ssh ${user}@${host}  '$this' ")
     if (host == null) {
         return ""
     }
@@ -53,7 +53,7 @@ public fun String.onHost(host: String? = "localhost", user: String = "root", tim
                         val command = session.exec(this);
                         val result = IOUtils.toString(command?.getInputStream())
                         command?.join(timeoutInSeconds, TimeUnit.SECONDS)
-                        println("> $result")
+                        //                        println("> $result")
                         result
                     }?:throw Exception("Could not start session on $host")
                 }

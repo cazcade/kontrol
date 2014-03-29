@@ -55,7 +55,11 @@ public entity data class SensorValue(public var k: String? = null, value: Any? =
     public var v: String? = value.toString()
 
 
-    override fun toString(): String? {
+    override fun toString(): String {
+        return if (v == null) "" else v.toString();
+    }
+
+    fun asString(): String? {
         return if (v == null) null else v.toString();
     }
 

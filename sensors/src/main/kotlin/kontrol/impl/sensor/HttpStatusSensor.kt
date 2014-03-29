@@ -22,6 +22,7 @@ import kontrol.api.sensor.SensorValue
 import java.net.URL
 import java.util.Locale
 import kontrol.HttpUtil
+import java.net.URI
 
 /**
  * @todo document.
@@ -37,10 +38,16 @@ public class HttpStatusSensor(val path: String, val port: Int = 80) : Sensor {
         try {
             return SensorValue(name(), when {
                 machine.hostname().isNotEmpty() -> {
+                    val url: URI;
+                    if (path.startsWith("http:") || path.startsWith("https:")) {
+                        url = URL(path).toURI()
 
-                    val URI = URL("http", machine.hostname(), port, path).toURI()
-                    val status = HttpUtil.getStatus(URI, Locale.getDefault(), 30 * 60 * 1000)
-                    //                    println("$URI responded with $status")
+                    } else {
+                        url = URL("http", machine.hostname(), port, path).toURI()
+
+                    }
+                    val status = HttpUtil.getStatus(url, Locale.getDefault(), 30 * 60 * 1000)
+                    //                    println("url responded with $status")
                     status;
 
                 }

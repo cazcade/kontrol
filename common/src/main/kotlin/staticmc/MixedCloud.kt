@@ -24,14 +24,14 @@ import kontrol.api.MachineGroup
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class MixedCloud(val members: Map<String, MachineGroup>) : Infrastructure{
+public class MixedCloud(val members: Map<String, MachineGroup>) : Infrastructure {
 
 
     override fun topology(): Topology {
         return  MixedTopology(members);
     }
 
-    public fun toString(): String {
+    override fun toString(): String {
         return topology().toString();
     }
 

@@ -42,7 +42,7 @@
         <module>examples</module>
     </modules>
     <properties>
-        <kotlin.version>0.6.1910</kotlin.version>
+        <kotlin.version>0.7.191</kotlin.version>
     </properties>
 
     <build>

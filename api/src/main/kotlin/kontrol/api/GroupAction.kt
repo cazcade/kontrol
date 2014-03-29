@@ -21,4 +21,5 @@ public enum class GroupAction {
     EXPAND
     CONTRACT
     EMERGENCY_FIX
+    REBUILD_GROUP
 }

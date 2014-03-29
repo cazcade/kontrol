@@ -44,9 +44,9 @@ import java.util.concurrent.CopyOnWriteArraySet
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeoutInMinutes: Long = 30) : Controller{
+public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeoutInMinutes: Long = 30) : Controller {
 
-    override final val frequency: Int = 15
+    override final val frequency: Int = 60
     var gracePeriod: Int = 0
     var started: Long = 0
 
@@ -55,10 +55,10 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
     val actions = HashMap<String, Pair<(Machine) -> Boolean, (Machine) -> Serializable>>();
     val groupActions = HashMap<String, Pair<(MachineGroup) -> Boolean, (MachineGroup) -> Serializable>>();
     var executor: ScheduledExecutorService? = null
-    val monitorExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Monitor Queue", 0, 64, 98, 100, 20);
-    val groupMonitorExec: HashedExecutorService = HashedExecutorServiceImpl("Group Monitor Queue", 0, 10, 97, 100, 20);
-    var groupExec: HashedExecutorService = HashedExecutorServiceImpl("Group Exec Queue", 0, 10000, 100, 100, 1);
-    var machineExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Exec Queue", 0, 4, 100, 100, 4);
+    val monitorExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Monitor Queue", 0, 4, 98, 100, 4);
+    val groupMonitorExec: HashedExecutorService = HashedExecutorServiceImpl("Group Monitor Queue", 0, 1, 97, 100, 64);
+    var groupExec: HashedExecutorService = HashedExecutorServiceImpl("Group Exec Queue", 0, 64, 100, 100, 1);
+    var machineExec: HashedExecutorService = HashedExecutorServiceImpl("Machine Exec Queue", 0, 1, 100, 100, 16);
     val unExecutedActions: MutableSet<String> = CopyOnWriteArraySet()
 
     override fun addGroupMonitor(monitor: Monitor<MachineGroupState, MachineGroup>, target: MachineGroup, rules: Set<MonitorRule<MachineGroupState, MachineGroup>>) {
@@ -87,7 +87,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
 
                 groupMonitors.keySet().forEach {
                     val details = groupMonitors.get(it);
-                    groupMonitorExec.submit(false, true, details?.first?.id()) {
+                    groupMonitorExec.execute(false, details?.first?.id()) {
                         if (details?.first?.enabled()?:false) {
                             if (details != null) {
                                 details.second.forEach { it.evaluate(details.first, eventLog) }
@@ -109,7 +109,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 //                println("*** Machine Heartbeat ${Date()} ***")
                 machineMonitors.keySet().forEach {
                     val details = machineMonitors.get(it);
-                    monitorExec.submit(false, true, it.target()?.id()) {
+                    monitorExec.execute(false, it.target()?.id()) {
                         if (details?.first?.enabled()?:false) {
 
                             if (details != null) {
@@ -132,8 +132,8 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
         executor?.scheduleWithFixedDelay({
             try {
                 groupMonitors.keySet().forEach {
-                    groupExec.submit(false, true, it.target()?.groupName()) {
-                    it.update() ;
+                    groupMonitorExec.execute(false, it.target()?.groupName()) {
+                        it.update() ;
                         //println("*** Machine Group Update ${Date()} ***")
                     }
                 }
@@ -142,14 +142,14 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                 e.printStackTrace()
             }
 
-        }, 5, 120, TimeUnit.SECONDS)
+        }, 5, 300, TimeUnit.SECONDS)
         executor?.scheduleWithFixedDelay({
             try {
                 val monitors = HashMap(machineMonitors)
                 monitors.keySet().forEach {
                     if (it.target()?.enabled?:false) {
-                        groupExec.submit(false, true, it.target()?.groupName()) {
-                        it.update() ;
+                        monitorExec.execute(false, it.target()?.groupName()) {
+                            it.update() ;
                             //println("*** Machine Update ${Date()} ***")
                         }
                     } else {
@@ -159,9 +159,9 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            unExecutedActions.forEach { println("Unexecuted action: $it") }
+            unExecutedActions.forEach { println("Queued actions: $it") }
 
-        }, 2, 30, TimeUnit.SECONDS)
+        }, 15, 60, TimeUnit.SECONDS)
     }
 
     override fun stop() {
@@ -201,13 +201,13 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             val executionKey = key + ":" + machine.id();
             val action = actions[key];
             if (executionKey in unExecutedActions) {
-                println("Skipping group action for $actionArg on ${machine.id()}")
+                println("Skipping duplicate group action for $actionArg on ${machine.id()}")
             } else if (action != null && action.first(machine)) {
                 println("Performing group action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 unExecutedActions.add(executionKey);
                 machineExec.submit(false, false, machine.groupName()) {
-                unExecutedActions.remove(executionKey);
+                    unExecutedActions.remove(executionKey);
                     if (action.first(machine)) {
                         machine.disable();
                         try {
@@ -230,13 +230,13 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             val action2 = actions[key2];
             val executionKey2 = key2;
             if (executionKey2 in unExecutedActions) {
-                println("Skipping action for $actionArg on ${machine.id()}")
+                println("Skipping duplicate action for $actionArg on ${machine.id()}")
             } else if (action2 != null && action2.first(machine) ) {
                 println("Performing action for $actionArg on ${machine.ip()}")
                 bus.dispatch("machine.action.pre", actionArg to machine.id());
                 unExecutedActions.add(executionKey2)
                 machineExec.submit(false, false, machine.groupName()) {
-                unExecutedActions.remove(executionKey2);
+                    unExecutedActions.remove(executionKey2);
                     if (action2.first(machine)) {
                         machine.disable();
                         try {
@@ -275,7 +275,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
             println(key)
             val action = groupActions[key];
             if (key in unExecutedActions) {
-                println("Skipping action for $actionArg on ${group.name()}")
+                println("Skipping duplicate action for $actionArg on ${group.name()}")
 
             } else if (action != null && action.first(group)) {
                 println("Performing action for $actionArg on ${group.name()}")
@@ -331,7 +331,7 @@ public class DefaultController(val bus: Bus, val eventLog: EventLog, val timeout
                         bus.dispatch("machine.group.pre", actionArg to group.name());
                         unExecutedActions.add(executionKey);
                         machineExec.submit(false, false, it.groupName()) {
-                        unExecutedActions.remove(executionKey);
+                            unExecutedActions.remove(executionKey);
                             if (action.first(it)) {
                                 it.disable();
                                 try {

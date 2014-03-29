@@ -192,7 +192,7 @@ public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
         group.addMachineBrokenRules("http-status" to 399.0)
         when(group.name()) {
-            "dockworker" -> {
+            "worker" -> {
                 //change this when deployed
                 group.addMachineOverloadRules("load" to 3.0, "http-response-time" to 500.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "load" to 1.0..3.0, "redis-snapito_snap_queue:linux" to  50.0..500.0)
@@ -216,8 +216,8 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
     val workerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/"), HttpResponseTimeSensor("/"), DiskUsageSensor()));
     val workerConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
     val keys = "93676"
-    val workerGroup = DigitalOceanMachineGroup(client, controller, "dockworker", workerSensorArray, workerConfig, keys, 0, 24, 32, arrayListOf<MachineGroup>(), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "107.170.24.38", 6379, autoTrimAt = 50000))))
-    return hashMapOf("dockworker" to workerGroup);
+    val workerGroup = DigitalOceanMachineGroup(client, controller, "worker", workerSensorArray, workerConfig, keys, 0, 24, 32, arrayListOf<MachineGroup>(), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "107.170.24.38", 6379, autoTrimAt = 50000))))
+    return hashMapOf("worker" to workerGroup);
 }
 
 
@@ -230,7 +230,7 @@ fun main(args: Array<String>): Unit {
             group.allowDefaultTransitions();
             group.applyDefaultRules(60);
         }
-        cloud["dockworker"].configureDefaultActions(controller, postmortems)
+        cloud["worker"].configureDefaultActions(controller, postmortems)
         snapitoSensorActions(cloud);
     }
 
@@ -240,7 +240,7 @@ fun main(args: Array<String>): Unit {
         while (true) {
             Thread.sleep(10000)
         }
-    } finally  {
+    } finally {
         server.stop();
     }
 

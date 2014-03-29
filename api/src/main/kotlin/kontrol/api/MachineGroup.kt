@@ -247,7 +247,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     }
 
 
-    fun toString(): String {
+    override public fun toString(): String {
         var string: String = "${name()} [${stateMachine.state()}]\n";
         for (machine in machines()) {
             string += "$machine\n";
@@ -310,12 +310,18 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
                        val newState: MachineGroupState) {
         public val yes: Boolean = true;
 
+        var condition: (MachineGroup) -> Boolean = { true };
 
         var registry: Controller? = null;
         var recheck = false;
 
         fun recheck(b: Recheck): RuleBuilder2 {
             recheck = b == Recheck.THEN;
+            return this;
+        }
+
+        fun andTest(condition: (MachineGroup) -> Boolean): RuleBuilder2 {
+            this.condition = condition;
             return this;
         }
 
@@ -332,7 +338,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
 
         fun takeAction(action: GroupAction): MachineGroup {
             machineGroup.stateMachine.rules?.on<MachineGroup>(null, newState, {
-                if (!recheck || machineGroup.stateMachine.state() == newState) {
+                if (!recheck || !condition(machineGroup) || machineGroup.stateMachine.state() == newState) {
                     registry?.execute(machineGroup, { true }, action)
                 } else {
                     println("RECHECK FAILED for $action")
@@ -344,7 +350,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     }
 
     class MachineStateRuleBuilder(val machineGroup: MachineGroup,
-                                  val state: MachineState) {
+                                  val state: MachineState?) {
         var condition: (Machine) -> Boolean = { true };
         var confirms = 0;
         var previousStates = hashSetOf<MachineState?>()
@@ -405,7 +411,7 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
     fun whenGroup(newState: MachineGroupState): RuleBuilder2 {
         return  RuleBuilder2(this, newState);
     }
-    fun memberIs(state: MachineState): MachineStateRuleBuilder {
+    fun memberIs(state: MachineState?): MachineStateRuleBuilder {
         return  MachineStateRuleBuilder(this, state);
     }
     fun becomes(state: MachineGroupState): MachineGroupStateRuleBuilder {

@@ -68,9 +68,6 @@ public fun MachineGroup.allowDefaultTransitions() {
     this allow (NORMAL to GROUP_BROKEN);
     this allow (NORMAL to QUIET);
     this allow (NORMAL to BUSY);
-    this allow (GROUP_BROKEN to QUIET);
-    this allow (GROUP_BROKEN to BUSY);
-    this allow (GROUP_BROKEN to NORMAL);
 }
 
 
@@ -87,7 +84,8 @@ public fun MachineGroup.configureDefaultActions(controller: Controller, postmort
     this whenMachine FAILED recheck THEN tell controller takeActions listOf(DESTROY_MACHINE);
     this whenGroup BUSY recheck THEN use controller takeAction EXPAND;
     this whenGroup QUIET recheck THEN use controller takeAction CONTRACT;
-    this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EMERGENCY_FIX);
+    this whenGroup GROUP_BROKEN andTest { this.workingSize() == 0 } recheck THEN use controller takeActions listOf(EMERGENCY_FIX);
+    this whenGroup GROUP_BROKEN andTest { this.workingSize() > 0 } recheck THEN use controller takeActions listOf(REBUILD_GROUP);
 
     //make sure the action performed is atomic as multiple actions can be split
 
@@ -171,6 +169,7 @@ public fun MachineGroup.configureDefaultActions(controller: Controller, postmort
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
+                this.stateMachine.attemptTransition(null);
                 if (this.workingSize() == 0) {
                     expand();
                 }
@@ -179,7 +178,31 @@ public fun MachineGroup.configureDefaultActions(controller: Controller, postmort
         } finally {
             this.enabled = true
         }
-    } to EMERGENCY_FIX  IF { this.workingSize() == 0 } group this;
+    } to EMERGENCY_FIX   group this;
+
+
+
+    controller use {
+        this.enabled = false;
+        try {
+            try {
+                it.machines().sortBy { it.id() } forEach {
+                    this.rebuild(it);
+                    this.clearState(it);
+                    this.configure(it)
+                }
+                this.configure();
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                this.stateMachine.attemptTransition(null);
+            }
+
+            java.lang.String()
+        } finally {
+            this.enabled = true
+        }
+    } to REBUILD_GROUP group this;
 }
 
 
@@ -193,7 +216,8 @@ public fun MachineGroup.configureStaticActions(controller: Controller, postmorte
     this whenMachine DEAD recheck THEN tell controller takeActions listOf(REBUILD) ;
     this whenMachine FAILED recheck THEN tell controller takeActions listOf(REBUILD);
     this whenMachine OVERLOADED recheck THEN tell controller  takeActions listOf(FAILOVER);
-    this whenGroup GROUP_BROKEN recheck THEN use controller  takeActions listOf(EMERGENCY_FIX);
+    this whenGroup GROUP_BROKEN andTest { this.workingSize() == 0 } recheck THEN use controller  takeActions listOf(EMERGENCY_FIX);
+    this whenGroup GROUP_BROKEN andTest { this.workingSize() > 0 } recheck THEN use controller  takeActions listOf(REBUILD_GROUP);
 
 
     //make sure the action performed is atomic as multiple actions can be split
@@ -270,12 +294,37 @@ public fun MachineGroup.configureStaticActions(controller: Controller, postmorte
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
+                this.stateMachine.attemptTransition(null);
             }
+
             java.lang.String()
         } finally {
             this.enabled = true
         }
-    } to EMERGENCY_FIX  IF { this.workingSize() == 0 } group this;
+    } to EMERGENCY_FIX group this;
+
+
+    controller use {
+        this.enabled = false;
+        try {
+            try {
+                it.machines().sortBy { it.id() } forEach {
+                    this.rebuild(it);
+                    this.clearState(it);
+                    this.configure(it)
+                }
+                this.configure();
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                this.stateMachine.attemptTransition(null);
+            }
+
+            java.lang.String()
+        } finally {
+            this.enabled = true
+        }
+    } to REBUILD_GROUP group this;
 
 }
 
@@ -293,7 +342,7 @@ public fun MachineGroup.applyDefaultRules(timeFactor: Int = 60) {
 
 public fun MachineGroup.addMachineOverloadRules(vararg rules: Pair<String, Double>, timeFactor: Int = 60) {
 
-    this memberIs OK ifStateIn listOf(OVERLOADED) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor / 2 seconds "machine-ok-load"
+    this memberIs OK ifStateIn listOf(OVERLOADED) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor seconds "machine-ok-load"
 
     this memberIs OVERLOADED ifStateIn listOf(OK, null) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after timeFactor * 4 seconds "machine-overloaded"
 }
@@ -301,7 +350,7 @@ public fun MachineGroup.addMachineOverloadRules(vararg rules: Pair<String, Doubl
 public fun MachineGroup.addMachineBrokenRules(vararg rules: Pair<String, Double>, timeFactor: Int = 60) {
 
 
-    this memberIs OK ifStateIn listOf(UPGRADE_FAILED, BROKEN, null, DEAD, STOPPED, FAILED, BROKEN) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor / 2 seconds "machine-ok"
+    this memberIs OK ifStateIn listOf(BROKEN, null, DEAD, STOPPED, FAILED, BROKEN) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor seconds "machine-ok"
 
     this memberIs OK ifStateIn listOf(UPGRADE_FAILED, STALE) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor * 10 seconds "machine-ok"
 
@@ -309,19 +358,20 @@ public fun MachineGroup.addMachineBrokenRules(vararg rules: Pair<String, Double>
     this memberIs UPGRADE_FAILED ifStateIn listOf(STALE) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after  timeFactor * 10 seconds "downgrade"
 
     this memberIs BROKEN ifStateIn listOf(OK, OVERLOADED, BROKEN, STOPPED, null) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } && this.downStreamGroups.all { it.state() != GROUP_BROKEN } } after timeFactor * 3 seconds "machine-broken"
+
+    this memberIs null andTest { this.downStreamGroups.any { it.state() == GROUP_BROKEN } } after timeFactor * 3 seconds "downstream-broken"
+
+
 }
 
 
 fun MachineGroup.addGroupSensorRules(vararg ranges: Pair<String, Range<Double>>, timeFactor: Int = 60) {
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(QUIET, BUSY, NORMAL) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 5 seconds "group-size-dangerously-low"
+    this becomes GROUP_BROKEN ifStateIn  listOf(QUIET, BUSY, NORMAL) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 5 seconds "group-sbroken"
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(null) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 5  seconds "group-size-dangerously-low-initial"
+    this becomes GROUP_BROKEN ifStateIn  listOf(null) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 5  seconds "group-broken-initial"
 
-    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 10 seconds "group-size-still-dangerously-low"
-
-    this becomes NORMAL ifStateIn  listOf(GROUP_BROKEN) andTest { it.max != 0 && it.workingSize() > 0 && it.activeSize() > 0 } after timeFactor seconds "group-size-okay"
-
+    this becomes GROUP_BROKEN ifStateIn  listOf(GROUP_BROKEN) andTest { it.max != 0 && (it.workingSize() == 0 || it.activeSize() == 0 ) } after timeFactor * 10 seconds "group-still-broken"
 
     this becomes BUSY ifStateIn  listOf(QUIET, BUSY, NORMAL, null) andTest { it.max != 0 && it.workingSize() < it.min } after timeFactor seconds "not-enough-working-machines-in-group"
 
@@ -341,6 +391,6 @@ fun MachineGroup.addGroupSensorRules(vararg ranges: Pair<String, Range<Double>>,
         it.max != 0 &&
         ranges.all { this[it.first]?:it.second.start in it.second }
         && this.workingSize() in this.min..this.max
-    }  after timeFactor / 2 seconds "group-ok"
+    }  after timeFactor seconds "group-ok"
 
 }

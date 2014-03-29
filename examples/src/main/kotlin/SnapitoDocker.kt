@@ -49,6 +49,10 @@ import kontrol.common.group.ext.configureStaticActions
 import kontrol.impl.sensor.DiskUsageSensor
 import kontrol.common.DefaultGroupSensorArray
 import kontrol.api.Machine
+import kontrol.api.MachineGroupState
+import java.util.Locale
+import kontrol.HttpUtil
+import java.net.URI
 
 
 val keys = "93676"
@@ -56,40 +60,46 @@ val keys = "93676"
 
 public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
-        group.addMachineBrokenRules("http-status" to 399.0)
         when(group.name()) {
             "api-lb", "gateway-lb" -> {
                 group.addMachineOverloadRules("load" to 6.0, "http-response-time" to 5000.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..2000.0, "load" to 2.0..5.0)
+                group.addMachineBrokenRules("http-status" to 399.0)
             }
             "static-linux-snapito.io" -> {
                 group.addMachineOverloadRules("load" to 6.0, "http-response-time" to 500.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..200.0, "load" to 2.0..5.0)
+                group.addMachineBrokenRules("http-status" to 399.0)
             }
-            "dockworker" -> {
+            "worker" -> {
                 //change this when deployed
                 group.addMachineOverloadRules("load" to 3.0, "http-response-time" to 500.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "load" to 1.0..3.0, "redis-snapito_snap_queue:linux" to  50.0..500.0)
+                group.addMachineBrokenRules("load" to 6.0)
             }
             "api" -> {
                 //change this when deployed
                 group.addMachineOverloadRules("load" to 3.0, "http-response-time" to 500.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "load" to 1.0..3.0)
+                group.addMachineBrokenRules("http-status" to 399.0)
             }
             "gateway" -> {
                 //change this when deployed
                 group.addMachineOverloadRules("load" to 3.0, "http-response-time" to 500.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "load" to 1.0..3.0)
+                group.addMachineBrokenRules("http-status" to 399.0)
             }
             "static-linux-workers", "pinstamatic" -> {
                 //change this when deployed
                 group.addMachineOverloadRules("http-load" to 50.0, "load" to 3.0, "http-response-time" to 500.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "http-load" to 1.0..3.0)
+                group.addMachineBrokenRules("http-status" to 399.0)
             }
             "static-osx-workers" -> {
                 //change this when deployed
                 group.addMachineOverloadRules("load" to 10.0, "http-response-time" to 3000.0)
                 group.addGroupSensorRules("http-response-time" to -1.0..2000.0, "http-load" to 4.0..10.0)
+                group.addMachineBrokenRules("http-status" to 399.0)
             }
         }
     }
@@ -105,36 +115,36 @@ fun staticMachines(groupName: String, controller: Controller sensors: SensorArra
 
 }
 
-fun buildDockerWorkers(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = true): MachineGroup {
-    val workerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/"), HttpResponseTimeSensor("/"), DiskUsageSensor()));
+fun buildDockerWorkers(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = true, api: MachineGroup): MachineGroup {
+    val workerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/"), DiskUsageSensor()));
     val workerConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
-    return  DigitalOceanMachineGroup(client, controller, "dockworker", workerSensorArray, workerConfig, keys, 0, 12, 16, arrayListOf<MachineGroup>(), listOf(CentosPostmortem(), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "107.170.24.38", 6379, autoTrimAt = 50000))))
+    return  DigitalOceanMachineGroup(client, controller, "worker", workerSensorArray, workerConfig, keys, 8, 12, 14, arrayListOf<MachineGroup>(api), listOf(CentosPostmortem(), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "redis.snapito.io", 6379, autoTrimAt = 50000))))
 
 }
 
 fun buildAPI(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = true, loadBalancers: MachineGroup): MachineGroup {
     val sensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/image?url=google.com&freshness=60"), HttpResponseTimeSensor("/image?url=google.com"), DiskUsageSensor()));
     val doConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
-    return DigitalOceanMachineGroup(client, controller, "api", sensorArray, doConfig, keys, 2, 4, 4, arrayListOf<MachineGroup>(loadBalancers), listOf(CentosPostmortem(), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "107.170.24.38", 6379))))
+    return DigitalOceanMachineGroup(client, controller, "api", sensorArray, doConfig, keys, 2, 4, 8, arrayListOf<MachineGroup>(loadBalancers), listOf(CentosPostmortem(), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "redis.snapito.io", 6379))))
 
 }
 
 fun buildGateway(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = true, loadBalancers: MachineGroup): MachineGroup {
     val sensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?limits"), HttpResponseTimeSensor("/gateway?limits"), DiskUsageSensor()));
     val doConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
-    return DigitalOceanMachineGroup(client, controller, "gateway", sensorArray, doConfig, keys, 2, 4, 4, arrayListOf<MachineGroup>(loadBalancers), listOf(CentosPostmortem(), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "107.170.24.38", 6379))))
+    return DigitalOceanMachineGroup(client, controller, "gateway", sensorArray, doConfig, keys, 2, 4, 4, arrayListOf<MachineGroup>(loadBalancers), listOf(CentosPostmortem(), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "redis.snapito.io", 6379))))
 
 }
 
 fun buildAPILoadBalancers(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = true): MachineGroup {
-    val loadBalancerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/load"), HttpResponseTimeSensor("/_stats", 8888)));
+    val loadBalancerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/_stats", 8888), HttpResponseTimeSensor("/_stats", 8888)));
     val lbConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 66)
     return DigitalOceanMachineGroup(client, controller, "api-lb", loadBalancerSensorArray, lbConfig, keys, 2, 2, 5, arrayListOf(), listOf(CentosPostmortem()), downStreamKonfigurator = HaproxyKonfigurator("/api-haproxy.cfg.vm"))
 
 }
 
 fun buildGatewayLoadBalancers(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = true): MachineGroup {
-    val loadBalancerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/gateway?gatewayVersion"), HttpResponseTimeSensor("/_stats", 8888)));
+    val loadBalancerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/_stats", 8888), HttpResponseTimeSensor("/_stats", 8888)));
     val lbConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 66)
     return DigitalOceanMachineGroup(client, controller, "gateway-lb", loadBalancerSensorArray, lbConfig, keys, 2, 2, 5, arrayListOf(), listOf(CentosPostmortem()), downStreamKonfigurator = HaproxyKonfigurator("/gateway-haproxy.cfg.vm"))
 
@@ -149,9 +159,9 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
     val staticOSXWorkers = StaticMachineGroup(staticMachines("static-osx-workers", controller, staticOSXWorkerSensorArray, 109.0, "osx-worker-1" to "208.52.187.175", "osx-worker-2" to "208.52.187.176", "osx-worker-3" to "208.52.187.180", "osx-worker-4" to "208.52.187.178", "osx-worker-5" to "208.52.187.179"), " sudo reboot ", "rm -rf ~/cazcade/images/*; sudo reboot", "administrator", controller, "static-osx-workers", staticOSXWorkerSensorArray, keys, arrayListOf(), arrayListOf(TomcatPostmortem("/usr/local/tomcat"), HeapDumpsPostmortem()), upStreamKonfigurator = WorkerKonfigurator("administrator"))
 
     val contaboMachines = staticMachines("static-linux-workers", controller, workerSensorArray, 149.0, "contabo-worker-1" to "80.241.209.220")
-    val hetznerMachines = staticMachines("static-linux-workers", controller, workerSensorArray, 149.0, "EOL!!!-hetzner-worker-1" to "144.76.194.178")
+    //    val hetznerMachines = staticMachines("static-linux-workers", controller, workerSensorArray, 149.0, "EOL!!!-hetzner-worker-1" to "144.76.194.178")
     val onlineNetMachines = staticMachines("static-linux-workers", controller, workerSensorArray, 80.0, "online.net-1" to "62.210.188.41", "online.net-2" to "62.210.188.85", "online.net-2" to  "62.210.146.72")
-    val staticLinuxMachines = contaboMachines plus hetznerMachines plus onlineNetMachines;
+    val staticLinuxMachines = contaboMachines plus onlineNetMachines;
 
     val staticLinuxWorkers = StaticMachineGroup(staticLinuxMachines, "sudo docker rm $(docker ps -q -a) ; sudo service supervisor restart", "sudo find /usr/share/nginx/html/temp_images -exec rm {} ; sudo reboot", "cazcade", controller, "static-linux-workers", staticWorkerSensorArray, keys, arrayListOf(), arrayListOf(CentosPostmortem()))
 
@@ -168,16 +178,16 @@ fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test:
 
     val apiLoadBalancers = buildAPILoadBalancers(client, controller, test)
     val gatewayLoadBalancers = buildGatewayLoadBalancers(client, controller, test)
-
+    val api = buildAPI(client, controller, test, apiLoadBalancers)
     return hashMapOf(
-            "dockworker" to buildDockerWorkers(client, controller, test),
+            "worker" to buildDockerWorkers(client, controller, test, api),
             "gateway-lb" to gatewayLoadBalancers,
             "gateway" to buildGateway(client, controller, test, gatewayLoadBalancers),
             "static-osx-workers" to staticOSXWorkers,
             "static-linux-workers" to staticLinuxWorkers,
             "static-linux-snapito.io" to snapitoIO,
             "api-lb" to apiLoadBalancers,
-            "api" to buildAPI(client, controller, test, apiLoadBalancers),
+            "api" to api,
             "pinstamatic" to  pinstamaticGroup
 
     );
@@ -215,16 +225,23 @@ fun main(args: Array<String>): Unit {
         val easydeployUpgrade: (Machine, MachineGroup) -> Unit = { m, g -> "/home/easydeploy/bin/update.sh 0s".onHost(m.id(), "root") }
         cloud["static-linux-snapito.io"].configureStaticActions(controller, postmortems);
         cloud["static-linux-workers"].configureStaticActions(controller, postmortems);
-        cloud["dockworker"].configureDefaultActions(controller, postmortems)
+        cloud["worker"].configureDefaultActions(controller, postmortems)
         cloud["api"].configureDefaultActions(controller, postmortems)
         cloud["gateway"].configureDefaultActions(controller, postmortems, easydeployUpgrade)
-        cloud["api-lb"].configureStaticActions(controller, postmortems);
-        cloud["gateway-lb"].configureStaticActions(controller, postmortems);
+        //        cloud["api-lb"].configureStaticActions(controller, postmortems);
+        //        cloud["gateway-lb"].configureStaticActions(controller, postmortems);
 
-        //        cloud["lb"] becomes MachineGroupState.GROUP_BROKEN ifStateIn listOf(MachineGroupState.QUIET, MachineGroupState.BUSY, MachineGroupState.NORMAL, null) andTest {
-        //            cloud["gateway"].state() != MachineGroupState.GROUP_BROKEN && cloud["worker"].state() != MachineGroupState.GROUP_BROKEN && it.machines().size < it.hardMax
-        //            HttpUtil.getStatus(URI("http://api.snapito.com/web/monitor/lc/sky.com?freshness=1"), Locale.getDefault(), 60000) >= 400
-        //        } after 60 seconds "api-broken"
+        // General rules based on external services
+
+        cloud["gateway-lb"] becomes MachineGroupState.GROUP_BROKEN ifStateIn listOf(MachineGroupState.QUIET, MachineGroupState.BUSY, MachineGroupState.NORMAL, null) andTest {
+            cloud["api-lb"].state() != MachineGroupState.GROUP_BROKEN && cloud["gateway"].state() != MachineGroupState.GROUP_BROKEN &&
+            HttpUtil.getStatus(URI("http://api.snapito.com/web/monitor/lc/sky.com?freshness=60"), Locale.getDefault(), 60000) >= 400
+        } after 60 seconds "gateway-lb-broken"
+
+        cloud["api-lb"] becomes MachineGroupState.GROUP_BROKEN ifStateIn listOf(MachineGroupState.QUIET, MachineGroupState.BUSY, MachineGroupState.NORMAL, null) andTest {
+            cloud["api"].state() != MachineGroupState.GROUP_BROKEN && cloud["worker"].state() != MachineGroupState.GROUP_BROKEN &&
+            HttpUtil.getStatus(URI("http://process.snapito.com/?url=google.com&key=monitor&freshness=60"), Locale.getDefault(), 60000) >= 400
+        } after 60 seconds "api-lb-broken"
 
 
         snapitoSensorActions(cloud);

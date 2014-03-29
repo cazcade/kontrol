@@ -23,7 +23,7 @@ package kontrol.api
  */
 public class Type(val value: String) {
 
-    public  fun toString(): String {
+    override  fun toString(): String {
         return value
     }
 

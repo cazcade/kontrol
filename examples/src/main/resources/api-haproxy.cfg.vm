@@ -52,13 +52,13 @@ defaults
     option                  redispatch
     retries                 3
     timeout http-request    5s
-    timeout queue           30s
+    timeout queue           300s
     timeout connect         5s
-    timeout client          30s
-    timeout server          30s
+    timeout client          300s
+    timeout server          300s
     timeout http-keep-alive 10s
-    timeout check           10s
-    maxconn                 3000
+    timeout check           300s
+    maxconn                 1000
 
 #---------------------------------------------------------------------
 # main frontend which proxys to the backends
@@ -80,20 +80,6 @@ frontend  main *:80
     # The very fast client gets here meaning they have to wait full inspect-delay
     tcp-request content accept if WAIT_END
 
-#---------------------------------------------------------------------
-# static backend for serving up images, stylesheets and such
-#---------------------------------------------------------------------
-backend static
-    balance     roundrobin
-    server      static 127.0.0.1:8080 check
-
-backend app
-    balance roundrobin
-    option httpchk GET /image?url=example.com&freshness=60&key=monitor
-#foreach($machine in $downstreamMachines)
-    server  api-${machine.ip()} ${machine.ip()}:80 weight 1 maxconn 1024 check inter 5000
-#end
-
 
 
 listen stats :8888
@@ -105,3 +91,21 @@ listen stats :8888
    stats realm Haproxy\ Statistics
    stats uri /_stats
 ##   stats auth haproxy:ked6gek6irt2on2ru2wen8ab7vos3beit5fern6at9nas4hy9s
+
+
+#---------------------------------------------------------------------
+# static backend for serving up images, stylesheets and such
+#---------------------------------------------------------------------
+backend static
+    balance     roundrobin
+    server      static 127.0.0.1:8080 check
+
+backend app
+    balance roundrobin
+    option httpchk GET /image?url=example.com&freshness=60&key=monitor
+#foreach($machine in $downstreamMachines)
+    server  api-${machine.ip()} ${machine.ip()}:80 weight 1 maxconn 100 check inter 20000
+#end
+
+
+
