@@ -1,3 +1,4 @@
+package kontrol.konfigurators
 /*
  * Copyright 2014 Cazcade Limited (http://cazcade.com)
  *

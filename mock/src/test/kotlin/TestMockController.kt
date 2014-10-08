@@ -41,6 +41,7 @@ import java.util.ArrayList
 import java.util.LinkedHashMap
 import kontrol.mock.MockKonfigurator
 import kontrol.common.NullEventLog
+import kontrol.common.NullBus
 
 public class TestMockController {
 

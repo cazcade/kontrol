@@ -23,6 +23,8 @@ import kontrol.hibernate.HibernatePostmortemStore
 import kontrol.api.Controller
 import kontrol.api.Bus
 import kontrol.api.PostmortemStore
+import kontrol.common.NullBus
+import kontrol.hibernate.HibernateEventLog
 
 /**
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>

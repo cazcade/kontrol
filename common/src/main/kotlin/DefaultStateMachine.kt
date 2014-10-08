@@ -72,10 +72,10 @@ public open class DefaultStateMachine<E : Enum<E>>(val target: Any) : StateMachi
                         okay = true;
                     }
                     if ( (it.currentState == null) || (it.currentState == previousState)) {
-                        val action = it.action
+                        val action: ((out Any?) -> Unit)? = it.action as ((Any?) -> Unit)?
                         if (action != null) {
                             try {
-                                action!!(target);
+                                action(target);
                             } catch (e: Exception) {
                                 e.printStackTrace();
                             }

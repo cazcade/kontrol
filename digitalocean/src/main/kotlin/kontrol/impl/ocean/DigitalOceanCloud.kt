@@ -31,7 +31,7 @@ public class DigitalOceanCloud(val client: DigitalOceanClientFactory, val member
         return  DigitalOceanTopology(members);
     }
 
-    public fun toString(): String {
+    public override fun toString(): String {
         return topology().toString();
     }
 

@@ -23,7 +23,6 @@ import kontrol.digitalocean.DigitalOceanConfig
 import kontrol.common.DefaultSensorArray
 import kontrol.api.Infrastructure
 import kontrol.sensor.HttpResponseTimeSensor
-import kontrol.postmortem.CentosPostmortem
 import kontrol.server.Server
 import kontrol.api.Controller
 import kontrol.digitalocean.StaticMachine
@@ -31,8 +30,6 @@ import java.util.ArrayList
 import kontrol.api.sensors.SensorArray
 import kontrol.api.MachineGroup
 import kontrol.staticmc.MixedCloud
-import kontrol.postmortem.JettyPostmortem
-import kontrol.postmortem.HeapDumpsPostmortem
 import kontrol.impl.sensor.DiskUsageSensor
 import kontrol.api.PostmortemStore
 import kontrol.api.Machine
@@ -45,6 +42,9 @@ import kontrol.common.group.ext.allowDefaultTransitions
 import kontrol.sensor.HttpStatusSensor
 import kontrol.common.DefaultGroupSensorArray
 import kontrol.common.group.ext.addGroupSensorRules
+import kontrol.sensor.RedisListSensor
+import kontrol.postmortem.UbuntuPostmortem
+import kontrol.sensor.RedisPingSensor
 
 
 public fun MachineGroup.configureDefaultActions(controller: Controller, postmortemStore: PostmortemStore, upgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> ;g.rebuild(m) }, downgradeAction: (Machine, MachineGroup) -> Unit = { m, g -> }) {
@@ -99,7 +99,8 @@ public fun MachineGroup.configureDefaultActions(controller: Controller, postmort
 
     controller will {
         this.failover(it);
-        postmortemStore.addAll(this.postmortem(it));
+        val list = this.postmortem(it)
+        postmortemStore.addAll(list);
         try {
             downgradeAction(it, this);
         } catch(e: Exception) {
@@ -169,40 +170,56 @@ public fun MachineGroup.applyDefaultRules(timeFactor: Int = 60) {
 
 public fun MachineGroup.addMachineOverloadRules(vararg rules: Pair<String, Double>, timeFactor: Int = 60) {
 
-    this memberIs OK ifStateIn listOf(OVERLOADED) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor / 2 seconds "machine-ok-load"
+    this memberIs OK ifStateIn listOf(OVERLOADED) andTest { machine -> rules.all { machine[it.first]?.D() ?: (it.second + 1) < it.second } } after timeFactor / 2 seconds "machine-ok-load"
 
-    this memberIs OVERLOADED ifStateIn listOf(OK, null) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after timeFactor * 4 seconds "machine-overloaded"
+    this memberIs OVERLOADED ifStateIn listOf(OK, null) andTest { machine -> rules.any { machine[it.first]?.D() ?: (it.second - 1) > it.second } } after timeFactor * 4 seconds "machine-overloaded"
 }
 
 public fun MachineGroup.addMachineBrokenRules(vararg rules: Pair<String, Double>, timeFactor: Int = 60) {
 
 
-    this memberIs OK ifStateIn listOf(UPGRADE_FAILED, BROKEN, null, DEAD, STOPPED, FAILED, BROKEN) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor / 2 seconds "machine-ok"
+    this memberIs OK ifStateIn listOf(UPGRADE_FAILED, BROKEN, null, DEAD, STOPPED, FAILED, BROKEN) andTest { machine -> rules.all { machine[it.first]?.D() ?: (it.second + 1) < it.second } } after timeFactor / 2 seconds "machine-ok"
 
-    this memberIs OK ifStateIn listOf(UPGRADE_FAILED, STALE) andTest { machine -> rules.all { machine[it.first]?.D()?:(it.second + 1) < it.second } } after timeFactor * 10 seconds "machine-ok"
+    this memberIs OK ifStateIn listOf(UPGRADE_FAILED, STALE) andTest { machine -> rules.all { machine[it.first]?.D() ?: (it.second + 1) < it.second } } after timeFactor * 10 seconds "machine-ok"
 
 
-    this memberIs UPGRADE_FAILED ifStateIn listOf(STALE) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } } after  timeFactor * 10 seconds "downgrade"
+    this memberIs UPGRADE_FAILED ifStateIn listOf(STALE) andTest { machine -> rules.any { machine[it.first]?.D() ?: (it.second - 1) > it.second } } after  timeFactor * 10 seconds "downgrade"
 
-    this memberIs BROKEN ifStateIn listOf(OK, OVERLOADED, BROKEN, STOPPED, null) andTest { machine -> rules.any { machine[it.first]?.D()?:(it.second - 1) > it.second } && this.downStreamGroups.all { it.state() != GROUP_BROKEN } } after timeFactor * 3 seconds "machine-broken"
+    this memberIs BROKEN ifStateIn listOf(OK, OVERLOADED, BROKEN, STOPPED, null) andTest { machine -> rules.any { machine[it.first]?.D() ?: (it.second - 1) > it.second } && this.downStreamGroups.all { it.state() != GROUP_BROKEN } } after timeFactor * 3 seconds "machine-broken"
 }
 
+public fun MachineGroup.addMachineBrokenRulesBoolean(vararg rules: String, timeFactor: Int = 60) {
+
+    this memberIs OK ifStateIn listOf(UPGRADE_FAILED, BROKEN, null, DEAD, STOPPED, FAILED, BROKEN) andTest { machine -> rules.all { machine[it]?.asString() == "OK" } } after timeFactor / 2 seconds "machine-ok"
+
+    this memberIs OK ifStateIn listOf(UPGRADE_FAILED, STALE) andTest { machine -> rules.all { machine[it]?.asString() == "OK" } } after timeFactor * 10 seconds "machine-ok"
+
+
+    this memberIs UPGRADE_FAILED ifStateIn listOf(STALE) andTest { machine -> rules.any { machine[it]?.asString() != "OK" } } after  timeFactor * 10 seconds "downgrade"
+
+    this memberIs BROKEN ifStateIn listOf(OK, OVERLOADED, BROKEN, STOPPED, null) andTest { machine -> rules.any { machine[it]?.asString() != "OK" } && this.downStreamGroups.all { it.state() != GROUP_BROKEN } } after timeFactor * 3 seconds "machine-broken"
+
+}
 
 public fun snapitoSensorActions(infra: Infrastructure): Infrastructure {
     infra.topology().each { group ->
         group.addMachineBrokenRules("http-status" to 399.0)
-        when(group.name()) {
-            "worker" -> {
+        group.addMachineBrokenRules("http-status-1888" to 299.0)
+        when (group.name()) {
+            "api" -> {
                 //change this when deployed
                 group.addMachineOverloadRules("load" to 3.0, "http-response-time" to 500.0)
-                group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "load" to 1.0..3.0, "redis-snapito_snap_queue:linux" to  50.0..500.0)
+                group.addGroupSensorRules("http-response-time" to -1.0..1500.0, "load" to 1.0..3.0, "redis-in_cdn" to  50.0..500.0)
+            }
+            "redis" -> {
+                group.addMachineBrokenRulesBoolean("redis-ping")
             }
         }
     }
     return infra;
 }
 
-fun staticMachines(groupName: String, controller: Controller sensors: SensorArray, cost: Double, vararg mcs: Pair<String, String>): List<StaticMachine> {
+fun staticMachines(groupName: String, controller: Controller, sensors: SensorArray, cost: Double, vararg mcs: Pair<String, String>): List<StaticMachine> {
     val list: ArrayList<StaticMachine> = arrayListOf()
     for (mc in mcs) {
         list.add(StaticMachine(sensors, controller, groupName, cost / 24 / 30.5, mc.second, mc.second, mc.second, mc.first))
@@ -212,25 +229,41 @@ fun staticMachines(groupName: String, controller: Controller sensors: SensorArra
 }
 
 
-fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = true): Map<String, MachineGroup> {
-    val workerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/"), HttpResponseTimeSensor("/"), DiskUsageSensor()));
-    val workerConfig = DigitalOceanConfig(if (test) "test-snapito-" else "prod-snapito-", "template-snapito-", 4, 62)
+fun buildGroups(client: DigitalOceanClientFactory, controller: Controller, test: Boolean = false): Map<String, MachineGroup> {
+    val apiSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/", 1888), HttpStatusSensor("/v2/webshot/spu-ea68c8-ogi2-3cwn3bmfojjlb56e?size=lc&url=google.com&cache=no"), HttpResponseTimeSensor("/v2/webshot/spu-ea68c8-ogi2-3cwn3bmfojjlb56e?size=lc&url=google.com&cache=yes"), DiskUsageSensor()));
+    val workerSensorArray = DefaultSensorArray(listOf(SSHLoadSensor(), HttpStatusSensor("/", 1888), HttpStatusSensor("/"), HttpResponseTimeSensor("/"), DiskUsageSensor()));
+    val redisSensorArray = DefaultSensorArray(listOf(RedisPingSensor("Fwb2zLDfrWZpHm9f"), SSHLoadSensor(), HttpStatusSensor("/", 1888), DiskUsageSensor()));
+    //    val blueConfig = DigitalOceanConfig(if (test) "nyc2-dev-snapito-" else "nyc2-prod-blue-snapito-", "template-snapito-", 4, 62)
+    //    val greenConfig = DigitalOceanConfig(if (test) "nyc2-dev-snapito-" else "nyc2-prod-green-snapito-", "template-snapito-", 4, 62)
+    val plainConfig = DigitalOceanConfig(if (test) "nyc2-dev-" else "nyc2-prod-", "template-", 4, 62)
     val keys = "93676"
-    val workerGroup = DigitalOceanMachineGroup(client, controller, "worker", workerSensorArray, workerConfig, keys, 0, 24, 32, arrayListOf<MachineGroup>(), listOf(CentosPostmortem(), JettyPostmortem("/home/cazcade/jetty"), HeapDumpsPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("snapito_snap_queue:linux", "107.170.24.38", 6379, autoTrimAt = 50000))))
-    return hashMapOf("worker" to workerGroup);
+
+    val apiGroup = DigitalOceanMachineGroup(client, controller, "blue-snapito-api", apiSensorArray, plainConfig, keys, 1, 4, 1, arrayListOf<MachineGroup>(), listOf(UbuntuPostmortem()), groupSensors = DefaultGroupSensorArray(listOf(RedisListSensor("in_cdn", "nyc2-prod-snapito-redis.snapito.io", 6379, autoTrimAt = 50000))))
+
+    val apiLbGroup = DigitalOceanMachineGroup(client, controller, "blue-snapito-api-lb", workerSensorArray, plainConfig, keys, 1, 1, 1, arrayListOf<MachineGroup>(), listOf(UbuntuPostmortem()), groupSensors = DefaultGroupSensorArray())
+
+    val appGroup = DigitalOceanMachineGroup(client, controller, "blue-snapito-app", workerSensorArray, plainConfig, keys, 1, 2, 4, arrayListOf<MachineGroup>(), listOf(UbuntuPostmortem()), groupSensors = DefaultGroupSensorArray())
+
+    val metricGroup = DigitalOceanMachineGroup(client, controller, "snapito-metrics", workerSensorArray, plainConfig, keys, 1, 1, 1, arrayListOf<MachineGroup>(), listOf(UbuntuPostmortem()), groupSensors = DefaultGroupSensorArray())
+
+    val logstashGroup = DigitalOceanMachineGroup(client, controller, "snapito-logstash", workerSensorArray, plainConfig, keys, 1, 1, 1, arrayListOf<MachineGroup>(), listOf(UbuntuPostmortem()), groupSensors = DefaultGroupSensorArray())
+
+    val redisGroup = DigitalOceanMachineGroup(client, controller, "snapito-redis", redisSensorArray, plainConfig, keys, 1, 1, 1, arrayListOf<MachineGroup>(), listOf(UbuntuPostmortem()), groupSensors = DefaultGroupSensorArray())
+
+    return hashMapOf("api" to apiGroup, "metrics" to metricGroup, "api-lb" to apiLbGroup, "app" to appGroup, "logstash" to logstashGroup, "redis" to redisGroup);
 }
 
 
 fun main(args: Array<String>): Unit {
 
     val server = Server { controller, bus, postmortems ->
-        val client = DigitalOceanClientFactory(System.getProperty("do.cid")?:"", System.getProperty("do.apikey")?:"")
+        val client = DigitalOceanClientFactory(System.getProperty("do.cid") ?: "", System.getProperty("do.apikey") ?: "")
         val cloud = MixedCloud(buildGroups(client, controller, false))
         cloud.topology().each { group ->
             group.allowDefaultTransitions();
             group.applyDefaultRules(60);
         }
-        cloud["worker"].configureDefaultActions(controller, postmortems)
+        //        cloud["api"].configureDefaultActions(controller, postmortems)
         snapitoSensorActions(cloud);
     }
 

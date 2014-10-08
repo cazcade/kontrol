@@ -1,3 +1,4 @@
+package kontrol.hibernate
 /*
  * Copyright 2014 Cazcade Limited (http://cazcade.com)
  *
@@ -18,7 +19,6 @@
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
-import kontrol.hibernate.HibernateEventLogStore
 import kontrol.api.EventLog
 import kontrol.api.LogContextualState
 import kontrol.api.EventLogEntry

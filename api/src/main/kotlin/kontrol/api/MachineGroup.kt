@@ -101,13 +101,17 @@ public trait MachineGroup : Monitorable<MachineGroupState> {
         machine.transition(null);
 
     }
-    fun postmortem(machine: Machine): List<PostmortemResult> = postmortems.map {
-        try {
+
+    fun postmortem(machine: Machine): List<PostmortemResult> {
+        val list = postmortems.map {
+            //            try {
             it.perform(machine)
-        } catch(e: Exception) {
-            e.printStackTrace(); null
+            //            } catch(e: Exception) {
+            //                e.printStackTrace(); null
+            //            }
         }
-    }.filterNotNull()
+        return list.filterNotNull()
+    }
 
     fun startMonitoring() {
         println("Started monitoring ${name()}")

@@ -1,7 +1,9 @@
+package kontrol.sensor
 /**
  * @todo document.
  * @author <a href="http://uk.linkedin.com/in/neilellis">Neil Ellis</a>
  */
+
 import kontrol.api.sensor.SensorValue
 import redis.clients.jedis.Jedis
 import kontrol.api.GroupSensor

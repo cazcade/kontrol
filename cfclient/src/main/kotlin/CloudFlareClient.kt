@@ -76,21 +76,21 @@ public class CloudFlareClient(public val email: String, public val apiKey: Strin
 
 
     public fun zones(): List<Zone> {
-        return execute(Method.GET, "zones", mapOf("a" to "zone_load_multi"), javaClass<ZoneRecordResponse>()).objs?:listOf()
+        return (execute(Method.GET, "zones", mapOf("a" to "zone_load_multi")) as ZoneRecordResponse).objs ?: listOf()
     }
 
     public fun domainRecords(zone: String): List<DomainRecord> {
-        return execute(Method.GET, "recs", mapOf("a" to "rec_load_all", "z" to zone), javaClass<DomainRecordsResponse>()).objs?:listOf()
+        return (execute(Method.GET, "recs", mapOf("a" to "rec_load_all", "z" to zone)) as DomainRecordsResponse).objs ?: listOf()
     }
 
     public fun update(zone: String, record: DomainRecord): DomainRecord {
-        return execute(Method.GET, "rec", (record.toParams()).toMap<String, Any?>(hashMapOf("a" to "rec_edit", "z" to zone)), javaClass<DomainRecordResponse>()).obj!!
+        return (execute(Method.GET, "rec", (record.toParams()).toMap(hashMapOf<String, Any?>("a" to "rec_edit", "z" to zone))) as DomainRecordResponse).obj!!
     }
     public fun create(zone: String, record: DomainRecord): DomainRecord {
-        return execute(Method.GET, "rec", (record.toParams()).toMap<String, Any?>(hashMapOf("a" to "rec_new", "z" to zone)), javaClass<DomainRecordResponse>()).obj!!
+        return (execute(Method.GET, "rec", (record.toParams()).toMap(hashMapOf<String, Any?>("a" to "rec_new", "z" to zone))) as DomainRecordResponse).obj!!
     }
 
-    private fun execute<T>(method: Method, subObject: String, params: Map<String, Any?>, c: Class<T>): T {
+    private fun execute(method: Method, subObject: String, params: Map<String, Any?>): Any? {
         var uriBuilder = URIBuilder(base);
         uriBuilder.addParameter("tkn", apiKey)
         uriBuilder.addParameter("email", email)
@@ -117,7 +117,7 @@ public class CloudFlareClient(public val email: String, public val apiKey: Strin
             //            println(obj)
             if (obj.get("result")?.getAsString()?.equalsIgnoreCase("success")?:false) {
                 LOG.debug("JSON Respose Data: " + obj.toString())
-                return obj.getAsJsonObject("response")?.getAsJsonObject(subObject)?.asClass(c) as T
+                return obj.getAsJsonObject("response")?.getAsJsonObject(subObject)
             } else {
                 println(obj)
                 throw RequestUnsuccessfulException("Cloudflare API request unsuccessful, possible reason could be incorrect values [$uri].")

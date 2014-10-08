@@ -31,7 +31,7 @@ import java.net.URI
 public class HttpStatusSensor(val path: String, val port: Int = 80) : Sensor {
 
     override fun name(): String {
-        return "http-status"
+        return if (this.port == 80) "http-status" else ("http-status-" + port);
     }
 
     override fun value(machine: Machine): SensorValue {
